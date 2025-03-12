@@ -23,8 +23,8 @@ export default function AuthPage() {
         <div className="w-full max-w-sm">
           <Tabs defaultValue="login">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="register">Register</TabsTrigger>
+              <TabsTrigger value="login">Anmelden</TabsTrigger>
+              <TabsTrigger value="register">Kostenloses Konto</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
               <LoginForm />
@@ -37,10 +37,10 @@ export default function AuthPage() {
       </div>
       <div className="hidden md:flex items-center justify-center bg-muted/30 p-8">
         <div className="max-w-md text-center">
-          <h1 className="text-4xl font-bold mb-4">Welcome to LeadScraper</h1>
+          <h1 className="text-4xl font-bold mb-4">Willkommen bei LeadScraper</h1>
           <p className="text-muted-foreground">
-            Generate high-quality leads from Google Maps with our powerful scraping tool. 
-            Perfect for sales and marketing professionals.
+            Generieren Sie hochwertige Leads mit unserem leistungsstarken Scraping-Tool.
+            Perfekt für Vertriebs- und Marketingfachleute.
           </p>
         </div>
       </div>
