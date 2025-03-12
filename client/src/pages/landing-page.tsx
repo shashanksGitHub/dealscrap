@@ -39,7 +39,7 @@ export default function LandingPage() {
             </p>
             <Link href="/auth">
               <Button size="lg" className="text-lg px-8">
-                Jetzt starten - Kostenloses Konto
+                Kostenloses Konto
               </Button>
             </Link>
           </div>
