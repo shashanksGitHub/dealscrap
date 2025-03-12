@@ -20,7 +20,7 @@ export default function LandingPage() {
               </Link>
             ) : (
               <Link href="/auth">
-                <Button>Anmelden</Button>
+                <Button>Kostenloses Konto</Button>
               </Link>
             )}
           </div>
