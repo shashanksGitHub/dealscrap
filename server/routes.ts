@@ -23,43 +23,15 @@ interface PaymentMetadata {
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
 
-  // Credit management
-  app.post("/api/credits/purchase", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-
-    try {
-      if (!["100", "250"].includes(req.body.packageId)) {
-        return res.status(400).json({ message: "Invalid package ID" });
-      }
-
-      const session = await createPayment(req.user.id, req.body.packageId);
-
-      if (!session.url) {
-        throw new Error("No checkout URL received from Stripe");
-      }
-
-      res.json({ checkoutUrl: session.url });
-    } catch (error) {
-      console.error("Payment creation error:", error);
-      res.status(500).json({ message: "Failed to create payment" });
-    }
-  });
-
-  app.post("/api/credits/add", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-    const amount = parseInt(req.body.amount);
-    if (isNaN(amount) || amount <= 0) {
-      return res.status(400).json({ message: "Invalid credit amount" });
-    }
-
-    const user = await storage.addCredits(req.user.id, amount);
-    res.json(user);
-  });
-
+  // Configure express.raw() middleware only for the webhook route
   app.post("/api/payments/webhook", express.raw({type: 'application/json'}), async (req, res) => {
     const sig = req.headers['stripe-signature'];
 
     try {
+      if (!sig) {
+        throw new Error('No Stripe signature found');
+      }
+
       const event = stripe.webhooks.constructEvent(
         req.body,
         sig as string | Buffer,
@@ -76,6 +48,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Webhook error:", error);
       res.status(400).send(`Webhook Error: ${(error as Error).message}`);
     }
+  });
+
+  // Credit management
+  app.post("/api/credits/purchase", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      if (!["100", "250"].includes(req.body.packageId)) {
+        return res.status(400).json({ message: "Invalid package ID" });
+      }
+
+      const session = await createPayment(req.user.id, req.body.packageId as "100" | "250");
+
+      if (!session.url) {
+        throw new Error("No checkout URL received from Stripe");
+      }
+
+      res.json({ checkoutUrl: session.url });
+    } catch (error) {
+      console.error("Payment creation error:", error);
+      res.status(500).json({ message: "Failed to create payment", error: (error as Error).message });
+    }
+  });
+
+  app.post("/api/credits/add", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    const amount = parseInt(req.body.amount);
+    if (isNaN(amount) || amount <= 0) {
+      return res.status(400).json({ message: "Invalid credit amount" });
+    }
+
+    const user = await storage.addCredits(req.user.id, amount);
+    res.json(user);
   });
 
   // Lead management
@@ -130,7 +135,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(lead);
     } catch (error) {
-      res.status(500).json({ message: "Failed to scrape data" });
+      res.status(500).json({ message: "Failed to scrape data", error: (error as Error).message });
     }
   });
 
