@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { GlobeIcon, SearchIcon, CreditCardIcon, ArrowRightIcon } from "lucide-react";
+import { CookieBanner } from "@/components/cookie-banner";
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -151,21 +152,64 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* FAQ Section */}
+      <section className="py-20 px-4 bg-muted/10 backdrop-blur-sm">
+        <div className="container mx-auto">
+          <div className="max-w-3xl mx-auto text-center mb-16">
+            <h2 className="text-3xl font-bold mb-6 bg-gradient-to-r from-primary to-violet-500 bg-clip-text text-transparent">
+              Häufig gestellte Fragen
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Hier finden Sie Antworten auf die häufigsten Fragen zu unserem Service
+            </p>
+          </div>
+          
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="p-6 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20">
+              <h3 className="text-lg font-semibold mb-2">Wie funktioniert LeadScraper?</h3>
+              <p className="text-muted-foreground">LeadScraper durchsucht automatisch öffentlich zugängliche Unternehmensverzeichnisse und extrahiert relevante Kontaktdaten nach Ihren Suchkriterien.</p>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20">
+              <h3 className="text-lg font-semibold mb-2">Welche Informationen kann ich sammeln?</h3>
+              <p className="text-muted-foreground">Sie können Unternehmensnamen, Kontaktdaten, Adressen, Brancheninformationen und weitere geschäftsrelevante Details sammeln.</p>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20">
+              <h3 className="text-lg font-semibold mb-2">Wie viel kostet der Service?</h3>
+              <p className="text-muted-foreground">Wir verwenden ein Kreditsystem, bei dem Sie nur für die tatsächlich gesammelten Leads bezahlen. Ein kostenloses Konto enthält eine begrenzte Anzahl an Credits zum Testen.</p>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20">
+              <h3 className="text-lg font-semibold mb-2">Sind die Daten DSGVO-konform?</h3>
+              <p className="text-muted-foreground">Ja, wir sammeln nur öffentlich zugängliche Geschäftsdaten und halten uns strikt an die DSGVO-Bestimmungen. Mehr dazu in unserer Datenschutzerklärung.</p>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20">
+              <h3 className="text-lg font-semibold mb-2">Kann ich die Daten exportieren?</h3>
+              <p className="text-muted-foreground">Ja, alle gesammelten Leads können in verschiedene Formate wie CSV, Excel oder direkt in CRM-Systeme exportiert werden.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    {/* Footer */}
       <footer className="border-t border-muted/20 py-8 px-4 mt-10">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-muted-foreground text-sm mb-4 md:mb-0">
               © {new Date().getFullYear()} LeadScraper. Alle Rechte vorbehalten.
             </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-muted-foreground hover:text-primary text-sm">Datenschutz</a>
-              <a href="#" className="text-muted-foreground hover:text-primary text-sm">AGB</a>
-              <a href="#" className="text-muted-foreground hover:text-primary text-sm">Kontakt</a>
+            <div className="flex flex-wrap gap-6 justify-center">
+              <Link href="/datenschutz" className="text-muted-foreground hover:text-primary text-sm">Datenschutz</Link>
+              <Link href="/agb" className="text-muted-foreground hover:text-primary text-sm">AGB</Link>
+              <Link href="/impressum" className="text-muted-foreground hover:text-primary text-sm">Impressum</Link>
+              <Link href="/kontakt" className="text-muted-foreground hover:text-primary text-sm">Kontakt</Link>
             </div>
           </div>
         </div>
       </footer>
+      <CookieBanner />
     </div>
   );
 }
