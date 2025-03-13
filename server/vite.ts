@@ -27,10 +27,10 @@ export async function setupVite(app: Express, server: Server) {
     middlewareMode: true,
     hmr: { 
       server,
-      clientPort: Number(process.env.PORT || 3000),
+      clientPort: Number(process.env.PORT || 5000),
       host: '0.0.0.0',
       path: '/hmr',
-      timeout: 60000
+      timeout: 120000
     },
     host: '0.0.0.0',
     allowedHosts: true,
