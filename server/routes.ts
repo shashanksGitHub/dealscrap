@@ -19,9 +19,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
     try {
+      if (!["100", "250"].includes(req.body.packageId)) {
+        return res.status(400).json({ message: "Invalid package ID" });
+      }
+
       const payment = await createPayment(req.user.id, req.body.packageId);
-      res.json({ checkoutUrl: payment._links?.checkout?.href });
+
+      if (!payment._links?.checkout?.href) {
+        throw new Error("No checkout URL received from Mollie");
+      }
+
+      res.json({ checkoutUrl: payment._links.checkout.href });
     } catch (error) {
+      console.error("Payment creation error:", error);
       res.status(500).json({ message: "Failed to create payment" });
     }
   });

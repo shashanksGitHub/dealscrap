@@ -12,14 +12,19 @@ export async function createPayment(userId: number, packageId: "100" | "250") {
   const creditPackage = CREDIT_PACKAGES[packageId];
   if (!creditPackage) throw new Error("Invalid package");
 
+  // Get the base URL from environment or default to localhost for development
+  const baseUrl = process.env.REPL_SLUG 
+    ? `https://${process.env.REPL_SLUG}.replit.dev`
+    : 'http://localhost:5000';
+
   const payment = await mollieClient.payments.create({
     amount: {
       currency: "EUR",
       value: creditPackage.amount,
     },
     description: `${creditPackage.credits} Credits for LeadScraper`,
-    redirectUrl: `${process.env.REPL_SLUG}.repl.co/dashboard?payment=success`,
-    webhookUrl: `${process.env.REPL_SLUG}.repl.co/api/payments/webhook`,
+    redirectUrl: `${baseUrl}/dashboard?payment=success`,
+    webhookUrl: `${baseUrl}/api/payments/webhook`,
     metadata: {
       userId,
       credits: creditPackage.credits,
