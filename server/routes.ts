@@ -55,11 +55,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
     try {
-      if (!["100", "250"].includes(req.body.packageId)) {
+      if (!["100", "250", "500", "1000"].includes(req.body.packageId)) {
         return res.status(400).json({ message: "Invalid package ID" });
       }
 
-      const session = await createPayment(req.user.id, req.body.packageId as "100" | "250");
+      const session = await createPayment(
+        req.user.id, 
+        req.body.packageId as "100" | "250" | "500" | "1000"
+      );
 
       if (!session.url) {
         throw new Error("No checkout URL received from Stripe");

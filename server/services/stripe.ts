@@ -11,9 +11,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 const CREDIT_PACKAGES = {
   "100": { credits: 100, amount: 10000 }, // 100 EUR in cents
   "250": { credits: 250, amount: 20000 }, // 200 EUR in cents
+  "500": { credits: 500, amount: 35000 }, // 350 EUR in cents
+  "1000": { credits: 1000, amount: 60000 }, // 600 EUR in cents
 };
 
-export async function createPayment(userId: number, packageId: "100" | "250") {
+export async function createPayment(userId: number, packageId: "100" | "250" | "500" | "1000") {
   const creditPackage = CREDIT_PACKAGES[packageId];
   if (!creditPackage) throw new Error("Invalid package");
 

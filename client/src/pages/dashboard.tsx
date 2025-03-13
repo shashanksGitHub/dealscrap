@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
@@ -68,7 +69,7 @@ export default function Dashboard() {
   };
 
   const purchaseMutation = useMutation({
-    mutationFn: async (packageId: "100" | "250") => {
+    mutationFn: async (packageId: "100" | "250" | "500" | "1000") => {
       const res = await apiRequest("POST", "/api/credits/purchase", { packageId });
       return res.json();
     },
@@ -84,6 +85,13 @@ export default function Dashboard() {
       });
     },
   });
+
+  const creditPackages = [
+    { id: "100", credits: 100, price: 100 },
+    { id: "250", credits: 250, price: 200 },
+    { id: "500", credits: 500, price: 350, recommended: true },
+    { id: "1000", credits: 1000, price: 600 },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -150,24 +158,26 @@ export default function Dashboard() {
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <Button
-                    onClick={() => purchaseMutation.mutate("100")}
-                    className="h-24"
-                    disabled={purchaseMutation.isPending}
-                  >
-                    100 Credits
-                    <br />
-                    €100
-                  </Button>
-                  <Button
-                    onClick={() => purchaseMutation.mutate("250")}
-                    className="h-24"
-                    disabled={purchaseMutation.isPending}
-                  >
-                    250 Credits
-                    <br />
-                    €200
-                  </Button>
+                  {creditPackages.map((pkg) => (
+                    <Button
+                      key={pkg.id}
+                      onClick={() => purchaseMutation.mutate(pkg.id as "100" | "250" | "500" | "1000")}
+                      className="h-32 relative"
+                      disabled={purchaseMutation.isPending}
+                    >
+                      {pkg.recommended && (
+                        <Badge 
+                          variant="secondary" 
+                          className="absolute -top-2 left-1/2 -translate-x-1/2"
+                        >
+                          Empfohlen
+                        </Badge>
+                      )}
+                      {pkg.credits} Credits
+                      <br />
+                      €{pkg.price}
+                    </Button>
+                  ))}
                 </div>
                 {purchaseMutation.isPending && (
                   <p className="text-sm text-muted-foreground text-center">
