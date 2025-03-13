@@ -1,10 +1,18 @@
-import type { Express } from "express";
+import { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertLeadSchema } from "@shared/schema";
-import { createPayment, verifyPayment } from "./services/mollie";
-import type { Payment } from "@mollie/api-client";
+import { createPayment, handleWebhook } from "./services/stripe";
+import Stripe from "stripe";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 
 interface PaymentMetadata {
   userId: number;
@@ -23,13 +31,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid package ID" });
       }
 
-      const payment = await createPayment(req.user.id, req.body.packageId);
+      const session = await createPayment(req.user.id, req.body.packageId);
 
-      if (!payment._links?.checkout?.href) {
-        throw new Error("No checkout URL received from Mollie");
+      if (!session.url) {
+        throw new Error("No checkout URL received from Stripe");
       }
 
-      res.json({ checkoutUrl: payment._links.checkout.href });
+      res.json({ checkoutUrl: session.url });
     } catch (error) {
       console.error("Payment creation error:", error);
       res.status(500).json({ message: "Failed to create payment" });
@@ -48,18 +56,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/payments/webhook", async (req, res) => {
-    try {
-      const payment = await verifyPayment(req.body.id);
-      const metadata = payment.metadata as PaymentMetadata;
+    const sig = req.headers['stripe-signature'];
 
-      if (payment.status === "paid") {
-        await storage.addCredits(metadata.userId, metadata.credits);
+    try {
+      const event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+
+      const result = await handleWebhook(event);
+      if (result) {
+        await storage.addCredits(result.userId, result.credits);
       }
 
-      res.status(200).send("OK");
+      res.json({ received: true });
     } catch (error) {
       console.error("Webhook error:", error);
-      res.status(500).send("Error processing webhook");
+      res.status(400).send(`Webhook Error: ${error.message}`);
     }
   });
 

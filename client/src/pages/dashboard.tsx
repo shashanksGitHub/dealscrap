@@ -73,7 +73,7 @@ export default function Dashboard() {
       return res.json();
     },
     onSuccess: (data) => {
-      // Redirect to Mollie checkout
+      // Redirect to Stripe checkout
       window.location.href = data.checkoutUrl;
     },
     onError: (error: Error) => {
