@@ -29,27 +29,25 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Basic session setup with improved cookie settings
   app.use(session({
     secret: process.env.SESSION_SECRET || 'development_secret',
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
+    name: 'sid',
     cookie: {
-      secure: false, // Allow non-HTTPS in development
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: "lax",
-      path: "/",
-      httpOnly: true
+      secure: false,
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      sameSite: 'lax',
+      path: '/'
     }
   }));
 
-  // Initialize passport
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Configure passport local strategy with proper typing
-  passport.use(new LocalStrategy(async (username: string, password: string, done: (error: any, user?: any, options?: { message: string }) => void) => {
+  passport.use(new LocalStrategy(async (username: string, password: string, done) => {
     try {
       const user = await storage.getUserByUsername(username);
       if (!user || !(await comparePasswords(password, user.password))) {
@@ -61,12 +59,10 @@ export function setupAuth(app: Express) {
     }
   }));
 
-  // Serialize user for the session
   passport.serializeUser((user: Express.User, done) => {
     done(null, user.id);
   });
 
-  // Deserialize user from the session
   passport.deserializeUser(async (id: number, done) => {
     try {
       const user = await storage.getUser(id);
@@ -79,10 +75,10 @@ export function setupAuth(app: Express) {
     }
   });
 
-  // Auth routes with improved error handling and logging
   app.post("/api/register", async (req, res, next) => {
     try {
       const { username, password } = req.body;
+
       if (!username || !password) {
         return res.status(400).json({ message: "Username and password are required" });
       }
