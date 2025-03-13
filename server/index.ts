@@ -39,23 +39,22 @@ app.use((req, res, next) => {
       res.status(status).json({ message });
     });
 
-    // 4. Setup Vite or static serving
+    // 4. Setup Vite middleware in development
     if (app.get("env") === "development") {
-      const originalPort = process.env.PORT;
-      delete process.env.PORT;
       try {
         await setupVite(app, server);
         log("Vite middleware setup complete");
-      } finally {
-        process.env.PORT = originalPort;
+      } catch (error) {
+        log("Vite setup failed: " + error);
+        throw error;
       }
     } else {
       serveStatic(app);
     }
 
-    // 5. Start server
-    const port = Number(process.env.PORT || 5000);
-    server.listen({ port, host: "0.0.0.0" }, () => {
+    // 5. Start server on port 5000
+    const port = 5000;
+    server.listen(port, "0.0.0.0", () => {
       log(`Server running at http://0.0.0.0:${port}`);
     });
 
