@@ -5,13 +5,14 @@ import { storage } from "./storage";
 import { insertLeadSchema } from "@shared/schema";
 import { createPayment, handleWebhook } from "./services/stripe";
 import Stripe from "stripe";
+import * as express from 'express';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-02-24.acacia",
 });
 
 interface PaymentMetadata {
@@ -55,14 +56,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(user);
   });
 
-  app.post("/api/payments/webhook", async (req, res) => {
+  app.post("/api/payments/webhook", express.raw({type: 'application/json'}), async (req, res) => {
     const sig = req.headers['stripe-signature'];
 
     try {
       const event = stripe.webhooks.constructEvent(
         req.body,
-        sig,
-        process.env.STRIPE_WEBHOOK_SECRET
+        sig as string | Buffer,
+        process.env.STRIPE_WEBHOOK_SECRET || ''
       );
 
       const result = await handleWebhook(event);
@@ -73,7 +74,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ received: true });
     } catch (error) {
       console.error("Webhook error:", error);
-      res.status(400).send(`Webhook Error: ${error.message}`);
+      res.status(400).send(`Webhook Error: ${(error as Error).message}`);
     }
   });
 
