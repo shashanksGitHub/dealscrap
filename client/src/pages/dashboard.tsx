@@ -70,19 +70,13 @@ export default function Dashboard() {
   };
 
   const purchaseMutation = useMutation({
-    mutationFn: async (packageId: "100" | "250" | "500" | "1000") => {
-      const res = await apiRequest("POST", "/api/credits/purchase", { packageId });
-      return res.json();
-    },
-    onSuccess: (data) => {
-      window.location.href = data.checkoutUrl;
-    },
-    onError: (error: Error) => {
+    mutationFn: async (packageId: string) => {
+      // Deaktiviert bis die Zahlungsintegration wieder implementiert wird
       toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
+        title: "Info",
+        description: "Die Zahlungsfunktion ist derzeit deaktiviert",
       });
+      return { checkoutUrl: "/dashboard" };
     },
   });
 
