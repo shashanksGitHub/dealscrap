@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 import { SearchIcon, LogOutIcon, DownloadIcon } from "lucide-react";
+import type { Lead } from "@shared/schema";
 
 export default function Dashboard() {
   const { user, logoutMutation } = useAuth();
@@ -15,7 +16,7 @@ export default function Dashboard() {
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
 
-  const { data: leads = [] } = useQuery({
+  const { data: leads = [] } = useQuery<Lead[]>({
     queryKey: ["/api/leads"],
   });
 
@@ -54,17 +55,35 @@ export default function Dashboard() {
   };
 
   const handleExport = () => {
-    const csv = leads.map((lead) => 
-      Object.values(lead).join(',')
-    ).join('\n');
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const csv = leads.map((lead: Lead) => 
+      Object.values(lead).join(",")
+    ).join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'leads.csv';
+    a.download = "leads.csv";
     a.click();
   };
+
+  const purchaseMutation = useMutation({
+    mutationFn: async (packageId: "100" | "250") => {
+      const res = await apiRequest("POST", "/api/credits/purchase", { packageId });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      // Redirect to Mollie checkout
+      window.location.href = data.checkoutUrl;
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   return (
     <div className="min-h-screen">
@@ -109,12 +128,17 @@ export default function Dashboard() {
                 </div>
                 <Button
                   onClick={handleScrape}
-                  disabled={scrapeMutation.isPending}
+                  disabled={scrapeMutation.isPending || user?.credits === 0}
                   className="w-full"
                 >
                   <SearchIcon className="w-4 h-4 mr-2" />
                   {scrapeMutation.isPending ? "Scraping..." : "Start Scraping"}
                 </Button>
+                {user?.credits === 0 && (
+                  <p className="text-sm text-destructive text-center">
+                    You need credits to scrape leads
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -126,17 +150,30 @@ export default function Dashboard() {
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <Button onClick={() => {}} className="h-24">
+                  <Button
+                    onClick={() => purchaseMutation.mutate("100")}
+                    className="h-24"
+                    disabled={purchaseMutation.isPending}
+                  >
                     100 Credits
                     <br />
                     €100
                   </Button>
-                  <Button onClick={() => {}} className="h-24">
+                  <Button
+                    onClick={() => purchaseMutation.mutate("250")}
+                    className="h-24"
+                    disabled={purchaseMutation.isPending}
+                  >
                     250 Credits
                     <br />
                     €200
                   </Button>
                 </div>
+                {purchaseMutation.isPending && (
+                  <p className="text-sm text-muted-foreground text-center">
+                    Redirecting to payment...
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -163,7 +200,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {leads.map((lead) => (
+                  {leads.map((lead: Lead) => (
                     <tr key={lead.id} className="border-b">
                       <td className="p-2">{lead.businessName}</td>
                       <td className="p-2">{lead.address}</td>

@@ -4,6 +4,12 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertLeadSchema } from "@shared/schema";
 import { createPayment, verifyPayment } from "./services/mollie";
+import type { Payment } from "@mollie/api-client";
+
+interface PaymentMetadata {
+  userId: number;
+  credits: number;
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
@@ -14,7 +20,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     try {
       const payment = await createPayment(req.user.id, req.body.packageId);
-      res.json({ checkoutUrl: payment.getCheckoutUrl() });
+      res.json({ checkoutUrl: payment._links?.checkout?.href });
     } catch (error) {
       res.status(500).json({ message: "Failed to create payment" });
     }
@@ -26,7 +32,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (isNaN(amount) || amount <= 0) {
       return res.status(400).json({ message: "Invalid credit amount" });
     }
-    
+
     const user = await storage.addCredits(req.user.id, amount);
     res.json(user);
   });
@@ -34,10 +40,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/payments/webhook", async (req, res) => {
     try {
       const payment = await verifyPayment(req.body.id);
+      const metadata = payment.metadata as PaymentMetadata;
 
-      if (payment.isPaid()) {
-        const { userId, credits } = payment.metadata;
-        await storage.addCredits(userId, credits);
+      if (payment.status === "paid") {
+        await storage.addCredits(metadata.userId, metadata.credits);
       }
 
       res.status(200).send("OK");
@@ -63,7 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     const user = await storage.getUser(req.user.id);
-    if (user.credits <= 0) {
+    if (!user || user.credits <= 0) {
       return res.status(403).json({ message: "Insufficient credits" });
     }
 

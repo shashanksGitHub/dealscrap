@@ -9,20 +9,20 @@ const CREDIT_PACKAGES = {
 };
 
 export async function createPayment(userId: number, packageId: "100" | "250") {
-  const package = CREDIT_PACKAGES[packageId];
-  if (!package) throw new Error("Invalid package");
+  const creditPackage = CREDIT_PACKAGES[packageId];
+  if (!creditPackage) throw new Error("Invalid package");
 
   const payment = await mollieClient.payments.create({
     amount: {
       currency: "EUR",
-      value: package.amount,
+      value: creditPackage.amount,
     },
-    description: `${package.credits} Credits for LeadScraper`,
+    description: `${creditPackage.credits} Credits for LeadScraper`,
     redirectUrl: `${process.env.REPL_SLUG}.repl.co/dashboard?payment=success`,
     webhookUrl: `${process.env.REPL_SLUG}.repl.co/api/payments/webhook`,
     metadata: {
       userId,
-      credits: package.credits,
+      credits: creditPackage.credits,
     },
   });
 
