@@ -3,11 +3,23 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertLeadSchema } from "@shared/schema";
+import { createPayment, verifyPayment } from "./services/mollie";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
 
   // Credit management
+  app.post("/api/credits/purchase", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const payment = await createPayment(req.user.id, req.body.packageId);
+      res.json({ checkoutUrl: payment.getCheckoutUrl() });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create payment" });
+    }
+  });
+
   app.post("/api/credits/add", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const amount = parseInt(req.body.amount);
@@ -17,6 +29,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     const user = await storage.addCredits(req.user.id, amount);
     res.json(user);
+  });
+
+  app.post("/api/payments/webhook", async (req, res) => {
+    try {
+      const payment = await verifyPayment(req.body.id);
+
+      if (payment.isPaid()) {
+        const { userId, credits } = payment.metadata;
+        await storage.addCredits(userId, credits);
+      }
+
+      res.status(200).send("OK");
+    } catch (error) {
+      console.error("Webhook error:", error);
+      res.status(500).send("Error processing webhook");
+    }
   });
 
   // Lead management
@@ -29,7 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/scrape", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const { query, location } = req.body;
-    
+
     if (!query || !location) {
       return res.status(400).json({ message: "Query and location are required" });
     }
@@ -40,8 +68,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      // Here we would integrate with Apify
-      // This is where the actual API call would happen
       const response = await fetch(`https://api.apify.com/v2/acts/drobnikj~google-maps-scraper/runs?token=${process.env.APIFY_TOKEN}`, {
         method: 'POST',
         headers: {
@@ -59,7 +85,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error('Failed to scrape data');
       }
 
-      // Deduct credits and save lead
       await storage.addCredits(req.user.id, -1);
       const lead = await storage.createLead({
         userId: req.user.id,
