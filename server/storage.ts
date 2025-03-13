@@ -11,7 +11,7 @@ export interface IStorage {
   addCredits(userId: number, amount: number): Promise<User>;
   createLead(lead: Omit<Lead, "id" | "createdAt">): Promise<Lead>;
   getLeadsByUserId(userId: number): Promise<Lead[]>;
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
 }
 
 export class MemStorage implements IStorage {
@@ -19,7 +19,7 @@ export class MemStorage implements IStorage {
   private leads: Map<number, Lead>;
   private currentUserId: number;
   private currentLeadId: number;
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
 
   constructor() {
     this.users = new Map();
@@ -56,7 +56,7 @@ export class MemStorage implements IStorage {
   async addCredits(userId: number, amount: number): Promise<User> {
     const user = await this.getUser(userId);
     if (!user) throw new Error("User not found");
-    
+
     const updatedUser = {
       ...user,
       credits: user.credits + amount

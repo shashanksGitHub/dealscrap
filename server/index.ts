@@ -45,39 +45,38 @@ app.use((req, res, next) => {
 
     res.status(status).json({ message });
     console.error("Server error:", err);
-    // Don't throw error after handling it to prevent crash
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // Try a different port if 5000 is in use
-  const port = process.env.PORT || 3000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`Server running at http://0.0.0.0:${port}`);
-  });
-  
-  // Füge Fehlerbehandlung für den Server hinzu
-  server.on('error', (err) => {
-    console.error('Server error:', err);
-    // Versuche nach einem Fehler neu zu starten
-    setTimeout(() => {
-      log('Versuche Server neu zu starten...');
-      server.listen({
-        port,
-        host: "0.0.0.0",
-        reusePort: true,
-      });
-    }, 5000);
-  });
+  const port = process.env.PORT || 5000; // Changed default port to 5000
+  const maxRetries = 3;
+  let retries = 0;
+
+  const startServer = () => {
+    server.listen({
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    }, () => {
+      log(`Server running at http://0.0.0.0:${port}`);
+    });
+
+    server.on('error', (err: any) => {
+      if (err.code === 'EADDRINUSE' && retries < maxRetries) {
+        retries++;
+        log(`Port ${port} is in use, retrying in 5 seconds... (Attempt ${retries}/${maxRetries})`);
+        setTimeout(startServer, 5000);
+      } else {
+        console.error('Server error:', err);
+        process.exit(1);
+      }
+    });
+  };
+
+  startServer();
 })();
