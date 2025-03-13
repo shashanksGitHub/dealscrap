@@ -10,6 +10,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 import { SearchIcon, LogOutIcon, DownloadIcon } from "lucide-react";
 import type { Lead } from "@shared/schema";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const { user, logoutMutation } = useAuth();
@@ -162,20 +163,26 @@ export default function Dashboard() {
                     <Button
                       key={pkg.id}
                       onClick={() => purchaseMutation.mutate(pkg.id as "100" | "250" | "500" | "1000")}
-                      className="h-32 relative"
+                      variant={pkg.recommended ? "default" : "outline"}
+                      className={cn(
+                        "h-40 relative flex flex-col items-center justify-center gap-2 p-6",
+                        pkg.recommended && "border-2 border-primary shadow-lg scale-105"
+                      )}
                       disabled={purchaseMutation.isPending}
                     >
                       {pkg.recommended && (
                         <Badge 
                           variant="secondary" 
-                          className="absolute -top-2 left-1/2 -translate-x-1/2"
+                          className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground"
                         >
                           Empfohlen
                         </Badge>
                       )}
-                      {pkg.credits} Credits
-                      <br />
-                      €{pkg.price}
+                      <span className="text-2xl font-bold">{pkg.credits} Credits</span>
+                      <span className="text-3xl font-bold text-primary">€{pkg.price}</span>
+                      {pkg.recommended && (
+                        <span className="text-sm text-muted-foreground mt-1">Bester Preis pro Credit</span>
+                      )}
                     </Button>
                   ))}
                 </div>
