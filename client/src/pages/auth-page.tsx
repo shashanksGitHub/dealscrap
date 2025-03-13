@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Redirect } from "wouter";
 
 export default function AuthPage() {
@@ -23,7 +24,7 @@ export default function AuthPage() {
           <Tabs defaultValue="login">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Anmelden</TabsTrigger>
-              <TabsTrigger value="register">Kostenloses Konto</TabsTrigger>
+              <TabsTrigger value="register">Registrieren</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
               <LoginForm />
@@ -50,9 +51,9 @@ export default function AuthPage() {
 function LoginForm() {
   const { loginMutation } = useAuth();
   const form = useForm({
-    resolver: zodResolver(insertUserSchema),
+    resolver: zodResolver(insertUserSchema.pick({ email: true, password: true })),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
@@ -69,13 +70,14 @@ function LoginForm() {
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Benutzername</Label>
+            <Label htmlFor="email">E-Mail</Label>
             <Input
-              id="username"
-              {...form.register("username")}
+              id="email"
+              type="email"
+              {...form.register("email")}
             />
-            {form.formState.errors.username && (
-              <p className="text-sm text-destructive">{form.formState.errors.username.message}</p>
+            {form.formState.errors.email && (
+              <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -108,6 +110,7 @@ function RegisterForm() {
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
       username: "",
+      email: "",
       password: "",
     },
   });
@@ -134,6 +137,17 @@ function RegisterForm() {
             )}
           </div>
           <div className="space-y-2">
+            <Label htmlFor="email">E-Mail</Label>
+            <Input
+              id="email"
+              type="email"
+              {...form.register("email")}
+            />
+            {form.formState.errors.email && (
+              <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
+            )}
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="password">Passwort</Label>
             <Input
               id="password"
@@ -143,6 +157,9 @@ function RegisterForm() {
             {form.formState.errors.password && (
               <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
             )}
+            <p className="text-sm text-muted-foreground">
+              Das Passwort muss mindestens 8 Zeichen lang sein, einen Großbuchstaben und eine Zahl enthalten.
+            </p>
           </div>
           <Button
             type="submit"

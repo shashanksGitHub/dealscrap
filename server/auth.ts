@@ -47,11 +47,14 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  passport.use(new LocalStrategy(async (username: string, password: string, done) => {
+  passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+  }, async (email, password, done) => {
     try {
-      const user = await storage.getUserByUsername(username);
+      const user = await storage.getUserByEmail(email);
       if (!user || !(await comparePasswords(password, user.password))) {
-        return done(null, false, { message: "Invalid credentials" });
+        return done(null, false, { message: "Ungültige Anmeldedaten" });
       }
       return done(null, user);
     } catch (error) {
@@ -77,20 +80,26 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { username, password } = req.body;
+      const { username, email, password } = req.body;
 
-      if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
+      if (!username || !email || !password) {
+        return res.status(400).json({ message: "Alle Felder sind erforderlich" });
       }
 
-      const existingUser = await storage.getUserByUsername(username);
-      if (existingUser) {
-        return res.status(400).json({ message: "Username already exists" });
+      const existingUserByEmail = await storage.getUserByEmail(email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ message: "Diese E-Mail-Adresse wird bereits verwendet" });
+      }
+
+      const existingUserByUsername = await storage.getUserByUsername(username);
+      if (existingUserByUsername) {
+        return res.status(400).json({ message: "Dieser Benutzername wird bereits verwendet" });
       }
 
       const hashedPassword = await hashPassword(password);
       const user = await storage.createUser({
         username,
+        email,
         password: hashedPassword
       });
 
@@ -107,7 +116,7 @@ export function setupAuth(app: Express) {
     passport.authenticate("local", (err: Error | null, user: Express.User | false, info: { message: string } | undefined) => {
       if (err) return next(err);
       if (!user) {
-        return res.status(401).json({ message: info?.message || "Invalid credentials" });
+        return res.status(401).json({ message: info?.message || "Ungültige Anmeldedaten" });
       }
       req.login(user, (err) => {
         if (err) return next(err);
@@ -125,7 +134,7 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Not authenticated" });
+      return res.status(401).json({ message: "Nicht authentifiziert" });
     }
     res.json(req.user);
   });

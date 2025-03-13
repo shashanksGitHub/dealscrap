@@ -7,6 +7,7 @@ const MemoryStore = createMemoryStore(session);
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   addCredits(userId: number, amount: number): Promise<User>;
   createLead(lead: Omit<Lead, "id" | "createdAt">): Promise<Lead>;
@@ -41,12 +42,19 @@ export class MemStorage implements IStorage {
     );
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.email === email,
+    );
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
     const user: User = { 
       ...insertUser, 
       id,
       credits: 0,
+      isActive: true,
       createdAt: new Date()
     };
     this.users.set(id, user);
