@@ -31,13 +31,12 @@ async function comparePasswords(supplied: string, stored: string) {
 export function setupAuth(app: Express) {
   // Basic session setup with improved cookie settings
   app.use(session({
-    secret: process.env.SESSION_SECRET!,
+    secret: process.env.SESSION_SECRET || 'development_secret',
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
-    proxy: true, // Trust the reverse proxy
     cookie: {
-      secure: false, // Set to true in production with HTTPS
+      secure: false, // Allow non-HTTPS in development
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
       sameSite: "lax",
       path: "/",
@@ -49,12 +48,12 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Configure passport local strategy
-  passport.use(new LocalStrategy(async (username, password, done) => {
+  // Configure passport local strategy with proper typing
+  passport.use(new LocalStrategy(async (username: string, password: string, done: (error: any, user?: any, options?: { message: string }) => void) => {
     try {
       const user = await storage.getUserByUsername(username);
       if (!user || !(await comparePasswords(password, user.password))) {
-        return done(null, false);
+        return done(null, false, { message: "Invalid credentials" });
       }
       return done(null, user);
     } catch (error) {
@@ -63,7 +62,7 @@ export function setupAuth(app: Express) {
   }));
 
   // Serialize user for the session
-  passport.serializeUser((user, done) => {
+  passport.serializeUser((user: Express.User, done) => {
     done(null, user.id);
   });
 
@@ -109,10 +108,10 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", (err: Error | null, user: Express.User | false, info: { message: string } | undefined) => {
       if (err) return next(err);
       if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: info?.message || "Invalid credentials" });
       }
       req.login(user, (err) => {
         if (err) return next(err);
@@ -129,12 +128,6 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    console.log("Auth Check:", {
-      isAuthenticated: req.isAuthenticated(),
-      sessionID: req.sessionID,
-      user: req.user
-    });
-
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Not authenticated" });
     }
