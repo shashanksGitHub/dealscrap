@@ -4,37 +4,18 @@ import { setupVite, serveStatic, log } from "./vite";
 import { setupAuth } from "./auth";
 
 const app = express();
+
+// Basic middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Add request logging middleware
+// Request logging
 app.use((req, res, next) => {
   const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
+    log(`${req.method} ${req.path} ${res.statusCode} in ${duration}ms`);
   });
-
   next();
 });
 
@@ -42,13 +23,15 @@ app.use((req, res, next) => {
   try {
     log("Initializing server...");
 
-    // Setup authentication first
+    // 1. Setup authentication with sessions
     setupAuth(app);
+    log("Auth setup complete");
 
-    // Setup routes
+    // 2. Setup API routes
     const server = await registerRoutes(app);
+    log("Routes setup complete");
 
-    // Error handling middleware
+    // 3. Setup error handling
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
@@ -56,25 +39,21 @@ app.use((req, res, next) => {
       res.status(status).json({ message });
     });
 
+    // 4. Setup Vite or static serving
     if (app.get("env") === "development") {
-      // Store current PORT
       const originalPort = process.env.PORT;
-      // Temporarily unset PORT for Vite
       delete process.env.PORT;
-
       try {
         await setupVite(app, server);
         log("Vite middleware setup complete");
       } finally {
-        // Restore original PORT
-        if (originalPort) {
-          process.env.PORT = originalPort;
-        }
+        process.env.PORT = originalPort;
       }
     } else {
       serveStatic(app);
     }
 
+    // 5. Start server
     const port = Number(process.env.PORT || 5000);
     server.listen({ port, host: "0.0.0.0" }, () => {
       log(`Server running at http://0.0.0.0:${port}`);
