@@ -1,5 +1,4 @@
 import { useAuth } from "@/hooks/use-auth";
-import { useToast } from "@/hooks/use-toast";
 import { insertUserSchema } from "@shared/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Redirect } from "wouter";
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { user } = useAuth();
 
   if (user) {
     return <Redirect to="/dashboard" />;
@@ -65,33 +64,37 @@ function LoginForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Login to your account</CardTitle>
+        <CardTitle>Anmelden</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Benutzername</Label>
             <Input
               id="username"
               {...form.register("username")}
-              error={form.formState.errors.username?.message}
             />
+            {form.formState.errors.username && (
+              <p className="text-sm text-destructive">{form.formState.errors.username.message}</p>
+            )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Passwort</Label>
             <Input
               id="password"
               type="password"
               {...form.register("password")}
-              error={form.formState.errors.password?.message}
             />
+            {form.formState.errors.password && (
+              <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
+            )}
           </div>
           <Button
             type="submit"
             className="w-full"
             disabled={loginMutation.isPending}
           >
-            {loginMutation.isPending ? "Logging in..." : "Login"}
+            {loginMutation.isPending ? "Anmeldung..." : "Anmelden"}
           </Button>
         </form>
       </CardContent>
@@ -116,33 +119,37 @@ function RegisterForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
+        <CardTitle>Konto erstellen</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">Benutzername</Label>
             <Input
               id="username"
               {...form.register("username")}
-              error={form.formState.errors.username?.message}
             />
+            {form.formState.errors.username && (
+              <p className="text-sm text-destructive">{form.formState.errors.username.message}</p>
+            )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Passwort</Label>
             <Input
               id="password"
               type="password"
               {...form.register("password")}
-              error={form.formState.errors.password?.message}
             />
+            {form.formState.errors.password && (
+              <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
+            )}
           </div>
           <Button
             type="submit"
             className="w-full"
             disabled={registerMutation.isPending}
           >
-            {registerMutation.isPending ? "Creating account..." : "Create Account"}
+            {registerMutation.isPending ? "Konto wird erstellt..." : "Konto erstellen"}
           </Button>
         </form>
       </CardContent>

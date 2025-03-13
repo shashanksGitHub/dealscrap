@@ -1,15 +1,10 @@
 import { Express } from "express";
 import { createServer, type Server } from "http";
-import { setupAuth } from "./auth";
-import { storage } from "./storage";
 import { insertLeadSchema } from "@shared/schema";
-import * as express from 'express';
+import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  setupAuth(app);
-
-  // Credit management (simplified without payment processing)
-
+  // Credit management
   app.post("/api/credits/add", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const amount = parseInt(req.body.amount);
@@ -42,23 +37,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     try {
-      const response = await fetch(`https://api.apify.com/v2/acts/drobnikj~google-maps-scraper/runs?token=${process.env.APIFY_TOKEN}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          startUrls: [{
-            url: `https://www.google.com/maps/search/${encodeURIComponent(query)}+${encodeURIComponent(location)}`
-          }],
-          maxCrawledPlaces: 1
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to scrape data');
-      }
-
+      // Mock scraping for now
       await storage.addCredits(req.user.id, -1);
       const lead = await storage.createLead({
         userId: req.user.id,

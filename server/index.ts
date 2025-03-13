@@ -1,11 +1,13 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { setupAuth } from "./auth";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Add request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -37,46 +39,49 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    log("Initializing server...");
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    // Setup authentication first
+    setupAuth(app);
 
-    res.status(status).json({ message });
-    console.error("Server error:", err);
-  });
+    // Setup routes
+    const server = await registerRoutes(app);
 
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
+    // Error handling middleware
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      log(`Error: ${message}`);
+      res.status(status).json({ message });
+    });
 
-  const port = process.env.PORT || 5000; // Changed default port to 5000
-  const maxRetries = 3;
-  let retries = 0;
+    if (app.get("env") === "development") {
+      // Store current PORT
+      const originalPort = process.env.PORT;
+      // Temporarily unset PORT for Vite
+      delete process.env.PORT;
 
-  const startServer = () => {
-    server.listen({
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    }, () => {
+      try {
+        await setupVite(app, server);
+        log("Vite middleware setup complete");
+      } finally {
+        // Restore original PORT
+        if (originalPort) {
+          process.env.PORT = originalPort;
+        }
+      }
+    } else {
+      serveStatic(app);
+    }
+
+    const port = Number(process.env.PORT || 5000);
+    server.listen({ port, host: "0.0.0.0" }, () => {
       log(`Server running at http://0.0.0.0:${port}`);
     });
 
-    server.on('error', (err: any) => {
-      if (err.code === 'EADDRINUSE' && retries < maxRetries) {
-        retries++;
-        log(`Port ${port} is in use, retrying in 5 seconds... (Attempt ${retries}/${maxRetries})`);
-        setTimeout(startServer, 5000);
-      } else {
-        console.error('Server error:', err);
-        process.exit(1);
-      }
-    });
-  };
-
-  startServer();
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
 })();
