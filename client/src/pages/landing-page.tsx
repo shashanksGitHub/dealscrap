@@ -37,24 +37,24 @@ export default function LandingPage() {
 
   const faqs = [
     {
-      question: "Wie funktioniert LeadScraper?",
-      answer: "LeadScraper verwendet fortschrittliche Technologien, um B2B-Kontaktdaten aus öffentlich zugänglichen Quellen zu sammeln und aufzubereiten. Sie können die Daten nach verschiedenen Kriterien filtern und exportieren."
+      question: "Wie funktioniert das Kreditsystem?",
+      answer: "Unser Kreditsystem ist einfach: Sie kaufen Credits und geben pro Lead einen Credit aus. Sie müssen nur für die Leads bezahlen, die Sie tatsächlich benötigen - ohne monatliche Gebühren oder versteckte Kosten."
     },
     {
-      question: "Ist die Nutzung von LeadScraper DSGVO-konform?",
-      answer: "Ja, wir achten sehr auf die Einhaltung der Datenschutzgrundverordnung (DSGVO). Alle gesammelten Daten stammen aus öffentlich zugänglichen Quellen, und wir bieten Ihnen Tools, um die Compliance bei der Nutzung dieser Daten sicherzustellen."
+      question: "Woher stammen die Daten und sind diese DSGVO-konform?",
+      answer: "Alle Daten werden aus öffentlich zugänglichen Quellen gesammelt und in Übereinstimmung mit der DSGVO verarbeitet. Wir stellen sicher, dass alle erforderlichen rechtlichen Grundlagen für die Verarbeitung vorhanden sind."
     },
     {
-      question: "Wie viel kostet die Nutzung von LeadScraper?",
-      answer: "Wir bieten verschiedene Preispläne an, die auf Ihre Bedürfnisse zugeschnitten sind. Sie können mit einem kostenlosen Konto beginnen und später auf Premium-Funktionen upgraden. Die genauen Preise finden Sie in unserem Preisbereich."
+      question: "Kann ich die Leads in mein CRM-System exportieren?",
+      answer: "Ja, selbstverständlich! Sie können Ihre Leads bequem als CSV oder Excel-Datei exportieren oder unsere API nutzen, um die Daten direkt in Ihr CRM-System zu übertragen."
     },
     {
-      question: "Kann ich die Daten in mein CRM-System exportieren?",
-      answer: "Absolut! LeadScraper ermöglicht den Export von Daten in verschiedenen Formaten wie CSV und Excel. Zudem bieten wir direkte Integrationen mit gängigen CRM-Systemen wie Salesforce, HubSpot und Pipedrive."
+      question: "Wie aktuell sind die Leads?",
+      answer: "Unsere Datenbank wird kontinuierlich aktualisiert, um sicherzustellen, dass Sie Zugriff auf die neuesten Informationen haben. Bei jeder Suchanfrage erhalten Sie die aktuellsten verfügbaren Daten."
     },
     {
-      question: "Wie aktuell sind die Daten?",
-      answer: "Unsere Datenbank wird kontinuierlich aktualisiert, um sicherzustellen, dass Sie Zugriff auf die neuesten Informationen haben. Die meisten Datensätze werden mindestens vierteljährlich überprüft und aktualisiert."
+      question: "Gibt es eine Mindestabnahme von Credits?",
+      answer: "Nein, Sie können genau die Menge an Credits kaufen, die Sie benötigen. Wir bieten jedoch Mengenrabatte an, sodass der Preis pro Lead sinkt, je mehr Credits Sie auf einmal erwerben."
     }
   ];
 
@@ -232,17 +232,47 @@ export default function LandingPage() {
         <div className="container mx-auto">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold mb-10 text-center">Häufig gestellte Fragen</h2>
-            <Accordion type="single" collapsible className="space-y-4">
-              {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`} className="border border-muted/30 rounded-lg px-6 py-2 bg-card/50">
-                  <AccordionTrigger className="text-lg font-medium hover:no-underline">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pt-2 pb-4">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger>Wie funktioniert das Kreditsystem?</AccordionTrigger>
+                <AccordionContent>
+                  Unser Kreditsystem ist einfach: Sie kaufen Credits und geben pro Lead einen Credit aus. 
+                  Sie müssen nur für die Leads bezahlen, die Sie tatsächlich benötigen - ohne monatliche Gebühren oder versteckte Kosten.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-2">
+                <AccordionTrigger>Woher stammen die Daten und sind diese DSGVO-konform?</AccordionTrigger>
+                <AccordionContent>
+                  Alle Daten werden aus öffentlich zugänglichen Quellen gesammelt und in Übereinstimmung mit der DSGVO verarbeitet. 
+                  Wir stellen sicher, dass alle erforderlichen rechtlichen Grundlagen für die Verarbeitung vorhanden sind.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-3">
+                <AccordionTrigger>Kann ich die Leads in mein CRM-System exportieren?</AccordionTrigger>
+                <AccordionContent>
+                  Ja, selbstverständlich! Sie können Ihre Leads bequem als CSV oder Excel-Datei exportieren oder unsere API nutzen, 
+                  um die Daten direkt in Ihr CRM-System zu übertragen.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-4">
+                <AccordionTrigger>Wie aktuell sind die Leads?</AccordionTrigger>
+                <AccordionContent>
+                  Unsere Datenbank wird kontinuierlich aktualisiert, um sicherzustellen, dass Sie Zugriff auf die neuesten Informationen haben. 
+                  Bei jeder Suchanfrage erhalten Sie die aktuellsten verfügbaren Daten.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-5">
+                <AccordionTrigger>Gibt es eine Mindestabnahme von Credits?</AccordionTrigger>
+                <AccordionContent>
+                  Nein, Sie können genau die Menge an Credits kaufen, die Sie benötigen. Wir bieten jedoch Mengenrabatte an, 
+                  sodass der Preis pro Lead sinkt, je mehr Credits Sie auf einmal erwerben.
+                </AccordionContent>
+              </AccordionItem>
             </Accordion>
           </div>
         </div>
