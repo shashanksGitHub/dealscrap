@@ -66,4 +66,18 @@ app.use((req, res, next) => {
   }, () => {
     log(`Server running at http://0.0.0.0:${port}`);
   });
+  
+  // Füge Fehlerbehandlung für den Server hinzu
+  server.on('error', (err) => {
+    console.error('Server error:', err);
+    // Versuche nach einem Fehler neu zu starten
+    setTimeout(() => {
+      log('Versuche Server neu zu starten...');
+      server.listen({
+        port,
+        host: "0.0.0.0",
+        reusePort: true,
+      });
+    }, 5000);
+  });
 })();

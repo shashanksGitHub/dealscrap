@@ -28,10 +28,18 @@ export async function setupVite(app: Express, server: Server) {
     hmr: { 
       server,
       clientPort: Number(process.env.PORT || 3000),
-      host: '0.0.0.0'
+      host: '0.0.0.0',
+      path: '/hmr',
+      timeout: 60000
     },
     host: '0.0.0.0',
     allowedHosts: true,
+    server: {
+      watch: {
+        usePolling: true,
+        interval: 1000,
+      }
+    }
   };
 
   const vite = await createViteServer({
