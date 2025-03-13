@@ -11,6 +11,13 @@ import { useState } from "react";
 import { SearchIcon, LogOutIcon, DownloadIcon } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 export default function Dashboard() {
   const { user, logoutMutation } = useAuth();
@@ -57,7 +64,7 @@ export default function Dashboard() {
   };
 
   const handleExport = () => {
-    const csv = leads.map((lead: Lead) => 
+    const csv = leads.map((lead: Lead) =>
       Object.values(lead).join(",")
     ).join("\n");
 
@@ -75,7 +82,6 @@ export default function Dashboard() {
       return res.json();
     },
     onSuccess: (data) => {
-      // Redirect to Stripe checkout
       window.location.href = data.checkoutUrl;
     },
     onError: (error: Error) => {
@@ -110,6 +116,59 @@ export default function Dashboard() {
       </nav>
 
       <main className="container mx-auto px-4 py-8">
+        {/* Product Tour Carousel */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Wie es funktioniert</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Carousel className="w-full max-w-4xl mx-auto">
+              <CarouselContent>
+                <CarouselItem>
+                  <div className="p-6 text-center">
+                    <div className="w-full h-64 bg-muted rounded-lg mb-4 flex items-center justify-center">
+                      <SearchIcon className="w-16 h-16 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Lead-Generierung</h3>
+                    <p className="text-muted-foreground">
+                      Geben Sie einfach Ihre Suchkriterien ein und erhalten Sie sofort relevante Business-Leads
+                    </p>
+                  </div>
+                </CarouselItem>
+                <CarouselItem>
+                  <div className="p-6 text-center">
+                    <div className="w-full h-64 bg-muted rounded-lg mb-4 flex items-center justify-center">
+                      <svg className="w-16 h-16 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" strokeWidth="2"/>
+                        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="8" fill="currentColor">
+                          €
+                        </text>
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Credit-System</h3>
+                    <p className="text-muted-foreground">
+                      Flexibles Pay-as-you-go System: Kaufen Sie Credits und nutzen Sie sie nach Bedarf
+                    </p>
+                  </div>
+                </CarouselItem>
+                <CarouselItem>
+                  <div className="p-6 text-center">
+                    <div className="w-full h-64 bg-muted rounded-lg mb-4 flex items-center justify-center">
+                      <DownloadIcon className="w-16 h-16 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Export & Analyse</h3>
+                    <p className="text-muted-foreground">
+                      Exportieren Sie Ihre Leads als CSV und integrieren Sie sie in Ihr CRM-System
+                    </p>
+                  </div>
+                </CarouselItem>
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </CardContent>
+        </Card>
+
         <div className="grid md:grid-cols-2 gap-8 mb-8">
           <Card>
             <CardHeader>
@@ -171,8 +230,8 @@ export default function Dashboard() {
                       disabled={purchaseMutation.isPending}
                     >
                       {pkg.recommended && (
-                        <Badge 
-                          variant="secondary" 
+                        <Badge
+                          variant="secondary"
                           className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground"
                         >
                           Empfohlen
