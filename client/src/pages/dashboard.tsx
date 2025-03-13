@@ -8,16 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { SearchIcon, LogOutIcon, DownloadIcon } from "lucide-react";
+import { SearchIcon, LogOutIcon, DownloadIcon, PlayCircleIcon } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 
 export default function Dashboard() {
   const { user, logoutMutation } = useAuth();
@@ -116,56 +109,26 @@ export default function Dashboard() {
       </nav>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Product Tour Carousel */}
+        {/* Product Demo Video */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Wie es funktioniert</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <PlayCircleIcon className="w-6 h-6 text-primary" />
+              Sehen Sie, wie einfach die Lead-Generierung funktioniert
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <Carousel className="w-full max-w-4xl mx-auto">
-              <CarouselContent>
-                <CarouselItem>
-                  <div className="p-6 text-center">
-                    <div className="w-full h-64 bg-muted rounded-lg mb-4 flex items-center justify-center">
-                      <SearchIcon className="w-16 h-16 text-muted-foreground" />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">Lead-Generierung</h3>
-                    <p className="text-muted-foreground">
-                      Geben Sie einfach Ihre Suchkriterien ein und erhalten Sie sofort relevante Business-Leads
-                    </p>
-                  </div>
-                </CarouselItem>
-                <CarouselItem>
-                  <div className="p-6 text-center">
-                    <div className="w-full h-64 bg-muted rounded-lg mb-4 flex items-center justify-center">
-                      <svg className="w-16 h-16 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="12" cy="12" r="10" strokeWidth="2"/>
-                        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="8" fill="currentColor">
-                          €
-                        </text>
-                      </svg>
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">Credit-System</h3>
-                    <p className="text-muted-foreground">
-                      Flexibles Pay-as-you-go System: Kaufen Sie Credits und nutzen Sie sie nach Bedarf
-                    </p>
-                  </div>
-                </CarouselItem>
-                <CarouselItem>
-                  <div className="p-6 text-center">
-                    <div className="w-full h-64 bg-muted rounded-lg mb-4 flex items-center justify-center">
-                      <DownloadIcon className="w-16 h-16 text-muted-foreground" />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">Export & Analyse</h3>
-                    <p className="text-muted-foreground">
-                      Exportieren Sie Ihre Leads als CSV und integrieren Sie sie in Ihr CRM-System
-                    </p>
-                  </div>
-                </CarouselItem>
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
+            <div className="aspect-video rounded-lg overflow-hidden">
+              <iframe
+                src="https://www.loom.com/embed/caafc64aed3a46d1b83262c5e843b7d4?sid=c3c6fcee-4802-4418-bfa8-2b6bde0ef4dc"
+                frameBorder="0"
+                allowFullScreen
+                className="w-full h-full"
+              ></iframe>
+            </div>
+            <p className="mt-4 text-muted-foreground text-center">
+              In diesem kurzen Video zeige ich Ihnen persönlich, wie Sie mit unserem Tool effizient Business-Leads generieren können.
+            </p>
           </CardContent>
         </Card>
 
