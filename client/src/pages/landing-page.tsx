@@ -55,7 +55,27 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Testimonial Section */}
+      <section className="py-20 px-4 border-y border-muted/20">
+        <div className="container mx-auto">
+          <h2 className="text-2xl font-medium text-center mb-12 text-muted-foreground">
+            Vertrauen von führenden Unternehmen in Deutschland
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center">
+            {companies.map((company, index) => (
+              <div key={index} className="grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+                <img 
+                  src={company.logo} 
+                  alt={company.name} 
+                  className="h-12 object-contain" 
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+  {/* Features Section */}
       <section className="py-20 px-4 bg-muted/10 backdrop-blur-sm">
         <div className="container mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
@@ -150,6 +170,33 @@ export default function LandingPage() {
     </div>
   );
 }
+
+const companies = [
+  {
+    name: "Bosch",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Robert_Bosch_GmbH_logo.svg/320px-Robert_Bosch_GmbH_logo.svg.png"
+  },
+  {
+    name: "Würth",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Würth_Logo.svg/320px-Würth_Logo.svg.png"
+  },
+  {
+    name: "Trumpf",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/TRUMPF_Logo.svg/320px-TRUMPF_Logo.svg.png"
+  },
+  {
+    name: "Festo",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Festo_logo.svg/320px-Festo_logo.svg.png"
+  },
+  {
+    name: "Miele",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Miele_Logo.svg/320px-Miele_Logo.svg.png"
+  },
+  {
+    name: "Kärcher",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Logo_Kaercher.svg/320px-Logo_Kaercher.svg.png"
+  }
+];
 
 const benefits = [
   {
