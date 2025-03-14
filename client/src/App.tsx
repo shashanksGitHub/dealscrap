@@ -10,6 +10,7 @@ import LandingPage from "@/pages/landing-page";
 import Dashboard from "@/pages/dashboard";
 import BlogPage from "@/pages/blog";
 import NewBlogPost from "@/pages/blog-new";
+import ResetPassword from "@/pages/reset-password";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -19,6 +20,7 @@ function Router() {
       <Switch>
         <Route path="/" component={LandingPage} />
         <Route path="/auth" component={AuthPage} />
+        <Route path="/reset-password" component={ResetPassword} />
         <Route path="/blog" component={BlogPage} />
         <ProtectedRoute path="/blog/new" component={NewBlogPost} />
         <ProtectedRoute path="/dashboard" component={Dashboard} />
