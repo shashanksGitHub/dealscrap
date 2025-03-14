@@ -10,24 +10,18 @@ import LandingPage from "@/pages/landing-page";
 import Dashboard from "@/pages/dashboard";
 import BlogPage from "@/pages/blog";
 import NewBlogPost from "@/pages/blog-new";
-import Checkout from "@/pages/checkout";
 import { ProtectedRoute } from "./lib/protected-route";
-import { useLocation } from "wouter";
 
 function Router() {
-  const [location] = useLocation();
-  const hideNavigation = location.startsWith('/checkout/');
-
   return (
     <>
-      {!hideNavigation && <NavHeader />}
+      <NavHeader />
       <Switch>
         <Route path="/" component={LandingPage} />
         <Route path="/auth" component={AuthPage} />
         <Route path="/blog" component={BlogPage} />
         <ProtectedRoute path="/blog/new" component={NewBlogPost} />
         <ProtectedRoute path="/dashboard" component={Dashboard} />
-        <ProtectedRoute path="/checkout/:amount" component={Checkout} />
         <Route component={NotFound} />
       </Switch>
     </>

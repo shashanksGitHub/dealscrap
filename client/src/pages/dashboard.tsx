@@ -17,8 +17,8 @@ export default function Dashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
-  const [searchLocation, setSearchLocation] = useState(""); // Renamed from location to searchLocation
-  const [, setLocation] = useLocation(); // Added setLocation from wouter
+  const [searchLocation, setSearchLocation] = useState("");
+  const [, setLocation] = useLocation();
 
   const { data: leads = [] } = useQuery<Lead[]>({
     queryKey: ["/api/leads"],
@@ -73,22 +73,12 @@ export default function Dashboard() {
 
   const purchaseMutation = useMutation({
     mutationFn: async (packageId: string) => {
-      const packageMap = {
-        "100": 100,
-        "250": 200,
-        "500": 350,
-        "1000": 600,
-      };
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "Please log in to purchase credits",
-          variant: "destructive",
-        });
-        return { success: false };
-      }
-      setLocation(`/checkout/${packageMap[packageId as keyof typeof packageMap]}`);
-      return { success: true };
+      toast({
+        title: "Info",
+        description: "Die Zahlungsfunktion ist derzeit deaktiviert. Bitte versuchen Sie es später erneut.",
+        variant: "default",
+      });
+      return { success: false };
     },
   });
 
