@@ -19,7 +19,7 @@ export default function Impressum() {
         <div className="space-y-6 max-w-3xl">
           <section>
             <h2 className="text-xl font-semibold mb-3">Angaben gemäß § 5 TMG</h2>
-            <p>Deimann Consulting UG<br />
+            <p>Deim. Consulting UG<br />
             Randstraße 75<br />
             22525 Hamburg<br />
             Deutschland</p>

@@ -20,7 +20,7 @@ export default function AGB() {
           <section>
             <h2 className="text-xl font-semibold mb-3">1. Geltungsbereich</h2>
             <p className="mb-4">
-              Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen der Deimann Consulting UG, Randstraße 75, 22525 Hamburg (nachfolgend "Anbieter") und ihren Kunden (nachfolgend "Nutzer") über die Nutzung der LeadScraper-Plattform.
+              Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen der Deim. Consulting UG, Randstraße 75, 22525 Hamburg (nachfolgend "Anbieter") und ihren Kunden (nachfolgend "Nutzer") über die Nutzung der LeadScraper-Plattform.
             </p>
           </section>
 
@@ -50,7 +50,10 @@ export default function AGB() {
               4.2 Die jeweils aktuellen Preise für Credits sind auf der Website einsehbar.
             </p>
             <p className="mb-4">
-              4.3 Der Nutzer ist verpflichtet, die Plattform nur im Rahmen der geltenden Gesetze zu nutzen und nicht auf eine Weise, die den Betrieb der Plattform beeinträchtigen könnte.
+              4.3 Erworbene Credits sind vom Umtausch ausgeschlossen. Eine Rückerstattung von gekauften Credits ist nicht möglich.
+            </p>
+            <p className="mb-4">
+              4.4 Der Nutzer ist verpflichtet, die Plattform nur im Rahmen der geltenden Gesetze zu nutzen und nicht auf eine Weise, die den Betrieb der Plattform beeinträchtigen könnte.
             </p>
           </section>
 
