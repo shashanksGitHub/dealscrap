@@ -1,3 +1,4 @@
+import "tsconfig-paths/register";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -67,7 +68,7 @@ async function startServer() {
         res.status(404).json({ error: 'API route not found' });
       });
 
-      // Finally set up Vite middleware for all other routes
+      // Finally set up Vite middleware
       log("Setting up Vite middleware...");
       await setupVite(app, server);
 
