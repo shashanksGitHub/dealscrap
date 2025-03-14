@@ -5,15 +5,23 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ArrowLeftIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Loader2, ArrowLeftIcon, CreditCard } from "lucide-react";
+import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
 }
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-const CheckoutForm = ({ amount }: { amount: number }) => {
+const CREDIT_PACKAGES = {
+  100: { credits: 100, price: 100 },
+  200: { credits: 250, price: 200 },
+  350: { credits: 500, price: 350 },
+  600: { credits: 1000, price: 600 }
+};
+
+const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) => {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
@@ -24,7 +32,7 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
-      console.error('Stripe or Elements not initialized');
+      console.error('Stripe oder Elements nicht initialisiert');
       return;
     }
 
@@ -39,7 +47,7 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
       });
 
       if (error) {
-        console.error('Payment confirmation error:', error);
+        console.error('Zahlungsbestätigung fehlgeschlagen:', error);
         toast({
           title: "Zahlung fehlgeschlagen",
           description: error.message,
@@ -47,7 +55,7 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
         });
       }
     } catch (error: any) {
-      console.error('Payment processing error:', error);
+      console.error('Fehler bei der Zahlungsverarbeitung:', error);
       toast({
         title: "Fehler",
         description: "Bei der Verarbeitung der Zahlung ist ein Fehler aufgetreten.",
@@ -59,20 +67,38 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="rounded-lg border border-border p-4 bg-muted/5">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h3 className="font-medium">Ausgewähltes Paket</h3>
+            <p className="text-sm text-muted-foreground">{credits} Credits</p>
+          </div>
+          <div className="text-right">
+            <p className="font-medium">{amount}€</p>
+            <p className="text-sm text-muted-foreground">inkl. MwSt.</p>
+          </div>
+        </div>
+      </div>
+
       <PaymentElement />
+
       <Button 
         type="submit" 
         className="w-full" 
+        size="lg"
         disabled={!stripe || isProcessing}
       >
         {isProcessing ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Wird verarbeitet...
+            Zahlung wird verarbeitet...
           </>
         ) : (
-          `${amount}€ bezahlen`
+          <>
+            <CreditCard className="mr-2 h-4 w-4" />
+            Jetzt {amount}€ bezahlen
+          </>
         )}
       </Button>
     </form>
@@ -90,6 +116,12 @@ export default function Checkout() {
     const initializePayment = async () => {
       if (match && params?.amount) {
         const numAmount = parseInt(params.amount, 10);
+
+        if (!CREDIT_PACKAGES[numAmount]) {
+          setError("Ungültiges Kreditpaket ausgewählt");
+          return;
+        }
+
         setAmount(numAmount);
 
         try {
@@ -97,12 +129,12 @@ export default function Checkout() {
           const data = await response.json();
 
           if (!response.ok) {
-            throw new Error(data.message || 'Failed to create payment intent');
+            throw new Error(data.message || 'Fehler beim Erstellen der Zahlung');
           }
 
           setClientSecret(data.clientSecret);
         } catch (error: any) {
-          console.error('Payment intent creation error:', error);
+          console.error('Fehler beim Erstellen der Zahlung:', error);
           setError(error.message);
           toast({
             title: "Fehler",
@@ -123,9 +155,9 @@ export default function Checkout() {
           <Card>
             <CardHeader>
               <CardTitle className="text-destructive">Fehler</CardTitle>
+              <CardDescription>{error}</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">{error}</p>
               <Link href="/dashboard">
                 <Button className="mt-4">
                   <ArrowLeftIcon className="mr-2 h-4 w-4" />
@@ -149,17 +181,35 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen py-20 px-4">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md mx-auto space-y-8">
         <Card>
           <CardHeader>
             <CardTitle>Kreditpaket kaufen</CardTitle>
+            <CardDescription>
+              Sicher bezahlen mit Stripe
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
-              <CheckoutForm amount={amount} />
+            <Elements stripe={stripePromise} options={{ 
+              clientSecret,
+              appearance: { 
+                theme: 'stripe',
+                variables: {
+                  colorPrimary: '#7c3aed',
+                  colorBackground: '#ffffff',
+                  colorText: '#1a1a1a',
+                }
+              } 
+            }}>
+              <CheckoutForm 
+                amount={amount} 
+                credits={CREDIT_PACKAGES[amount]?.credits || 0} 
+              />
             </Elements>
           </CardContent>
         </Card>
+
+        <DSGVOBadge />
       </div>
     </div>
   );
