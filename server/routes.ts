@@ -8,7 +8,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-02-24.acacia",
 });
 
 // Credit package mapping
@@ -63,7 +63,10 @@ export async function registerRoutes(router: Router) {
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
-      res.status(500).json({ message: error.message || "Interner Serverfehler" });
+      res.status(500).json({ 
+        message: "Fehler bei der Zahlungsinitialisierung. Bitte versuchen Sie es später erneut.",
+        details: error.message 
+      });
     }
   });
 
