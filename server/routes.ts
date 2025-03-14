@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { insertLeadSchema, insertBlogPostSchema } from "@shared/schema";
+import { insertLeadSchema, insertBlogPostSchema } from "../shared/schema";
 import { storage } from "./storage";
 
 function validateApiKey(req: any, res: any, next: any) {
