@@ -68,7 +68,7 @@ export default function LandingPage() {
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             <span className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6">
-              durch KI-Technologie
+              Höchsteffiziente Leadgenerierung durch KI-Technologie
             </span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 md:mb-8 bg-gradient-to-r from-primary via-violet-500 to-blue-500 bg-clip-text text-transparent leading-tight">
               Einfach & kostengünstig B2B-Leads scrapen
