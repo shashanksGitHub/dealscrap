@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Redirect } from "wouter";
+import { Footer } from "@/components/layout/footer";
 
 export default function AuthPage() {
   const { user } = useAuth();
@@ -18,32 +19,35 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2 pt-20">
-      <div className="flex items-center justify-center p-8">
-        <div className="w-full max-w-sm">
-          <Tabs defaultValue="login">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Anmelden</TabsTrigger>
-              <TabsTrigger value="register">Registrieren</TabsTrigger>
-            </TabsList>
-            <TabsContent value="login">
-              <LoginForm />
-            </TabsContent>
-            <TabsContent value="register">
-              <RegisterForm />
-            </TabsContent>
-          </Tabs>
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-grow grid md:grid-cols-2 pt-20">
+        <div className="flex items-center justify-center p-8">
+          <div className="w-full max-w-sm">
+            <Tabs defaultValue="login">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login">Anmelden</TabsTrigger>
+                <TabsTrigger value="register">Registrieren</TabsTrigger>
+              </TabsList>
+              <TabsContent value="login">
+                <LoginForm />
+              </TabsContent>
+              <TabsContent value="register">
+                <RegisterForm />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+        <div className="hidden md:flex items-center justify-center bg-muted/30 p-8">
+          <div className="max-w-md text-center">
+            <h1 className="text-4xl font-bold mb-4">Willkommen bei LeadScraper</h1>
+            <p className="text-muted-foreground">
+              Generieren Sie hochwertige Leads mit unserem leistungsstarken Scraping-Tool.
+              Perfekt für Vertriebs- und Marketingfachleute.
+            </p>
+          </div>
         </div>
       </div>
-      <div className="hidden md:flex items-center justify-center bg-muted/30 p-8">
-        <div className="max-w-md text-center">
-          <h1 className="text-4xl font-bold mb-4">Willkommen bei LeadScraper</h1>
-          <p className="text-muted-foreground">
-            Generieren Sie hochwertige Leads mit unserem leistungsstarken Scraping-Tool.
-            Perfekt für Vertriebs- und Marketingfachleute.
-          </p>
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 }
