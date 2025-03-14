@@ -98,19 +98,22 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 relative overflow-hidden border-b">
+      <section className="pt-32 pb-24 md:pt-44 md:pb-32 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(black,transparent_70%)] -z-10" />
         <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl opacity-70 animate-blob"></div>
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-
-        <div className="container mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Automatisierte B2B-Leadgenerierung<br />für dein Business
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Finde in Sekunden perfekte Leads für dein Geschäft – mit präzisen Suchfiltern, vollständigen Kontaktdaten und direkter Exportmöglichkeit.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="container mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
+            <span className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6">
+              Revolutionäre Lead-Generierung
+            </span>
+            <h1 className="text-4xl md:text-6xl font-extrabold mb-8 bg-gradient-to-r from-primary via-violet-500 to-blue-500 bg-clip-text text-transparent leading-tight">
+              Einfach & kostengünstig B2B-Leads scrapen
+            </h1>
+            <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
+              Finden Sie qualifizierte Geschäftskontakte mit unserem leistungsstarken Tool und steigern Sie Ihren Vertriebserfolg.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth">
                 <Button size="lg" className="rounded-full text-lg px-8 py-6 h-auto font-medium">
                   Kostenloses Konto <ArrowRightIcon className="ml-2 h-5 w-5" />
@@ -166,6 +169,51 @@ export default function LandingPage() {
                 Alle Daten werden vor dem Export validiert, um höchste Qualitätsstandards zu gewährleisten.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Process Section */}
+      <section className="py-20 px-4">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">So einfach funktioniert Leadscraper.de</h2>
+            <p className="text-lg text-muted-foreground">Starten Sie in nur 3 Schritten mit der automatisierten Lead-Generierung</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-background/50 backdrop-blur-sm p-8 rounded-xl border border-primary/10 relative">
+              <div className="absolute -top-4 -left-4 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">1</div>
+              <h3 className="text-xl font-semibold mb-4">Registrieren & Suchfilter setzen</h3>
+              <p className="text-muted-foreground">Wähle Standort, Branche & weitere Kriterien für deine Leads.</p>
+            </div>
+            <div className="bg-background/50 backdrop-blur-sm p-8 rounded-xl border border-primary/10 relative">
+              <div className="absolute -top-4 -left-4 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">2</div>
+              <h3 className="text-xl font-semibold mb-4">Leads automatisch generieren</h3>
+              <p className="text-muted-foreground">Unser System sammelt geprüfte Kontaktdaten in Echtzeit.</p>
+            </div>
+            <div className="bg-background/50 backdrop-blur-sm p-8 rounded-xl border border-primary/10 relative">
+              <div className="absolute -top-4 -left-4 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">3</div>
+              <h3 className="text-xl font-semibold mb-4">Leads herunterladen & kontaktieren</h3>
+              <p className="text-muted-foreground">Exportiere deine Leads als CSV und starte deine Kampagne.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Industries Section */}
+      <section className="py-20 px-4 bg-muted/10">
+        <div className="container mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Für wen ist Leadscraper.de gemacht?</h2>
+            <p className="text-lg text-muted-foreground">Perfekt abgestimmt auf die Bedürfnisse verschiedener Branchen</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {["IT & Software", "Marketing & Werbung", "Beratung & Consulting", "Handel & E-Commerce", "Finanzen & Versicherung", "Handwerk & Industrie"].map((industry) => (
+              <div key={industry} className="bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all">
+                <h3 className="text-lg font-medium mb-2">{industry}</h3>
+                <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
