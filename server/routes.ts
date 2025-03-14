@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { createServer, type Server } from "http";
-import { insertLeadSchema } from "@shared/schema";
+import { insertLeadSchema, insertBlogPostSchema } from "@shared/schema";
 import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -21,6 +21,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const leads = await storage.getLeadsByUserId(req.user.id);
     res.json(leads);
+  });
+
+  // Blog routes
+  app.get("/api/blog-posts", async (req, res) => {
+    const authorId = req.query.authorId ? parseInt(req.query.authorId as string) : undefined;
+    const posts = await storage.getBlogPosts(authorId);
+    res.json(posts);
+  });
+
+  app.get("/api/blog-posts/:id", async (req, res) => {
+    const post = await storage.getBlogPost(parseInt(req.params.id));
+    if (!post) {
+      return res.status(404).json({ message: "Blog post not found" });
+    }
+    res.json(post);
+  });
+
+  app.post("/api/blog-posts", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const validatedData = insertBlogPostSchema.parse(req.body);
+      const post = await storage.createBlogPost({
+        ...validatedData,
+        authorId: req.user.id
+      });
+      res.status(201).json(post);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid blog post data", error });
+    }
   });
 
   app.post("/api/scrape", async (req, res) => {
