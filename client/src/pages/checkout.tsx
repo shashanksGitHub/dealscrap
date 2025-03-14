@@ -14,18 +14,17 @@ if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 }
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-const CREDIT_PACKAGES = {
-  100: { credits: 100, price: 100 },
-  200: { credits: 250, price: 200 },
-  350: { credits: 500, price: 350 },
-  600: { credits: 1000, price: 600 }
+const CREDIT_PACKAGES: Record<string, { credits: number; price: number }> = {
+  '100': { credits: 100, price: 100 },
+  '200': { credits: 250, price: 200 },
+  '350': { credits: 500, price: 350 },
+  '600': { credits: 1000, price: 600 }
 };
 
 const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) => {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,37 +110,41 @@ export default function Checkout() {
   const [error, setError] = useState<string | null>(null);
   const [match, params] = useRoute("/checkout/:amount");
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const initializePayment = async () => {
-      if (match && params?.amount) {
-        const numAmount = parseInt(params.amount, 10);
+      if (!match || !params?.amount) {
+        setError("Ungültiger Zahlungsbetrag");
+        return;
+      }
 
-        if (!CREDIT_PACKAGES[numAmount]) {
-          setError("Ungültiges Kreditpaket ausgewählt");
-          return;
+      const numAmount = parseInt(params.amount, 10);
+      if (!CREDIT_PACKAGES[numAmount]) {
+        setError("Ungültiges Kreditpaket ausgewählt");
+        return;
+      }
+
+      setAmount(numAmount);
+
+      try {
+        const response = await apiRequest("POST", "/api/create-payment-intent", { amount: numAmount });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: "Unbekannter Fehler" }));
+          throw new Error(errorData.message || 'Fehler beim Erstellen der Zahlung');
         }
 
-        setAmount(numAmount);
-
-        try {
-          const response = await apiRequest("POST", "/api/create-payment-intent", { amount: numAmount });
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.message || 'Fehler beim Erstellen der Zahlung');
-          }
-
-          setClientSecret(data.clientSecret);
-        } catch (error: any) {
-          console.error('Fehler beim Erstellen der Zahlung:', error);
-          setError(error.message);
-          toast({
-            title: "Fehler",
-            description: "Die Zahlung konnte nicht initialisiert werden. Bitte versuchen Sie es später erneut.",
-            variant: "destructive",
-          });
-        }
+        const data = await response.json();
+        setClientSecret(data.clientSecret);
+      } catch (error: any) {
+        console.error('Fehler beim Erstellen der Zahlung:', error);
+        setError(error.message);
+        toast({
+          title: "Fehler",
+          description: "Die Zahlung konnte nicht initialisiert werden. Bitte versuchen Sie es später erneut.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -203,7 +206,7 @@ export default function Checkout() {
             }}>
               <CheckoutForm 
                 amount={amount} 
-                credits={CREDIT_PACKAGES[amount]?.credits || 0} 
+                credits={CREDIT_PACKAGES[amount.toString()]?.credits || 0} 
               />
             </Elements>
           </CardContent>
