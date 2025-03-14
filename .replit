@@ -82,16 +82,8 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "kill-port 3000 5173"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "rm -rf node_modules"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
 args = "npm install"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "NODE_ENV=development HOST=0.0.0.0 npm run dev"
+args = "npx vite --host 0.0.0.0 --port 3000"
