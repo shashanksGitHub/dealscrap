@@ -24,25 +24,37 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
+      console.error('Stripe or Elements not initialized');
       return;
     }
 
     setIsProcessing(true);
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/dashboard`,
-      },
-    });
+    try {
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/dashboard`,
+        },
+      });
 
-    if (error) {
+      if (error) {
+        console.error('Payment confirmation error:', error);
+        toast({
+          title: "Zahlung fehlgeschlagen",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error('Payment processing error:', error);
       toast({
-        title: "Zahlung fehlgeschlagen",
-        description: error.message,
+        title: "Fehler",
+        description: "Bei der Verarbeitung der Zahlung ist ein Fehler aufgetreten.",
         variant: "destructive",
       });
     }
+
     setIsProcessing(false);
   };
 
@@ -70,21 +82,61 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
 export default function Checkout() {
   const [clientSecret, setClientSecret] = useState("");
   const [amount, setAmount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const [match, params] = useRoute("/checkout/:amount");
+  const { toast } = useToast();
 
   useEffect(() => {
-    if (match && params.amount) {
-      const numAmount = parseInt(params.amount, 10);
-      setAmount(numAmount);
-      
-      apiRequest("POST", "/api/create-payment-intent", { amount: numAmount })
-        .then((res) => res.json())
-        .then((data) => setClientSecret(data.clientSecret))
-        .catch((error) => {
-          console.error("Payment Intent Error:", error);
-        });
-    }
-  }, [match, params.amount]);
+    const initializePayment = async () => {
+      if (match && params?.amount) {
+        const numAmount = parseInt(params.amount, 10);
+        setAmount(numAmount);
+
+        try {
+          console.log('Creating payment intent for amount:', numAmount);
+          const response = await apiRequest("POST", "/api/create-payment-intent", { amount: numAmount });
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || 'Failed to create payment intent');
+          }
+
+          console.log('Payment intent created successfully');
+          setClientSecret(data.clientSecret);
+        } catch (error: any) {
+          console.error('Payment intent creation error:', error);
+          setError(error.message);
+          toast({
+            title: "Fehler",
+            description: "Die Zahlung konnte nicht initialisiert werden. Bitte versuchen Sie es später erneut.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    initializePayment();
+  }, [match, params?.amount, toast]);
+
+  if (error) {
+    return (
+      <div className="min-h-screen py-20 px-4">
+        <div className="max-w-md mx-auto">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-destructive">Fehler</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">{error}</p>
+              <Button className="mt-4" onClick={() => window.history.back()}>
+                Zurück
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (!clientSecret) {
     return (

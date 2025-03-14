@@ -1,6 +1,15 @@
 import { Router } from "express";
 import { insertLeadSchema, insertBlogPostSchema } from "@shared/schema";
 import { storage } from "./storage";
+import Stripe from "stripe";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2025-02-24.acacia",
+});
 
 function validateApiKey(req: any, res: any, next: any) {
   const apiKey = req.headers['x-api-key'];
@@ -13,6 +22,34 @@ function validateApiKey(req: any, res: any, next: any) {
 }
 
 export async function registerRoutes(router: Router) {
+  // Stripe payment route for credit packages
+  router.post("/api/create-payment-intent", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      console.log('User not authenticated for payment intent creation');
+      return res.sendStatus(401);
+    }
+
+    try {
+      const { amount } = req.body;
+      console.log(`Creating payment intent for amount: ${amount} EUR`);
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "eur",
+        metadata: {
+          userId: req.user.id,
+          credits: amount
+        }
+      });
+
+      console.log('Payment intent created successfully:', paymentIntent.id);
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      console.error("Error creating payment intent:", error);
+      res.status(500).json({ message: "Error creating payment intent: " + error.message });
+    }
+  });
+
   // Credit management
   router.post("/credits/add", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
@@ -23,6 +60,36 @@ export async function registerRoutes(router: Router) {
 
     const user = await storage.addCredits(req.user.id, amount);
     res.json(user);
+  });
+
+  // Stripe webhook to handle successful payments
+  router.post("/api/stripe-webhook", async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+
+    try {
+      const event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET || ''
+      );
+
+      switch (event.type) {
+        case 'payment_intent.succeeded':
+          const paymentIntent = event.data.object;
+          const userId = paymentIntent.metadata.userId;
+          const credits = parseInt(paymentIntent.metadata.credits);
+
+          if (userId && credits) {
+            await storage.addCredits(userId, credits);
+          }
+          break;
+      }
+
+      res.json({ received: true });
+    } catch (err) {
+      console.error('Webhook Error:', err.message);
+      res.status(400).send(`Webhook Error: ${err.message}`);
+    }
   });
 
   // Lead management

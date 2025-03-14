@@ -12,11 +12,15 @@ import BlogPage from "@/pages/blog";
 import NewBlogPost from "@/pages/blog-new";
 import Checkout from "@/pages/checkout";
 import { ProtectedRoute } from "./lib/protected-route";
+import { useLocation } from "wouter";
 
 function Router() {
+  const [location] = useLocation();
+  const hideNavigation = location.startsWith('/checkout/');
+
   return (
     <>
-      <NavHeader />
+      {!hideNavigation && <NavHeader />}
       <Switch>
         <Route path="/" component={LandingPage} />
         <Route path="/auth" component={AuthPage} />

@@ -17,6 +17,7 @@ export default function Dashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
+  const [searchLocation, setSearchLocation] = useState(""); // Renamed from location to searchLocation
   const [, setLocation] = useLocation(); // Added setLocation from wouter
 
   const { data: leads = [] } = useQuery<Lead[]>({
@@ -45,7 +46,7 @@ export default function Dashboard() {
   });
 
   const handleScrape = () => {
-    if (!query || !location) {
+    if (!query || !searchLocation) {
       toast({
         title: "Error",
         description: "Please enter both query and location",
@@ -54,7 +55,7 @@ export default function Dashboard() {
       return;
     }
 
-    scrapeMutation.mutate({ query, location });
+    scrapeMutation.mutate({ query, location: searchLocation });
   };
 
   const handleExport = () => {
@@ -78,6 +79,14 @@ export default function Dashboard() {
         "500": 350,
         "1000": 600,
       };
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Please log in to purchase credits",
+          variant: "destructive",
+        });
+        return { success: false };
+      }
       setLocation(`/checkout/${packageMap[packageId as keyof typeof packageMap]}`);
       return { success: true };
     },
@@ -150,8 +159,8 @@ export default function Dashboard() {
                   <Label htmlFor="location">Location</Label>
                   <Input
                     id="location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    value={searchLocation}
+                    onChange={(e) => setSearchLocation(e.target.value)}
                     placeholder="e.g. Berlin"
                   />
                 </div>
@@ -183,7 +192,7 @@ export default function Dashboard() {
                   {creditPackages.map((pkg) => (
                     <Button
                       key={pkg.id}
-                      onClick={() => purchaseMutation.mutate(pkg.id as "100" | "250" | "500" | "1000")}
+                      onClick={() => purchaseMutation.mutate(pkg.id)}
                       variant={pkg.recommended ? "default" : "outline"}
                       className={cn(
                         "relative flex flex-col items-center justify-center gap-2 p-4 md:p-6 h-auto min-h-[120px]",
