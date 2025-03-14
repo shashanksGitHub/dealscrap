@@ -91,22 +91,22 @@ export default function Dashboard() {
     <div className="min-h-screen">
       <nav className="border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <span>Credits: {user?.credits}</span>
-            <Button variant="outline" onClick={() => logoutMutation.mutate()}>
+          <h1 className="text-xl md:text-2xl font-bold">Dashboard</h1>
+          <div className="flex items-center gap-2 md:gap-4">
+            <span className="text-sm md:text-base">Credits: {user?.credits}</span>
+            <Button variant="outline" size="sm" onClick={() => logoutMutation.mutate()}>
               <LogOutIcon className="w-4 h-4 mr-2" />
-              Logout
+              <span className="hidden md:inline">Logout</span>
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 space-y-8">
         {/* Product Demo Video */}
-        <Card className="mb-8">
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
               <PlayCircleIcon className="w-6 h-6 text-primary" />
               Sehen Sie, wie einfach die Lead-Generierung funktioniert
             </CardTitle>
@@ -120,13 +120,14 @@ export default function Dashboard() {
                 className="w-full h-full"
               ></iframe>
             </div>
-            <p className="mt-4 text-muted-foreground text-center">
+            <p className="mt-4 text-sm md:text-base text-muted-foreground text-center">
               In diesem kurzen Video zeige ich Ihnen persönlich, wie Sie mit unserem Tool effizient Business-Leads generieren können.
             </p>
           </CardContent>
         </Card>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Scrape Form */}
           <Card>
             <CardHeader>
               <CardTitle>Scrape New Leads</CardTitle>
@@ -168,20 +169,21 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
+          {/* Credit Packages */}
           <Card>
             <CardHeader>
               <CardTitle>Buy Credits</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {creditPackages.map((pkg) => (
                     <Button
                       key={pkg.id}
                       onClick={() => purchaseMutation.mutate(pkg.id as "100" | "250" | "500" | "1000")}
                       variant={pkg.recommended ? "default" : "outline"}
                       className={cn(
-                        "h-40 relative flex flex-col items-center justify-center gap-2 p-6",
+                        "relative flex flex-col items-center justify-center gap-2 p-4 md:p-6 h-auto min-h-[120px]",
                         pkg.recommended && "border-2 border-primary shadow-lg scale-105"
                       )}
                       disabled={purchaseMutation.isPending}
@@ -189,57 +191,53 @@ export default function Dashboard() {
                       {pkg.recommended && (
                         <Badge
                           variant="secondary"
-                          className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground"
+                          className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground text-xs"
                         >
                           Empfohlen
                         </Badge>
                       )}
-                      <span className="text-2xl font-bold">{pkg.credits} Credits</span>
-                      <span className="text-3xl font-bold text-primary">€{pkg.price}</span>
+                      <span className="text-lg md:text-2xl font-bold">{pkg.credits} Credits</span>
+                      <span className="text-xl md:text-3xl font-bold text-primary">€{pkg.price}</span>
                       {pkg.recommended && (
-                        <span className="text-sm text-muted-foreground mt-1">Bester Preis pro Credit</span>
+                        <span className="text-xs md:text-sm text-muted-foreground mt-1">Bester Preis pro Credit</span>
                       )}
                     </Button>
                   ))}
                 </div>
-                {purchaseMutation.isPending && (
-                  <p className="text-sm text-muted-foreground text-center">
-                    Redirecting to payment...
-                  </p>
-                )}
               </div>
             </CardContent>
           </Card>
         </div>
 
+        {/* Leads Table */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Your Leads</CardTitle>
             <Button variant="outline" onClick={handleExport}>
               <DownloadIcon className="w-4 h-4 mr-2" />
-              Export CSV
+              <span className="hidden md:inline">Export CSV</span>
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
+            <div className="overflow-x-auto rounded-md border">
               <table className="w-full">
                 <thead>
                   <tr className="border-b bg-muted/50">
-                    <th className="p-2 text-left">Business Name</th>
-                    <th className="p-2 text-left">Address</th>
-                    <th className="p-2 text-left">Phone</th>
-                    <th className="p-2 text-left">Email</th>
-                    <th className="p-2 text-left">Website</th>
+                    <th className="p-2 text-left text-sm font-medium">Business Name</th>
+                    <th className="p-2 text-left text-sm font-medium hidden md:table-cell">Address</th>
+                    <th className="p-2 text-left text-sm font-medium">Phone</th>
+                    <th className="p-2 text-left text-sm font-medium hidden md:table-cell">Email</th>
+                    <th className="p-2 text-left text-sm font-medium hidden lg:table-cell">Website</th>
                   </tr>
                 </thead>
                 <tbody>
                   {leads.map((lead: Lead) => (
                     <tr key={lead.id} className="border-b">
-                      <td className="p-2">{lead.businessName}</td>
-                      <td className="p-2">{lead.address}</td>
-                      <td className="p-2">{lead.phone}</td>
-                      <td className="p-2">{lead.email}</td>
-                      <td className="p-2">{lead.website}</td>
+                      <td className="p-2 text-sm">{lead.businessName}</td>
+                      <td className="p-2 text-sm hidden md:table-cell">{lead.address}</td>
+                      <td className="p-2 text-sm">{lead.phone}</td>
+                      <td className="p-2 text-sm hidden md:table-cell">{lead.email}</td>
+                      <td className="p-2 text-sm hidden lg:table-cell">{lead.website}</td>
                     </tr>
                   ))}
                 </tbody>
