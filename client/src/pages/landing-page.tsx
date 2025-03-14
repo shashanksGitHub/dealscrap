@@ -74,6 +74,9 @@ export default function LandingPage() {
               <Link href="#benefits" className="text-muted-foreground hover:text-foreground transition-colors">
                 Vorteile
               </Link>
+              <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors">
+                Blog
+              </Link>
               <Link href="#faq" className="text-muted-foreground hover:text-foreground transition-colors">
                 FAQ
               </Link>
@@ -135,10 +138,10 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center">
             {companies.map((company, index) => (
               <div key={index} className="grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-                <img 
-                  src={company.logo} 
-                  alt={company.name} 
-                  className="h-10 object-contain" 
+                <img
+                  src={company.logo}
+                  alt={company.name}
+                  className="h-10 object-contain"
                 />
               </div>
             ))}
@@ -237,7 +240,7 @@ export default function LandingPage() {
               <AccordionItem value="item-1">
                 <AccordionTrigger>Wie funktioniert das Kreditsystem?</AccordionTrigger>
                 <AccordionContent>
-                  Unser Kreditsystem ist einfach: Sie kaufen Credits und geben pro Lead einen Credit aus. 
+                  Unser Kreditsystem ist einfach: Sie kaufen Credits und geben pro Lead einen Credit aus.
                   Sie müssen nur für die Leads bezahlen, die Sie tatsächlich benötigen - ohne monatliche Gebühren oder versteckte Kosten.
                 </AccordionContent>
               </AccordionItem>
@@ -245,7 +248,7 @@ export default function LandingPage() {
               <AccordionItem value="item-2">
                 <AccordionTrigger>Woher stammen die Daten und sind diese DSGVO-konform?</AccordionTrigger>
                 <AccordionContent>
-                  Alle Daten werden aus öffentlich zugänglichen Quellen gesammelt und in Übereinstimmung mit der DSGVO verarbeitet. 
+                  Alle Daten werden aus öffentlich zugänglichen Quellen gesammelt und in Übereinstimmung mit der DSGVO verarbeitet.
                   Wir stellen sicher, dass alle erforderlichen rechtlichen Grundlagen für die Verarbeitung vorhanden sind.
                 </AccordionContent>
               </AccordionItem>
@@ -253,7 +256,7 @@ export default function LandingPage() {
               <AccordionItem value="item-3">
                 <AccordionTrigger>Kann ich die Leads in mein CRM-System exportieren?</AccordionTrigger>
                 <AccordionContent>
-                  Ja, selbstverständlich! Sie können Ihre Leads bequem als CSV oder Excel-Datei exportieren oder unsere API nutzen, 
+                  Ja, selbstverständlich! Sie können Ihre Leads bequem als CSV oder Excel-Datei exportieren oder unsere API nutzen,
                   um die Daten direkt in Ihr CRM-System zu übertragen.
                 </AccordionContent>
               </AccordionItem>
@@ -261,7 +264,7 @@ export default function LandingPage() {
               <AccordionItem value="item-4">
                 <AccordionTrigger>Wie aktuell sind die Leads?</AccordionTrigger>
                 <AccordionContent>
-                  Unsere Datenbank wird kontinuierlich aktualisiert, um sicherzustellen, dass Sie Zugriff auf die neuesten Informationen haben. 
+                  Unsere Datenbank wird kontinuierlich aktualisiert, um sicherzustellen, dass Sie Zugriff auf die neuesten Informationen haben.
                   Bei jeder Suchanfrage erhalten Sie die aktuellsten verfügbaren Daten.
                 </AccordionContent>
               </AccordionItem>
@@ -269,7 +272,7 @@ export default function LandingPage() {
               <AccordionItem value="item-5">
                 <AccordionTrigger>Gibt es eine Mindestabnahme von Credits?</AccordionTrigger>
                 <AccordionContent>
-                  Nein, Sie können genau die Menge an Credits kaufen, die Sie benötigen. Wir bieten jedoch Mengenrabatte an, 
+                  Nein, Sie können genau die Menge an Credits kaufen, die Sie benötigen. Wir bieten jedoch Mengenrabatte an,
                   sodass der Preis pro Lead sinkt, je mehr Credits Sie auf einmal erwerben.
                 </AccordionContent>
               </AccordionItem>
