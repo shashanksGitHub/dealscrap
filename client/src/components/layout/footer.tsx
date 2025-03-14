@@ -4,15 +4,13 @@ import { useAuth } from "@/hooks/use-auth";
 export function Footer() {
   const { user } = useAuth();
 
-  if (user) return null;
-
   return (
     <footer className="py-10 px-4 border-t border-muted/20">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="mb-6 md:mb-0">
             <div className="text-2xl font-bold text-primary mb-2">LeadScraper</div>
-            <p className="text-sm text-muted-foreground">© 2023 LeadScraper GmbH. Alle Rechte vorbehalten.</p>
+            <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} LeadScraper GmbH. Alle Rechte vorbehalten.</p>
           </div>
           <div className="flex flex-wrap gap-6 justify-center">
             <Link href="/impressum" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
