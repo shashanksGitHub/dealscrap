@@ -12,7 +12,6 @@ if (typeof process !== 'undefined' && process.env) {
   // Configure Vite dev server
   process.env.VITE_DEV_SERVER_HOST = '0.0.0.0';
   process.env.VITE_DEV_SERVER_CORS = 'true';
-  process.env.VITE_FORCE_DEV_SERVER = 'true';
 }
 
 export default globalThis.themePlugin;
