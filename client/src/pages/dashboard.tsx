@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
 
 export default function Dashboard() {
-  const { user, logoutMutation } = useAuth();
+  const { user, logout } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
@@ -71,23 +71,16 @@ export default function Dashboard() {
     a.click();
   };
 
-  const purchaseMutation = useMutation({
-    mutationFn: async (packageId: string) => {
-      toast({
-        title: "Info",
-        description: "Die Zahlungsfunktion ist derzeit deaktiviert. Bitte versuchen Sie es später erneut.",
-        variant: "default",
-      });
-      return { success: false };
-    },
-  });
-
   const creditPackages = [
     { id: "100", credits: 100, price: 100 },
     { id: "250", credits: 250, price: 200 },
     { id: "500", credits: 500, price: 350, recommended: true },
     { id: "1000", credits: 1000, price: 600 },
   ];
+
+  const handlePurchase = (price: number) => {
+    setLocation(`/checkout/${price}`);
+  };
 
   return (
     <div className="min-h-screen">
@@ -96,7 +89,7 @@ export default function Dashboard() {
           <h1 className="text-xl md:text-2xl font-bold">Dashboard</h1>
           <div className="flex items-center gap-2 md:gap-4">
             <span className="text-sm md:text-base">Credits: {user?.credits}</span>
-            <Button variant="outline" size="sm" onClick={() => logoutMutation.mutate()}>
+            <Button variant="outline" size="sm" onClick={() => logout()}>
               <LogOutIcon className="w-4 h-4 mr-2" />
               <span className="hidden md:inline">Logout</span>
             </Button>
@@ -182,13 +175,12 @@ export default function Dashboard() {
                   {creditPackages.map((pkg) => (
                     <Button
                       key={pkg.id}
-                      onClick={() => purchaseMutation.mutate(pkg.id)}
+                      onClick={() => handlePurchase(pkg.price)}
                       variant={pkg.recommended ? "default" : "outline"}
                       className={cn(
                         "relative flex flex-col items-center justify-center gap-2 p-4 md:p-6 h-auto min-h-[120px]",
                         pkg.recommended && "border-2 border-primary shadow-lg scale-105"
                       )}
-                      disabled={purchaseMutation.isPending}
                     >
                       {pkg.recommended && (
                         <Badge
