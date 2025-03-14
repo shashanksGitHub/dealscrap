@@ -63,12 +63,24 @@ export async function registerRoutes(router: Router) {
     }
   });
 
-  // Webhook route for Zapier integration
+  // Webhook route for Zapier integration with Form data support
   router.post("/webhook/blog-posts", validateApiKey, async (req, res) => {
     console.log('Received webhook request for blog post creation');
+    console.log('Request body:', req.body);
+    console.log('Content-Type:', req.get('Content-Type'));
+
     try {
-      const validatedData = insertBlogPostSchema.parse(req.body);
-      console.log('Blog post data validation successful');
+      // Handle both form data and JSON
+      const data = req.body;
+      console.log('Processing data:', data);
+
+      const validatedData = insertBlogPostSchema.parse({
+        title: data.title,
+        content: data.content,
+        excerpt: data.excerpt
+      });
+
+      console.log('Data validation successful:', validatedData);
 
       const post = await storage.createBlogPost({
         ...validatedData,

@@ -52,7 +52,20 @@ async function startServer() {
       log("Registering API routes...");
       const apiRouter = express.Router();
       await registerRoutes(apiRouter);
-      app.use('/api', apiRouter);
+
+      // Mount API router first with explicit content type
+      app.use('/api', (req, res, next) => {
+        // Force JSON content type for API routes
+        res.setHeader('Content-Type', 'application/json');
+        log(`Processing API request: ${req.method} ${req.path}`);
+        next();
+      }, apiRouter);
+
+      // Catch unhandled API routes
+      app.use('/api', (req, res) => {
+        log(`Unhandled API route: ${req.method} ${req.path}`);
+        res.status(404).json({ error: 'API route not found' });
+      });
 
       // Finally set up Vite middleware for all other routes
       log("Setting up Vite middleware...");
