@@ -27,25 +27,26 @@ app.use((req, res, next) => {
 
 (async () => {
   try {
-    log("Initializing server...");
+    log("Starting server initialization...");
 
-    // 1. Setup Vite middleware in development first
-    // This ensures all middleware including session handling works with Vite
     if (app.get("env") === "development") {
       try {
+        log("Creating HTTP server...");
         const server = await createServer(app);
+
+        log("Setting up Vite middleware...");
         await setupVite(app, server);
         log("Vite middleware setup complete");
 
-        // 2. Setup authentication with sessions
+        log("Setting up authentication...");
         setupAuth(app);
-        log("Auth setup complete");
+        log("Authentication setup complete");
 
-        // 3. Setup API routes
+        log("Registering routes...");
         await registerRoutes(app);
-        log("Routes setup complete");
+        log("Routes registration complete");
 
-        // 4. Setup error handling
+        log("Setting up error handling...");
         app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
           const status = err.status || err.statusCode || 500;
           const message = err.message || "Internal Server Error";
@@ -53,28 +54,49 @@ app.use((req, res, next) => {
           res.status(status).json({ message });
         });
 
-        // 5. Start server on port 5000
         const port = 5000;
-        server.listen(port, "0.0.0.0", () => {
-          log(`Server running at http://0.0.0.0:${port}`);
+        server.on('error', (error: any) => {
+          if (error.code === 'EADDRINUSE') {
+            log(`Error: Port ${port} is already in use. Attempting to terminate existing process...`);
+            process.exit(1);
+          } else {
+            log(`Critical server error: ${error.message}`);
+            process.exit(1);
+          }
         });
+
+        log(`Attempting to start server on port ${port}...`);
+        server.listen(port, "0.0.0.0", () => {
+          log(`Server successfully started and listening at http://0.0.0.0:${port}`);
+        });
+
       } catch (error) {
-        log("Vite setup failed: " + error);
+        log(`Critical error during server setup: ${error}`);
         throw error;
       }
     } else {
+      log("Starting production server...");
       const server = await createServer(app);
       setupAuth(app);
       await registerRoutes(app);
       serveStatic(app);
 
       const port = 5000;
+      server.on('error', (error: any) => {
+        if (error.code === 'EADDRINUSE') {
+          log(`Error: Port ${port} is already in use in production mode`);
+        } else {
+          log(`Production server error: ${error.message}`);
+        }
+        process.exit(1);
+      });
+
       server.listen(port, "0.0.0.0", () => {
-        log(`Server running at http://0.0.0.0:${port}`);
+        log(`Production server running at http://0.0.0.0:${port}`);
       });
     }
   } catch (error) {
-    console.error("Failed to start server:", error);
+    log(`Fatal error during server initialization: ${error}`);
     process.exit(1);
   }
 })();
