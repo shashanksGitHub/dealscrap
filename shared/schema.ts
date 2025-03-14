@@ -57,13 +57,11 @@ export const insertUserSchema = baseUserSchema.extend({
 
 export const insertLeadSchema = createInsertSchema(leads);
 
-export const insertBlogPostSchema = createInsertSchema(blogPosts).pick({
-  title: true,
-  content: true,
-  authorId: true,
-}).extend({
+// Korrigiertes Blog Post Schema
+export const insertBlogPostSchema = z.object({
   title: z.string().min(5, "Titel muss mindestens 5 Zeichen lang sein"),
   content: z.string().min(50, "Inhalt muss mindestens 50 Zeichen lang sein"),
+  authorId: z.number()
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

@@ -52,11 +52,12 @@ export async function registerRoutes(router: Router) {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
     try {
-      const validatedData = insertBlogPostSchema.parse(req.body);
-      const post = await storage.createBlogPost({
-        ...validatedData,
+      const validatedData = insertBlogPostSchema.parse({
+        ...req.body,
         authorId: req.user.id
       });
+
+      const post = await storage.createBlogPost(validatedData);
       res.status(201).json(post);
     } catch (error) {
       res.status(400).json({ message: "Invalid blog post data", error });
@@ -70,22 +71,18 @@ export async function registerRoutes(router: Router) {
     console.log('Content-Type:', req.get('Content-Type'));
 
     try {
-      // Handle both form data and JSON
       const data = req.body;
       console.log('Processing data:', data);
 
       const validatedData = insertBlogPostSchema.parse({
         title: data.title,
         content: data.content,
-        excerpt: data.excerpt
+        authorId: parseInt(process.env.DEFAULT_AUTHOR_ID || "1")
       });
 
       console.log('Data validation successful:', validatedData);
 
-      const post = await storage.createBlogPost({
-        ...validatedData,
-        authorId: parseInt(process.env.DEFAULT_AUTHOR_ID || "1")
-      });
+      const post = await storage.createBlogPost(validatedData);
 
       console.log('Blog post created successfully:', post.id);
       res.status(201).json(post);
