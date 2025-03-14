@@ -1,4 +1,4 @@
-import { Express } from "express";
+import { Router } from "express";
 import { createServer, type Server } from "http";
 import { insertLeadSchema, insertBlogPostSchema } from "@shared/schema";
 import { storage } from "./storage";
@@ -6,14 +6,17 @@ import { storage } from "./storage";
 function validateApiKey(req: any, res: any, next: any) {
   const apiKey = req.headers['x-api-key'];
   if (!apiKey || apiKey !== process.env.BLOG_API_KEY) {
+    console.log('Invalid API key provided:', apiKey);
     return res.status(401).json({ message: "Invalid API key" });
   }
+  console.log('API key validation successful');
   next();
 }
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: any): Promise<Server> { // Modified to accept app and return Server
+  const router = Router();
   // Credit management
-  app.post("/api/credits/add", async (req, res) => {
+  router.post("/credits/add", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const amount = parseInt(req.body.amount);
     if (isNaN(amount) || amount <= 0) {
@@ -25,20 +28,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Lead management
-  app.get("/api/leads", async (req, res) => {
+  router.get("/leads", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const leads = await storage.getLeadsByUserId(req.user.id);
     res.json(leads);
   });
 
   // Blog routes
-  app.get("/api/blog-posts", async (req, res) => {
+  router.get("/blog-posts", async (req, res) => {
     const authorId = req.query.authorId ? parseInt(req.query.authorId as string) : undefined;
     const posts = await storage.getBlogPosts(authorId);
     res.json(posts);
   });
 
-  app.get("/api/blog-posts/:id", async (req, res) => {
+  router.get("/blog-posts/:id", async (req, res) => {
     const post = await storage.getBlogPost(parseInt(req.params.id));
     if (!post) {
       return res.status(404).json({ message: "Blog post not found" });
@@ -47,7 +50,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Protected route for authenticated users
-  app.post("/api/blog-posts", async (req, res) => {
+  router.post("/blog-posts", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
     try {
@@ -62,22 +65,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // New route for Zapier integration
-  app.post("/api/webhook/blog-posts", validateApiKey, async (req, res) => {
+  // Webhook route for Zapier integration
+  router.post("/webhook/blog-posts", validateApiKey, async (req, res) => {
+    console.log('Received webhook request for blog post creation');
     try {
       const validatedData = insertBlogPostSchema.parse(req.body);
+      console.log('Blog post data validation successful');
+
       const post = await storage.createBlogPost({
         ...validatedData,
-        // Use a default author ID for webhook-created posts
         authorId: parseInt(process.env.DEFAULT_AUTHOR_ID || "1")
       });
+
+      console.log('Blog post created successfully:', post.id);
       res.status(201).json(post);
     } catch (error) {
-      res.status(400).json({ message: "Invalid blog post data", error });
+      console.error('Error creating blog post:', error);
+      res.status(400).json({ message: "Invalid blog post data", error: (error as Error).message });
     }
   });
 
-  app.post("/api/scrape", async (req, res) => {
+  router.post("/scrape", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     const { query, location } = req.body;
 
@@ -110,6 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.use(router); // Apply the router to the app
   const httpServer = createServer(app);
   return httpServer;
 }

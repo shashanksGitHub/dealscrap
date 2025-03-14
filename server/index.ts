@@ -44,14 +44,19 @@ async function startServer() {
     if (process.env.NODE_ENV === "development") {
       log("Setting up development environment...");
 
+      // First set up auth as it's needed for protected routes
       log("Setting up authentication...");
       setupAuth(app);
 
+      // Then register API routes before Vite middleware
+      log("Registering API routes...");
+      const apiRouter = express.Router();
+      await registerRoutes(apiRouter);
+      app.use('/api', apiRouter);
+
+      // Finally set up Vite middleware for all other routes
       log("Setting up Vite middleware...");
       await setupVite(app, server);
-
-      log("Registering routes...");
-      await registerRoutes(app);
 
       app.use(errorHandler);
     } else {
@@ -64,7 +69,7 @@ async function startServer() {
 
     const port = Number(process.env.PORT || 5000);
 
-    server.listen(port, () => {
+    server.listen(port, "0.0.0.0", () => {
       log(`Server running at http://0.0.0.0:${port} in ${process.env.NODE_ENV} mode`);
     });
 
