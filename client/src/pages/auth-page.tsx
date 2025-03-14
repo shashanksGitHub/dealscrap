@@ -18,7 +18,9 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen grid md:grid-cols-2">
+    <>
+      <NavHeader />
+      <div className="min-h-screen grid md:grid-cols-2 pt-20">
       <div className="flex items-center justify-center p-8">
         <div className="w-full max-w-sm">
           <Tabs defaultValue="login">
@@ -45,6 +47,8 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+      <Footer />
+    </>
   );
 }
 
