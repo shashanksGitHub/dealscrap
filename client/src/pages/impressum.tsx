@@ -27,8 +27,7 @@ export default function Impressum() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">Kontakt</h2>
-            <p>Telefon: 015782260593<br />
-            E-Mail: info@deimannconsulting.com</p>
+            <p>E-Mail: info@leadscraper.de</p>
           </section>
 
           <section>

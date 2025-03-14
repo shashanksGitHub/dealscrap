@@ -53,8 +53,7 @@ export default function Datenschutz() {
             </p>
             <p className="mt-4">
               Datenschutzbeauftragter:<br />
-              E-Mail: info@deimannconsulting.com<br />
-              Tel.: 015782260593
+              E-Mail: info@leadscraper.de
             </p>
           </section>
 
@@ -117,7 +116,7 @@ export default function Datenschutz() {
               </ul>
               <p>
                 Zur Ausübung Ihrer Rechte kontaktieren Sie uns bitte unter:<br />
-                info@deimannconsulting.com
+                info@leadscraper.de
               </p>
             </div>
           </section>
@@ -151,8 +150,7 @@ export default function Datenschutz() {
               Bei Fragen zum Datenschutz können Sie sich jederzeit an unseren Datenschutzbeauftragten wenden:<br /><br />
               Datenschutzbeauftragter<br />
               Deim. Consulting UG<br />
-              E-Mail: info@deimannconsulting.com<br />
-              Tel.: 015782260593
+              E-Mail: info@leadscraper.de
             </p>
           </section>
         </div>
