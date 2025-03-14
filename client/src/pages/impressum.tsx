@@ -32,7 +32,7 @@ export default function Impressum() {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">Vertreten durch</h2>
-            <p>Janik Deimann</p>
+            <p>Lara Braun</p>
           </section>
 
           <section>
