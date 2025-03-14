@@ -4,4 +4,9 @@ globalThis.themePlugin = () => ({
   apply: () => {} // No-op implementation
 });
 
+// Ensure allowedHosts is set to true in Vite config
+if (typeof process !== 'undefined' && process.env) {
+  process.env.VITE_ALLOW_HOSTS = 'true';
+}
+
 export default globalThis.themePlugin;
