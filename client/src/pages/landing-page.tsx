@@ -194,23 +194,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Ad Space Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="bg-gradient-to-r from-primary/10 to-violet-500/10 rounded-2xl p-8 text-center">
-            <h2 className="text-2xl font-bold mb-4">Werbebereich</h2>
-            <p className="text-lg mb-6 max-w-2xl mx-auto">
-              Dieser Bereich kann für Werbeanzeigen oder Promotionen genutzt werden, z.B. für Partnerschaften oder besondere Angebote.
-            </p>
-            <div className="bg-background/60 backdrop-blur-sm p-6 rounded-xl border border-primary/20 max-w-3xl mx-auto">
-              <div className="h-20 flex items-center justify-center">
-                <p className="text-muted-foreground italic">Werbebereich für Partner und Sponsoren</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* FAQ Section */}
       <section id="faq" className="py-20 px-4 bg-muted/5">
         <div className="container mx-auto">
