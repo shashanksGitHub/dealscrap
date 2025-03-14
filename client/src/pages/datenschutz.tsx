@@ -1,17 +1,20 @@
-
 import { Link } from "wouter";
 import { ArrowLeftIcon } from "lucide-react";
+import { Helmet } from "react-helmet";
 
 export default function Datenschutz() {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="container mx-auto py-12 px-4">
         <Link href="/" className="inline-flex items-center text-primary hover:underline mb-8">
           <ArrowLeftIcon className="h-4 w-4 mr-2" /> Zurück zur Startseite
         </Link>
-        
+
         <h1 className="text-3xl font-bold mb-8">Datenschutzerklärung</h1>
-        
+
         <div className="space-y-6 max-w-3xl">
           <section>
             <h2 className="text-xl font-semibold mb-3">1. Datenschutz auf einen Blick</h2>
@@ -28,7 +31,7 @@ export default function Datenschutz() {
               E-Mail: datenschutz@leadscaper.example
             </p>
           </section>
-          
+
           <section>
             <h2 className="text-xl font-semibold mb-3">2. Datenerfassung auf unserer Website</h2>
             <h3 className="text-lg font-medium mb-2">2.1 Cookies</h3>
@@ -47,7 +50,7 @@ export default function Datenschutz() {
               - Passwort (verschlüsselt)
             </p>
           </section>
-          
+
           <section>
             <h2 className="text-xl font-semibold mb-3">3. Ihre Rechte</h2>
             <p className="mb-4">

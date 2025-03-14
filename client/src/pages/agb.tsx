@@ -1,17 +1,20 @@
-
 import { Link } from "wouter";
 import { ArrowLeftIcon } from "lucide-react";
+import { Helmet } from "react-helmet";
 
 export default function AGB() {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="container mx-auto py-12 px-4">
         <Link href="/" className="inline-flex items-center text-primary hover:underline mb-8">
           <ArrowLeftIcon className="h-4 w-4 mr-2" /> Zurück zur Startseite
         </Link>
-        
+
         <h1 className="text-3xl font-bold mb-8">Allgemeine Geschäftsbedingungen</h1>
-        
+
         <div className="space-y-6 max-w-3xl">
           <section>
             <h2 className="text-xl font-semibold mb-3">1. Geltungsbereich</h2>
@@ -19,14 +22,14 @@ export default function AGB() {
               Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen der LeadScraper GmbH, Musterstraße 123, 12345 Musterstadt (nachfolgend "Anbieter") und ihren Kunden (nachfolgend "Nutzer") über die Nutzung der LeadScraper-Plattform.
             </p>
           </section>
-          
+
           <section>
             <h2 className="text-xl font-semibold mb-3">2. Leistungsbeschreibung</h2>
             <p className="mb-4">
               Der Anbieter stellt eine Online-Plattform zur Verfügung, die es Nutzern ermöglicht, Unternehmenskontakte und Geschäftsdaten zu sammeln und zu exportieren. Die genaue Leistungsbeschreibung ergibt sich aus der jeweils aktuellen Beschreibung auf der Website.
             </p>
           </section>
-          
+
           <section>
             <h2 className="text-xl font-semibold mb-3">3. Vertragsschluss und Registrierung</h2>
             <p className="mb-4">
@@ -36,7 +39,7 @@ export default function AGB() {
               3.2 Der Nutzer ist verpflichtet, bei der Registrierung wahrheitsgemäße Angaben zu machen und seine Daten aktuell zu halten.
             </p>
           </section>
-          
+
           <section>
             <h2 className="text-xl font-semibold mb-3">4. Nutzungsbedingungen und Kreditsystem</h2>
             <p className="mb-4">
@@ -49,7 +52,7 @@ export default function AGB() {
               4.3 Der Nutzer ist verpflichtet, die Plattform nur im Rahmen der geltenden Gesetze zu nutzen und nicht auf eine Weise, die den Betrieb der Plattform beeinträchtigen könnte.
             </p>
           </section>
-          
+
           <section>
             <h2 className="text-xl font-semibold mb-3">5. Laufzeit und Kündigung</h2>
             <p className="mb-4">
@@ -59,7 +62,7 @@ export default function AGB() {
               5.2 Bei Kündigung verfallen nicht verbrauchte Credits ohne Erstattung.
             </p>
           </section>
-          
+
           <section>
             <h2 className="text-xl font-semibold mb-3">6. Haftung</h2>
             <p className="mb-4">
@@ -69,7 +72,7 @@ export default function AGB() {
               6.2 Der Anbieter haftet unbeschränkt für Vorsatz und grobe Fahrlässigkeit sowie für Schäden aus der Verletzung des Lebens, des Körpers oder der Gesundheit.
             </p>
           </section>
-          
+
           <section>
             <h2 className="text-xl font-semibold mb-3">7. Schlussbestimmungen</h2>
             <p className="mb-4">
