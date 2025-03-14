@@ -22,7 +22,8 @@ export default function AuthPage() {
     <div className="min-h-screen flex flex-col">
       <div className="flex-grow grid md:grid-cols-2 pt-20">
         <div className="flex items-center justify-center p-8">
-          <div className="w-full max-w-sm">
+          <div className="w-full max-w-sm space-y-8">
+            <DSGVOBadge />
             <Tabs defaultValue="login">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Anmelden</TabsTrigger>
@@ -35,9 +36,6 @@ export default function AuthPage() {
                 <RegisterForm />
               </TabsContent>
             </Tabs>
-            <div className="mt-8">
-              <DSGVOBadge />
-            </div>
           </div>
         </div>
         <div className="hidden md:flex items-center justify-center bg-muted/30 p-8">

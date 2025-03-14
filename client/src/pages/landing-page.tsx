@@ -77,7 +77,7 @@ export default function LandingPage() {
             <p className="text-lg sm:text-xl text-muted-foreground mb-8 md:mb-10 max-w-3xl mx-auto px-4">
               Finden Sie qualifizierte Geschäftskontakte mit unserem leistungsstarken Tool und steigern Sie Ihren Vertriebserfolg.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center px-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 mb-12">
               <Link href="/auth">
                 <Button size="lg" className="w-full sm:w-auto rounded-full text-base md:text-lg px-6 md:px-8 py-4 md:py-6 h-auto font-medium">
                   Kostenloses Konto <ArrowRightIcon className="ml-2 h-5 w-5" />
@@ -88,6 +88,9 @@ export default function LandingPage() {
                   Mehr erfahren
                 </Button>
               </Link>
+            </div>
+            <div className="flex justify-center">
+              <DSGVOBadge />
             </div>
           </div>
         </div>
@@ -198,9 +201,6 @@ export default function LandingPage() {
                 <p className="text-sm text-muted-foreground">{benefit.description}</p>
               </div>
             ))}
-          </div>
-          <div className="mt-12 flex justify-center">
-            <DSGVOBadge />
           </div>
         </div>
       </section>
