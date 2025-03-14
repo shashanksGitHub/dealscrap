@@ -30,7 +30,8 @@ export default defineConfig({
     hmr: {
       clientPort: 443,
       host: "0.0.0.0",
-    }
+    },
+    allowedHosts: true
   },
   resolve: {
     alias: [
