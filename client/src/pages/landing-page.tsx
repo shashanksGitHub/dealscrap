@@ -98,22 +98,19 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 md:pt-44 md:pb-32 px-4 relative overflow-hidden">
+      <section className="pt-32 pb-20 relative overflow-hidden border-b">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(black,transparent_70%)] -z-10" />
         <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl opacity-70 animate-blob"></div>
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <span className="inline-block px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6">
-              Revolutionäre Lead-Generierung
-            </span>
-            <h1 className="text-4xl md:text-6xl font-extrabold mb-8 bg-gradient-to-r from-primary via-violet-500 to-blue-500 bg-clip-text text-transparent leading-tight">
-              Einfach & kostengünstig B2B-Leads scrapen
-            </h1>
-            <p className="text-xl text-muted-foreground mb-10 max-w-3xl mx-auto">
-              Finden Sie qualifizierte Geschäftskontakte mit unserem leistungsstarken Tool und steigern Sie Ihren Vertriebserfolg.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+        <div className="container mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            Automatisierte B2B-Leadgenerierung<br />für dein Business
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            Finde in Sekunden perfekte Leads für dein Geschäft – mit präzisen Suchfiltern, vollständigen Kontaktdaten und direkter Exportmöglichkeit.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth">
                 <Button size="lg" className="rounded-full text-lg px-8 py-6 h-auto font-medium">
                   Kostenloses Konto <ArrowRightIcon className="ml-2 h-5 w-5" />
@@ -125,7 +122,6 @@ export default function LandingPage() {
                 </Button>
               </Link>
             </div>
-          </div>
         </div>
       </section>
 
