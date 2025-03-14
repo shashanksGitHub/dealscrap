@@ -28,6 +28,28 @@ async function comparePasswords(supplied: string, stored: string) {
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
 
+async function notifyZapier(userData: { email: string }) {
+  try {
+    const response = await fetch('https://hooks.zapier.com/hooks/catch/7988997/2ls3wpe/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: userData.email,
+        registrationDate: new Date().toISOString(),
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to notify Zapier:', await response.text());
+    }
+  } catch (error) {
+    console.error('Error notifying Zapier:', error);
+    // Don't throw the error - we don't want to block registration if Zapier notification fails
+  }
+}
+
 export function setupAuth(app: Express) {
   app.use(session({
     secret: process.env.SESSION_SECRET || 'development_secret',
@@ -96,6 +118,9 @@ export function setupAuth(app: Express) {
         email,
         password: hashedPassword
       });
+
+      // Notify Zapier about the new registration
+      await notifyZapier({ email });
 
       req.login(user, (err) => {
         if (err) return next(err);
