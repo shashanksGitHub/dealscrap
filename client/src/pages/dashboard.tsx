@@ -11,12 +11,13 @@ import { useState } from "react";
 import { SearchIcon, LogOutIcon, DownloadIcon, PlayCircleIcon } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { useLocation } from "wouter";
 
 export default function Dashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const [, setLocation] = useLocation(); // Added setLocation from wouter
 
   const { data: leads = [] } = useQuery<Lead[]>({
     queryKey: ["/api/leads"],
@@ -71,12 +72,14 @@ export default function Dashboard() {
 
   const purchaseMutation = useMutation({
     mutationFn: async (packageId: string) => {
-      // Deaktiviert bis die Zahlungsintegration wieder implementiert wird
-      toast({
-        title: "Info",
-        description: "Die Zahlungsfunktion ist derzeit deaktiviert",
-      });
-      return { checkoutUrl: "/dashboard" };
+      const packageMap = {
+        "100": 100,
+        "250": 200,
+        "500": 350,
+        "1000": 600,
+      };
+      setLocation(`/checkout/${packageMap[packageId as keyof typeof packageMap]}`);
+      return { success: true };
     },
   });
 
