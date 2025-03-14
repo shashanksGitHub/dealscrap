@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { ArrowLeftIcon } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { Footer } from "@/components/layout/footer";
 
 export default function Datenschutz() {
   return (
@@ -62,6 +63,7 @@ export default function Datenschutz() {
           </section>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

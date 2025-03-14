@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { ArrowLeftIcon } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { Footer } from "@/components/layout/footer";
 
 export default function Impressum() {
   return (
@@ -57,6 +58,7 @@ export default function Impressum() {
           </section>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
