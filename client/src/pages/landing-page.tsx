@@ -129,25 +129,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Testimonial Section */}
-      <section className="py-12 px-4 border-y border-muted/20 bg-muted/5">
-        <div className="container mx-auto">
-          <h2 className="text-xl font-medium text-center mb-10 text-muted-foreground">
-            Vertrauen von führenden Unternehmen in Deutschland
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 items-center justify-items-center">
-            {companies.map((company, index) => (
-              <div key={index} className="grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all duration-300">
-                <img
-                  src={company.logo}
-                  alt={company.name}
-                  className="h-10 object-contain"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section id="features" className="py-20 px-4">
@@ -281,109 +262,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing section */}
-      <section className="py-20 px-4" id="pricing">
-        <div className="container mx-auto text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Einfache und transparente Preise</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Wählen Sie das Paket, das am besten zu Ihren Anforderungen passt.
-          </p>
-        </div>
-        <div className="container mx-auto grid md:grid-cols-3 gap-8 max-w-5xl">
-          {/* Starter Package */}
-          <div className="border border-muted/40 rounded-lg overflow-hidden transition-all hover:shadow-lg bg-card">
-            <div className="p-6 flex flex-col items-center">
-              <div className="font-semibold text-xl mb-2">Starter</div>
-              <div className="text-3xl font-bold mb-1">€99</div>
-              <div className="text-primary font-semibold mb-6">100 Credits</div>
-              <Button variant="outline" className="w-full">Auswählen</Button>
-            </div>
-            <div className="bg-muted/10 p-6">
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>100 Leads</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>CSV Export</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>E-Mail Support</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Professional Package */}
-          <div className="border-2 border-primary rounded-lg overflow-hidden transition-all relative shadow-lg bg-card">
-            <div className="bg-primary text-white text-center font-medium py-1.5">
-              Empfohlen
-            </div>
-            <div className="p-6 flex flex-col items-center">
-              <div className="font-semibold text-xl mb-2">Professional</div>
-              <div className="text-4xl font-bold mb-1">€350</div>
-              <div className="text-primary font-bold mb-6">500 Credits</div>
-              <Button className="w-full font-semibold">Auswählen</Button>
-            </div>
-            <div className="bg-primary/5 p-6">
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>500 Leads</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>CSV & Excel Export</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Vorrangiger Support</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Filteroptionen</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Enterprise Package */}
-          <div className="border border-muted/40 rounded-lg overflow-hidden transition-all hover:shadow-lg bg-card">
-            <div className="p-6 flex flex-col items-center">
-              <div className="font-semibold text-xl mb-2">Enterprise</div>
-              <div className="text-3xl font-bold mb-1">€999</div>
-              <div className="text-primary font-semibold mb-6">1500 Credits</div>
-              <Button variant="outline" className="w-full">Auswählen</Button>
-            </div>
-            <div className="bg-muted/10 p-6">
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>1500 Leads</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Alle Export-Formate</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>24/7 Support</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Erweiterte Filteroptionen</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckIcon className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>API-Zugang</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="py-20 px-4">
