@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Request logging
+// Request logging with improved error handling
 app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
@@ -19,88 +19,76 @@ app.use((req, res, next) => {
   next();
 });
 
-// Debug logging for session and auth
+// Debug logging
 app.use((req, res, next) => {
-  log(`Session ID: ${req.sessionID}, Authenticated: ${req.isAuthenticated?.()}, Path: ${req.path}`);
+  log(`Session ID: ${req.sessionID || 'none'}, Auth: ${req.isAuthenticated?.() || false}, Path: ${req.path}`);
   next();
 });
 
-(async () => {
+// Error handler middleware
+const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  log(`Error: ${message}`);
+  res.status(status).json({ message });
+};
+
+async function startServer() {
   try {
     log("Starting server initialization...");
+    const server = await createServer(app);
 
-    if (app.get("env") === "development") {
-      try {
-        log("Creating HTTP server...");
-        const server = await createServer(app);
+    // Force development mode for local development
+    process.env.NODE_ENV = "development";
 
-        log("Setting up Vite middleware...");
-        await setupVite(app, server);
-        log("Vite middleware setup complete");
+    if (process.env.NODE_ENV === "development") {
+      log("Setting up development environment...");
 
-        log("Setting up authentication...");
-        setupAuth(app);
-        log("Authentication setup complete");
+      log("Setting up authentication...");
+      setupAuth(app);
 
-        log("Registering routes...");
-        await registerRoutes(app);
-        log("Routes registration complete");
+      log("Setting up Vite middleware...");
+      await setupVite(app, server);
 
-        log("Setting up error handling...");
-        app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-          const status = err.status || err.statusCode || 500;
-          const message = err.message || "Internal Server Error";
-          log(`Error: ${message}`);
-          res.status(status).json({ message });
-        });
+      log("Registering routes...");
+      await registerRoutes(app);
 
-        const port = 5000;
-        server.on('error', (error: any) => {
-          if (error.code === 'EADDRINUSE') {
-            log(`Error: Port ${port} is already in use. Attempting to terminate existing process...`);
-            process.exit(1);
-          } else {
-            log(`Critical server error: ${error.message}`);
-            process.exit(1);
-          }
-        });
-
-        log(`Attempting to start server on port ${port}...`);
-        server.listen(port, "0.0.0.0", () => {
-          log(`Server successfully started and listening at http://0.0.0.0:${port}`);
-        });
-
-      } catch (error) {
-        log(`Critical error during server setup: ${error}`);
-        throw error;
-      }
+      app.use(errorHandler);
     } else {
-      log("Starting production server...");
-      const server = await createServer(app);
+      log("Setting up production environment...");
       setupAuth(app);
       await registerRoutes(app);
       serveStatic(app);
-
-      const port = 5000;
-      server.on('error', (error: any) => {
-        if (error.code === 'EADDRINUSE') {
-          log(`Error: Port ${port} is already in use in production mode`);
-        } else {
-          log(`Production server error: ${error.message}`);
-        }
-        process.exit(1);
-      });
-
-      server.listen(port, "0.0.0.0", () => {
-        log(`Production server running at http://0.0.0.0:${port}`);
-      });
+      app.use(errorHandler);
     }
+
+    const port = Number(process.env.PORT || 5000);
+
+    server.listen(port, () => {
+      log(`Server running at http://0.0.0.0:${port} in ${process.env.NODE_ENV} mode`);
+    });
+
+    server.on('error', (error: any) => {
+      if (error.code === 'EADDRINUSE') {
+        log(`Error: Port ${port} is already in use`);
+      } else {
+        log(`Server error: ${error.message}`);
+      }
+      process.exit(1);
+    });
+
   } catch (error) {
     log(`Fatal error during server initialization: ${error}`);
     process.exit(1);
   }
-})();
+}
 
 function createServer(app: express.Express) {
   return import('http').then(({ createServer }) => createServer(app));
 }
+
+// Start the server
+startServer().catch((error) => {
+  log(`Unhandled error during server startup: ${error}`);
+  process.exit(1);
+});
