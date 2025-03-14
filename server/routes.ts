@@ -1,18 +1,96 @@
 import { Router } from "express";
 import { insertLeadSchema, insertBlogPostSchema } from "../shared/schema";
 import { storage } from "./storage";
+import Stripe from "stripe";
 
-function validateApiKey(req: any, res: any, next: any) {
-  const apiKey = req.headers['x-api-key'];
-  if (!apiKey || apiKey !== process.env.BLOG_API_KEY) {
-    console.log('Invalid API key provided:', apiKey);
-    return res.status(401).json({ message: "Invalid API key" });
-  }
-  console.log('API key validation successful');
-  next();
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
+
+// Credit package mapping
+const CREDIT_PACKAGES = {
+  100: { credits: 100, price: 100 },
+  200: { credits: 250, price: 200 },
+  350: { credits: 500, price: 350 },
+  600: { credits: 1000, price: 600 }
+};
+
 export async function registerRoutes(router: Router) {
+  // Stripe payment routes
+  router.post("/api/create-payment-intent", async (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+
+    try {
+      const { amount } = req.body;
+      if (!CREDIT_PACKAGES[amount]) {
+        return res.status(400).json({ message: "Invalid amount" });
+      }
+
+      // Create or get Stripe customer
+      let user = await storage.getUser(req.user.id);
+      let customerId = user.stripeCustomerId;
+
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: {
+            userId: user.id.toString()
+          }
+        });
+        user = await storage.setStripeCustomerId(user.id, customer.id);
+        customerId = customer.id;
+      }
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount * 100, // Convert to cents
+        currency: "eur",
+        customer: customerId,
+        metadata: {
+          userId: user.id.toString(),
+          credits: CREDIT_PACKAGES[amount].credits.toString()
+        },
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      console.error('Payment intent creation error:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Stripe webhook for handling successful payments
+  router.post("/api/stripe-webhook", async (req, res) => {
+    const sig = req.headers['stripe-signature'];
+
+    try {
+      const event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+
+      if (event.type === 'payment_intent.succeeded') {
+        const paymentIntent = event.data.object;
+        const userId = parseInt(paymentIntent.metadata.userId);
+        const credits = parseInt(paymentIntent.metadata.credits);
+
+        await storage.addCredits(userId, credits);
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      console.error('Webhook Error:', error.message);
+      return res.status(400).send(`Webhook Error: ${error.message}`);
+    }
+  });
+
   // Credit management
   router.post("/credits/add", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
@@ -124,4 +202,14 @@ export async function registerRoutes(router: Router) {
       res.status(500).json({ message: "Failed to scrape data", error: (error as Error).message });
     }
   });
+}
+
+function validateApiKey(req: any, res: any, next: any) {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey || apiKey !== process.env.BLOG_API_KEY) {
+    console.log('Invalid API key provided:', apiKey);
+    return res.status(401).json({ message: "Invalid API key" });
+  }
+  console.log('API key validation successful');
+  next();
 }

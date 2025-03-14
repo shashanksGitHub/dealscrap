@@ -1,9 +1,11 @@
 import { PriceCard } from "./price-card";
+import { useLocation } from "wouter";
 
 export function PricingSection() {
-  const handleSelect = (credits: number) => {
-    // Handle selection logic
-    console.log(`Selected ${credits} credits`);
+  const [, setLocation] = useLocation();
+
+  const handleSelect = (credits: number, price: number) => {
+    setLocation(`/checkout/${price}`);
   };
 
   return (
@@ -15,28 +17,28 @@ export function PricingSection() {
             Wählen Sie das passende Paket für Ihre Bedürfnisse
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <PriceCard
             credits={100}
             price={100}
-            onSelect={() => handleSelect(100)}
+            onSelect={() => handleSelect(100, 100)}
           />
           <PriceCard
             credits={250}
             price={200}
-            onSelect={() => handleSelect(250)}
+            onSelect={() => handleSelect(250, 200)}
           />
           <PriceCard
             credits={500}
             price={350}
             isRecommended
-            onSelect={() => handleSelect(500)}
+            onSelect={() => handleSelect(500, 350)}
           />
           <PriceCard
             credits={1000}
             price={600}
-            onSelect={() => handleSelect(1000)}
+            onSelect={() => handleSelect(1000, 600)}
           />
         </div>
       </div>

@@ -3,10 +3,10 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation, useRoute } from "wouter";
+import { useLocation, useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeftIcon } from "lucide-react";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
@@ -93,7 +93,6 @@ export default function Checkout() {
         setAmount(numAmount);
 
         try {
-          console.log('Creating payment intent for amount:', numAmount);
           const response = await apiRequest("POST", "/api/create-payment-intent", { amount: numAmount });
           const data = await response.json();
 
@@ -101,7 +100,6 @@ export default function Checkout() {
             throw new Error(data.message || 'Failed to create payment intent');
           }
 
-          console.log('Payment intent created successfully');
           setClientSecret(data.clientSecret);
         } catch (error: any) {
           console.error('Payment intent creation error:', error);
@@ -128,9 +126,12 @@ export default function Checkout() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">{error}</p>
-              <Button className="mt-4" onClick={() => window.history.back()}>
-                Zurück
-              </Button>
+              <Link href="/dashboard">
+                <Button className="mt-4">
+                  <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                  Zurück zum Dashboard
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
