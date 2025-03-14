@@ -11,6 +11,9 @@ import Dashboard from "@/pages/dashboard";
 import BlogPage from "@/pages/blog";
 import NewBlogPost from "@/pages/blog-new";
 import ResetPassword from "@/pages/reset-password";
+import Impressum from "@/pages/impressum";
+import Datenschutz from "@/pages/datenschutz";
+import AGB from "@/pages/agb";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -22,6 +25,9 @@ function Router() {
         <Route path="/auth" component={AuthPage} />
         <Route path="/reset-password" component={ResetPassword} />
         <Route path="/blog" component={BlogPage} />
+        <Route path="/impressum" component={Impressum} />
+        <Route path="/datenschutz" component={Datenschutz} />
+        <Route path="/agb" component={AGB} />
         <ProtectedRoute path="/blog/new" component={NewBlogPost} />
         <ProtectedRoute path="/dashboard" component={Dashboard} />
         <Route component={NotFound} />
