@@ -143,16 +143,6 @@ export default function Datenschutz() {
               </p>
             </div>
           </section>
-
-          <section className="bg-muted/5 rounded-lg p-6 mt-8">
-            <h2 className="text-xl font-semibold mb-4">Kontakt bei Datenschutzfragen</h2>
-            <p>
-              Bei Fragen zum Datenschutz können Sie sich jederzeit an unseren Datenschutzbeauftragten wenden:<br /><br />
-              Datenschutzbeauftragter<br />
-              Deim. Consulting UG<br />
-              E-Mail: info@leadscraper.de
-            </p>
-          </section>
         </div>
       </div>
       <Footer />
