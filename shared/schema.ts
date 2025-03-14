@@ -25,6 +25,17 @@ export const leads = pgTable("leads", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// New blog posts table
+export const blogPosts = pgTable("blog_posts", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  authorId: integer("author_id").notNull(),
+  isPublished: boolean("is_published").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
@@ -39,6 +50,18 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export const insertLeadSchema = createInsertSchema(leads);
 
+// New blog post schema for insertion
+export const insertBlogPostSchema = createInsertSchema(blogPosts).pick({
+  title: true,
+  content: true,
+  authorId: true,
+}).extend({
+  title: z.string().min(5, "Titel muss mindestens 5 Zeichen lang sein"),
+  content: z.string().min(50, "Inhalt muss mindestens 50 Zeichen lang sein"),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Lead = typeof leads.$inferSelect;
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
