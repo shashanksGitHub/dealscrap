@@ -36,7 +36,7 @@ const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunctio
 async function startServer() {
   try {
     log("Starting server initialization...");
-    const server = await createServer(app);
+    const server = await import('http').then(({ createServer }) => createServer(app));
 
     // Force development mode for local development
     process.env.NODE_ENV = "development";
@@ -62,7 +62,9 @@ async function startServer() {
     } else {
       log("Setting up production environment...");
       setupAuth(app);
-      await registerRoutes(app);
+      const apiRouter = express.Router();
+      await registerRoutes(apiRouter);
+      app.use('/api', apiRouter);
       serveStatic(app);
       app.use(errorHandler);
     }
@@ -86,10 +88,6 @@ async function startServer() {
     log(`Fatal error during server initialization: ${error}`);
     process.exit(1);
   }
-}
-
-function createServer(app: express.Express) {
-  return import('http').then(({ createServer }) => createServer(app));
 }
 
 // Start the server

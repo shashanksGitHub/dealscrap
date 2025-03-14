@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { createServer, type Server } from "http";
 import { insertLeadSchema, insertBlogPostSchema } from "@shared/schema";
 import { storage } from "./storage";
 
@@ -13,8 +12,7 @@ function validateApiKey(req: any, res: any, next: any) {
   next();
 }
 
-export async function registerRoutes(app: any): Promise<Server> { // Modified to accept app and return Server
-  const router = Router();
+export async function registerRoutes(router: Router) {
   // Credit management
   router.post("/credits/add", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
@@ -117,8 +115,4 @@ export async function registerRoutes(app: any): Promise<Server> { // Modified to
       res.status(500).json({ message: "Failed to scrape data", error: (error as Error).message });
     }
   });
-
-  app.use(router); // Apply the router to the app
-  const httpServer = createServer(app);
-  return httpServer;
 }
