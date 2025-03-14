@@ -3,6 +3,14 @@ import { createServer, type Server } from "http";
 import { insertLeadSchema, insertBlogPostSchema } from "@shared/schema";
 import { storage } from "./storage";
 
+function validateApiKey(req: any, res: any, next: any) {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey || apiKey !== process.env.BLOG_API_KEY) {
+    return res.status(401).json({ message: "Invalid API key" });
+  }
+  next();
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Credit management
   app.post("/api/credits/add", async (req, res) => {
@@ -38,6 +46,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(post);
   });
 
+  // Protected route for authenticated users
   app.post("/api/blog-posts", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
 
@@ -46,6 +55,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const post = await storage.createBlogPost({
         ...validatedData,
         authorId: req.user.id
+      });
+      res.status(201).json(post);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid blog post data", error });
+    }
+  });
+
+  // New route for Zapier integration
+  app.post("/api/webhook/blog-posts", validateApiKey, async (req, res) => {
+    try {
+      const validatedData = insertBlogPostSchema.parse(req.body);
+      const post = await storage.createBlogPost({
+        ...validatedData,
+        // Use a default author ID for webhook-created posts
+        authorId: parseInt(process.env.DEFAULT_AUTHOR_ID || "1")
       });
       res.status(201).json(post);
     } catch (error) {
