@@ -7,6 +7,12 @@ globalThis.themePlugin = () => ({
 // Ensure allowedHosts is set to true in Vite config
 if (typeof process !== 'undefined' && process.env) {
   process.env.VITE_ALLOW_HOSTS = 'true';
+  // Force development mode
+  process.env.NODE_ENV = 'development';
+  // Configure Vite dev server
+  process.env.VITE_DEV_SERVER_HOST = '0.0.0.0';
+  process.env.VITE_DEV_SERVER_CORS = 'true';
+  process.env.VITE_FORCE_DEV_SERVER = 'true';
 }
 
 export default globalThis.themePlugin;
