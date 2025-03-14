@@ -25,24 +25,13 @@ export function NavHeader() {
   );
 
   const AuthenticatedNavLinks = () => (
-    <>
-      <Link href="/dashboard">
-        <a className="text-muted-foreground hover:text-foreground transition-colors">Dashboard</a>
-      </Link>
-      <Link href="/blog">
-        <a className="text-muted-foreground hover:text-foreground transition-colors">Blog</a>
-      </Link>
-      <Link href="/kontakt">
-        <a className="text-muted-foreground hover:text-foreground transition-colors">Kontakt</a>
-      </Link>
-      <button
-        onClick={() => logout()}
-        className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
-      >
-        <LogOut className="h-4 w-4" />
-        Abmelden
-      </button>
-    </>
+    <button
+      onClick={() => logout()}
+      className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
+    >
+      <LogOut className="h-4 w-4" />
+      Abmelden
+    </button>
   );
 
   return (
