@@ -22,12 +22,14 @@ const CREDIT_PACKAGES = {
 export async function registerRoutes(router: Router) {
   // Stripe payment routes
   router.post("/api/create-payment-intent", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
-
     try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Nicht authentifiziert" });
+      }
+
       const { amount } = req.body;
       if (!CREDIT_PACKAGES[amount]) {
-        return res.status(400).json({ message: "Invalid amount" });
+        return res.status(400).json({ message: "Ungültiger Betrag" });
       }
 
       // Create or get Stripe customer
@@ -61,7 +63,7 @@ export async function registerRoutes(router: Router) {
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ message: error.message || "Interner Serverfehler" });
     }
   });
 
