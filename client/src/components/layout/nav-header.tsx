@@ -15,14 +15,11 @@ export function NavHeader() {
       <Link href="#benefits">
         <a className="text-muted-foreground hover:text-foreground transition-colors">Vorteile</a>
       </Link>
-      <Link href="/blog">
-        <a className="text-muted-foreground hover:text-foreground transition-colors">Blog</a>
+      <Link href="#pricing">
+        <a className="text-muted-foreground hover:text-foreground transition-colors">Preise</a>
       </Link>
       <Link href="#faq">
         <a className="text-muted-foreground hover:text-foreground transition-colors">FAQ</a>
-      </Link>
-      <Link href="/kontakt">
-        <a className="text-muted-foreground hover:text-foreground transition-colors">Kontakt</a>
       </Link>
     </>
   );
@@ -51,7 +48,7 @@ export function NavHeader() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
       <div className="container mx-auto flex justify-between items-center py-4">
-        <Link href="/">
+        <Link href={user ? "/dashboard" : "/"}>
           <a className="text-2xl font-bold text-primary">LeadScraper</a>
         </Link>
         <div className="flex items-center gap-6">
