@@ -58,9 +58,9 @@ export function setupAuth(app: Express) {
     store: storage.sessionStore,
     name: 'sid',
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
       sameSite: 'lax',
       path: '/'
     }
@@ -68,6 +68,12 @@ export function setupAuth(app: Express) {
 
   app.use(passport.initialize());
   app.use(passport.session());
+
+  // Debug middleware to log session and auth status
+  app.use((req, res, next) => {
+    console.log(`Session ID: ${req.sessionID}, Auth: ${req.isAuthenticated()}, Path: ${req.path}`);
+    next();
+  });
 
   passport.use(new LocalStrategy({
     usernameField: 'email',
@@ -156,50 +162,5 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Nicht authentifiziert" });
     }
     res.json(req.user);
-  });
-
-  // Password reset request
-  app.post("/api/request-password-reset", async (req, res) => {
-    try {
-      const { email } = req.body;
-      const user = await storage.getUserByEmail(email);
-
-      if (!user) {
-        // Return success even if user not found for security
-        return res.json({ message: "Wenn ein Konto mit dieser E-Mail existiert, erhalten Sie eine E-Mail mit weiteren Anweisungen." });
-      }
-
-      const resetToken = randomBytes(32).toString("hex");
-      const expiry = new Date();
-      expiry.setHours(expiry.getHours() + 1); // Token expires in 1 hour
-
-      await storage.setResetToken(user.id, resetToken, expiry);
-
-      // TODO: Send email with reset link
-      // For now, just return the token
-      res.json({ resetToken });
-    } catch (error) {
-      res.status(500).json({ message: "Fehler beim Zurücksetzen des Passworts" });
-    }
-  });
-
-  // Reset password
-  app.post("/api/reset-password", async (req, res) => {
-    try {
-      const { token, newPassword } = req.body;
-
-      const user = await storage.getUserByResetToken(token);
-      if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
-        return res.status(400).json({ message: "Ungültiger oder abgelaufener Reset-Token" });
-      }
-
-      const hashedPassword = await hashPassword(newPassword);
-      await storage.updatePassword(user.id, hashedPassword);
-      await storage.clearResetToken(user.id);
-
-      res.json({ message: "Passwort erfolgreich zurückgesetzt" });
-    } catch (error) {
-      res.status(500).json({ message: "Fehler beim Zurücksetzen des Passworts" });
-    }
   });
 }

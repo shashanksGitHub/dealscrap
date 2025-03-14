@@ -14,4 +14,12 @@ if (typeof process !== 'undefined' && process.env) {
   process.env.VITE_DEV_SERVER_CORS = 'true';
 }
 
+// Polyfill __dirname for ES modules
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+if (typeof globalThis.__dirname === 'undefined') {
+  globalThis.__dirname = dirname(fileURLToPath(import.meta.url));
+}
+
 export default globalThis.themePlugin;
