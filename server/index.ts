@@ -1,3 +1,4 @@
+import "../shim.js";
 import "tsconfig-paths/register";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
