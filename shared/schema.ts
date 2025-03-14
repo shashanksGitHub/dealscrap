@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -36,15 +36,20 @@ export const blogPosts = pgTable("blog_posts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  email: true,
-  password: true,
-}).extend({
+// Base user schema for validation
+const baseUserSchema = z.object({
+  email: z.string().email("Ungültige E-Mail-Adresse"),
   password: z.string().min(8, "Passwort muss mindestens 8 Zeichen lang sein")
     .regex(/[A-Z]/, "Passwort muss mindestens einen Großbuchstaben enthalten")
     .regex(/[0-9]/, "Passwort muss mindestens eine Zahl enthalten"),
-  passwordConfirm: z.string(),
-  email: z.string().email("Ungültige E-Mail-Adresse"),
+});
+
+// Login schema
+export const loginSchema = baseUserSchema;
+
+// Registration schema with password confirmation
+export const insertUserSchema = baseUserSchema.extend({
+  passwordConfirm: z.string()
 }).refine((data) => data.password === data.passwordConfirm, {
   message: "Passwörter stimmen nicht überein",
   path: ["passwordConfirm"],

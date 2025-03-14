@@ -17,9 +17,10 @@ type AuthContextType = {
   registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
 };
 
-type LoginData = Pick<InsertUser, "username" | "password">;
+type LoginData = Pick<InsertUser, "email" | "password">;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const {
@@ -41,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onError: (error: Error) => {
       toast({
-        title: "Login failed",
+        title: "Login fehlgeschlagen",
         description: error.message,
         variant: "destructive",
       });
@@ -58,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onError: (error: Error) => {
       toast({
-        title: "Registration failed",
+        title: "Registrierung fehlgeschlagen",
         description: error.message,
         variant: "destructive",
       });
@@ -74,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onError: (error: Error) => {
       toast({
-        title: "Logout failed",
+        title: "Logout fehlgeschlagen",
         description: error.message,
         variant: "destructive",
       });
