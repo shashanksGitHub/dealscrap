@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import CookieBanner from "@/components/cookie-banner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -197,6 +198,9 @@ export default function LandingPage() {
                 <p className="text-sm text-muted-foreground">{benefit.description}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-12 flex justify-center">
+            <DSGVOBadge />
           </div>
         </div>
       </section>

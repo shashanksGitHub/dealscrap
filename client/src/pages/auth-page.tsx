@@ -7,9 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Redirect } from "wouter";
 import { Footer } from "@/components/layout/footer";
+import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 
 export default function AuthPage() {
   const { user } = useAuth();
@@ -35,6 +35,9 @@ export default function AuthPage() {
                 <RegisterForm />
               </TabsContent>
             </Tabs>
+            <div className="mt-8">
+              <DSGVOBadge />
+            </div>
           </div>
         </div>
         <div className="hidden md:flex items-center justify-center bg-muted/30 p-8">
