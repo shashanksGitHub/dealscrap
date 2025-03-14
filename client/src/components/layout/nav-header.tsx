@@ -12,7 +12,7 @@ export function NavHeader() {
           LeadScraper
         </Link>
         <div className="flex items-center gap-6">
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="flex items-center gap-6">
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Features
             </Link>
@@ -29,9 +29,15 @@ export function NavHeader() {
               Kontakt
             </Link>
           </nav>
-          <Link href="/auth">
-            <Button size="sm">Kostenloses Konto</Button>
-          </Link>
+          {user ? (
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm">Dashboard</Button>
+            </Link>
+          ) : (
+            <Link href="/auth">
+              <Button size="sm">Kostenloses Konto</Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>

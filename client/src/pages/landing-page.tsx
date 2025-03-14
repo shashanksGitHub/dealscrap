@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import CookieBanner from "@/components/cookie-banner";
+import { NavHeader } from "@/components/layout/nav-header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function LandingPage() {
@@ -60,42 +61,8 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
-      {/* Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-        <div className="container mx-auto flex justify-between items-center py-4">
-          <Link href="/" className="text-2xl font-bold text-primary">
-            LeadScraper
-          </Link>
-          <div className="flex items-center gap-6">
-            <nav className="hidden md:flex items-center gap-6">
-              <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
-                Features
-              </Link>
-              <Link href="#benefits" className="text-muted-foreground hover:text-foreground transition-colors">
-                Vorteile
-              </Link>
-              <Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors">
-                Blog
-              </Link>
-              <Link href="#faq" className="text-muted-foreground hover:text-foreground transition-colors">
-                FAQ
-              </Link>
-              <Link href="/kontakt" className="text-muted-foreground hover:text-foreground transition-colors">
-                Kontakt
-              </Link>
-            </nav>
-            {user ? (
-              <Link href="/dashboard">
-                <Button variant="outline" size="sm">Dashboard</Button>
-              </Link>
-            ) : (
-              <Link href="/auth">
-                <Button size="sm">Kostenloses Konto</Button>
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+      {/* Use the NavHeader component */}
+      <NavHeader />
 
       {/* Hero Section */}
       <section className="pt-32 pb-24 md:pt-44 md:pb-32 px-4 relative overflow-hidden">
@@ -246,45 +213,12 @@ export default function LandingPage() {
             <h2 className="text-3xl font-bold mb-10 text-center">Häufig gestellte Fragen</h2>
 
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1">
-                <AccordionTrigger>Wie funktioniert das Kreditsystem?</AccordionTrigger>
-                <AccordionContent>
-                  Unser Kreditsystem ist einfach: Sie kaufen Credits und geben pro Lead einen Credit aus.
-                  Sie müssen nur für die Leads bezahlen, die Sie tatsächlich benötigen - ohne monatliche Gebühren oder versteckte Kosten.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-2">
-                <AccordionTrigger>Woher stammen die Daten und sind diese DSGVO-konform?</AccordionTrigger>
-                <AccordionContent>
-                  Alle Daten werden aus öffentlich zugänglichen Quellen gesammelt und in Übereinstimmung mit der DSGVO verarbeitet.
-                  Wir stellen sicher, dass alle erforderlichen rechtlichen Grundlagen für die Verarbeitung vorhanden sind.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-3">
-                <AccordionTrigger>Kann ich die Leads in mein CRM-System exportieren?</AccordionTrigger>
-                <AccordionContent>
-                  Ja, selbstverständlich! Sie können Ihre Leads bequem als CSV oder Excel-Datei exportieren oder unsere API nutzen,
-                  um die Daten direkt in Ihr CRM-System zu übertragen.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-4">
-                <AccordionTrigger>Wie aktuell sind die Leads?</AccordionTrigger>
-                <AccordionContent>
-                  Unsere Datenbank wird kontinuierlich aktualisiert, um sicherzustellen, dass Sie Zugriff auf die neuesten Informationen haben.
-                  Bei jeder Suchanfrage erhalten Sie die aktuellsten verfügbaren Daten.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-5">
-                <AccordionTrigger>Gibt es eine Mindestabnahme von Credits?</AccordionTrigger>
-                <AccordionContent>
-                  Nein, Sie können genau die Menge an Credits kaufen, die Sie benötigen. Wir bieten jedoch Mengenrabatte an,
-                  sodass der Preis pro Lead sinkt, je mehr Credits Sie auf einmal erwerben.
-                </AccordionContent>
-              </AccordionItem>
+              {faqs.map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index + 1}`}>
+                  <AccordionTrigger>{faq.question}</AccordionTrigger>
+                  <AccordionContent>{faq.answer}</AccordionContent>
+                </AccordionItem>
+              ))}
             </Accordion>
           </div>
         </div>
