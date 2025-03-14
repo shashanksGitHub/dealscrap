@@ -4,11 +4,12 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   credits: integer("credits").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
+  resetToken: text("reset_token"),
+  resetTokenExpiry: timestamp("reset_token_expiry"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -25,7 +26,6 @@ export const leads = pgTable("leads", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// New blog posts table
 export const blogPosts = pgTable("blog_posts", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -37,20 +37,21 @@ export const blogPosts = pgTable("blog_posts", {
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
   email: true,
   password: true,
 }).extend({
   password: z.string().min(8, "Passwort muss mindestens 8 Zeichen lang sein")
     .regex(/[A-Z]/, "Passwort muss mindestens einen Großbuchstaben enthalten")
     .regex(/[0-9]/, "Passwort muss mindestens eine Zahl enthalten"),
+  passwordConfirm: z.string(),
   email: z.string().email("Ungültige E-Mail-Adresse"),
-  username: z.string().min(3, "Benutzername muss mindestens 3 Zeichen lang sein")
+}).refine((data) => data.password === data.passwordConfirm, {
+  message: "Passwörter stimmen nicht überein",
+  path: ["passwordConfirm"],
 });
 
 export const insertLeadSchema = createInsertSchema(leads);
 
-// New blog post schema for insertion
 export const insertBlogPostSchema = createInsertSchema(blogPosts).pick({
   title: true,
   content: true,

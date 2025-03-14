@@ -102,6 +102,13 @@ function LoginForm() {
           >
             {loginMutation.isPending ? "Anmeldung..." : "Anmelden"}
           </Button>
+          <button
+            type="button"
+            onClick={() => window.location.href = "/reset-password"}
+            className="w-full text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            Passwort vergessen?
+          </button>
         </form>
       </CardContent>
     </Card>
@@ -113,9 +120,9 @@ function RegisterForm() {
   const form = useForm({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
+      passwordConfirm: "",
     },
   });
 
@@ -130,16 +137,6 @@ function RegisterForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="username">Benutzername</Label>
-            <Input
-              id="username"
-              {...form.register("username")}
-            />
-            {form.formState.errors.username && (
-              <p className="text-sm text-destructive">{form.formState.errors.username.message}</p>
-            )}
-          </div>
           <div className="space-y-2">
             <Label htmlFor="email">E-Mail</Label>
             <Input
@@ -161,9 +158,17 @@ function RegisterForm() {
             {form.formState.errors.password && (
               <p className="text-sm text-destructive">{form.formState.errors.password.message}</p>
             )}
-            <p className="text-sm text-muted-foreground">
-              Das Passwort muss mindestens 8 Zeichen lang sein, einen Großbuchstaben und eine Zahl enthalten.
-            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="passwordConfirm">Passwort bestätigen</Label>
+            <Input
+              id="passwordConfirm"
+              type="password"
+              {...form.register("passwordConfirm")}
+            />
+            {form.formState.errors.passwordConfirm && (
+              <p className="text-sm text-destructive">{form.formState.errors.passwordConfirm.message}</p>
+            )}
           </div>
           <Button
             type="submit"

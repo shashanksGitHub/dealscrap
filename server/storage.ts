@@ -6,13 +6,15 @@ const MemoryStore = createMemoryStore(session);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  getUserByResetToken(token: string): Promise<User | undefined>;
+  createUser(user: Omit<InsertUser, "passwordConfirm">): Promise<User>;
+  setResetToken(userId: number, token: string, expiry: Date): Promise<void>;
+  clearResetToken(userId: number): Promise<void>;
+  updatePassword(userId: number, hashedPassword: string): Promise<void>;
   addCredits(userId: number, amount: number): Promise<User>;
   createLead(lead: Omit<Lead, "id" | "createdAt">): Promise<Lead>;
   getLeadsByUserId(userId: number): Promise<Lead[]>;
-  // New blog post methods
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
   getBlogPost(id: number): Promise<BlogPost | undefined>;
   getBlogPosts(authorId?: number): Promise<BlogPost[]>;
@@ -41,15 +43,8 @@ export class MemStorage implements IStorage {
     });
   }
 
-  // Existing methods remain unchanged
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
@@ -58,17 +53,60 @@ export class MemStorage implements IStorage {
     );
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.resetToken === token,
+    );
+  }
+
+  async createUser(insertUser: Omit<InsertUser, "passwordConfirm">): Promise<User> {
     const id = this.currentUserId++;
-    const user: User = { 
-      ...insertUser, 
+    const user: User = {
+      ...insertUser,
       id,
       credits: 0,
       isActive: true,
-      createdAt: new Date()
+      createdAt: new Date(),
+      resetToken: null,
+      resetTokenExpiry: null
     };
     this.users.set(id, user);
     return user;
+  }
+
+  async setResetToken(userId: number, token: string, expiry: Date): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) throw new Error("User not found");
+
+    const updatedUser = {
+      ...user,
+      resetToken: token,
+      resetTokenExpiry: expiry
+    };
+    this.users.set(userId, updatedUser);
+  }
+
+  async clearResetToken(userId: number): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) throw new Error("User not found");
+
+    const updatedUser = {
+      ...user,
+      resetToken: null,
+      resetTokenExpiry: null
+    };
+    this.users.set(userId, updatedUser);
+  }
+
+  async updatePassword(userId: number, hashedPassword: string): Promise<void> {
+    const user = await this.getUser(userId);
+    if (!user) throw new Error("User not found");
+
+    const updatedUser = {
+      ...user,
+      password: hashedPassword
+    };
+    this.users.set(userId, updatedUser);
   }
 
   async addCredits(userId: number, amount: number): Promise<User> {
@@ -100,7 +138,6 @@ export class MemStorage implements IStorage {
     );
   }
 
-  // New blog post methods
   async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
     const id = this.currentBlogPostId++;
     const newPost: BlogPost = {
@@ -120,7 +157,7 @@ export class MemStorage implements IStorage {
 
   async getBlogPosts(authorId?: number): Promise<BlogPost[]> {
     const posts = Array.from(this.blogPosts.values());
-    return authorId 
+    return authorId
       ? posts.filter(post => post.authorId === authorId)
       : posts;
   }
