@@ -20,7 +20,7 @@ export default function AGB() {
           <section>
             <h2 className="text-xl font-semibold mb-3">1. Geltungsbereich</h2>
             <p className="mb-4">
-              Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen der LeadScraper GmbH, Musterstraße 123, 12345 Musterstadt (nachfolgend "Anbieter") und ihren Kunden (nachfolgend "Nutzer") über die Nutzung der LeadScraper-Plattform.
+              Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge zwischen der Deimann Consulting UG, Randstraße 75, 22525 Hamburg (nachfolgend "Anbieter") und ihren Kunden (nachfolgend "Nutzer") über die Nutzung der LeadScraper-Plattform.
             </p>
           </section>
 

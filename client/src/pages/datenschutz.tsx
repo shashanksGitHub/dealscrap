@@ -22,7 +22,7 @@ export default function Datenschutz() {
         <div className="bg-primary/5 border border-primary/10 rounded-lg p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">🔒 Unsere Verpflichtung zum Datenschutz</h2>
           <p className="text-muted-foreground">
-            LeadScraper legt höchsten Wert auf den Schutz Ihrer personenbezogenen Daten. Wir verarbeiten Ihre Daten ausschließlich im Einklang mit der DSGVO und den geltenden deutschen Datenschutzgesetzen. Unsere Plattform wurde von Grund auf nach den Prinzipien "Privacy by Design" und "Privacy by Default" entwickelt.
+            Die Deimann Consulting UG legt höchsten Wert auf den Schutz Ihrer personenbezogenen Daten. Wir verarbeiten Ihre Daten ausschließlich im Einklang mit der DSGVO und den geltenden deutschen Datenschutzgesetzen. Unsere Plattform wurde von Grund auf nach den Prinzipien "Privacy by Design" und "Privacy by Default" entwickelt.
           </p>
         </div>
 
@@ -31,7 +31,7 @@ export default function Datenschutz() {
             <h2 className="text-xl font-semibold mb-4">1. Überblick und DSGVO-Konformität</h2>
             <div className="space-y-4">
               <p>
-                Wir bei LeadScraper haben umfassende Maßnahmen implementiert, um die vollständige Konformität mit der DSGVO sicherzustellen:
+                Wir bei der Deimann Consulting UG haben umfassende Maßnahmen implementiert, um die vollständige Konformität mit der DSGVO sicherzustellen:
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>Verschlüsselte Datenübertragung (SSL/TLS)</li>
@@ -46,15 +46,15 @@ export default function Datenschutz() {
           <section>
             <h2 className="text-xl font-semibold mb-4">2. Verantwortliche Stelle</h2>
             <p>
-              LeadScraper GmbH<br />
-              Musterstraße 123<br />
-              12345 Musterstadt<br />
+              Deimann Consulting UG<br />
+              Randstraße 75<br />
+              22525 Hamburg<br />
               Deutschland
             </p>
             <p className="mt-4">
               Datenschutzbeauftragter:<br />
-              E-Mail: datenschutz@leadscaper.example<br />
-              Tel.: +49 123 456789
+              E-Mail: info@deimannconsulting.com<br />
+              Tel.: 015782260593
             </p>
           </section>
 
@@ -117,7 +117,7 @@ export default function Datenschutz() {
               </ul>
               <p>
                 Zur Ausübung Ihrer Rechte kontaktieren Sie uns bitte unter:<br />
-                datenschutz@leadscaper.example
+                info@deimannconsulting.com
               </p>
             </div>
           </section>
@@ -149,10 +149,10 @@ export default function Datenschutz() {
             <h2 className="text-xl font-semibold mb-4">Kontakt bei Datenschutzfragen</h2>
             <p>
               Bei Fragen zum Datenschutz können Sie sich jederzeit an unseren Datenschutzbeauftragten wenden:<br /><br />
-              Dr. Max Mustermann<br />
-              LeadScraper GmbH<br />
-              E-Mail: datenschutz@leadscaper.example<br />
-              Tel.: +49 123 456789
+              Datenschutzbeauftragter<br />
+              Deimann Consulting UG<br />
+              E-Mail: info@deimannconsulting.com<br />
+              Tel.: 015782260593
             </p>
           </section>
         </div>

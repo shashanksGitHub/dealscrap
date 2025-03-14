@@ -19,42 +19,33 @@ export default function Impressum() {
         <div className="space-y-6 max-w-3xl">
           <section>
             <h2 className="text-xl font-semibold mb-3">Angaben gemäß § 5 TMG</h2>
-            <p>LeadScraper GmbH<br />
-            Musterstraße 123<br />
-            12345 Musterstadt<br />
+            <p>Deimann Consulting UG<br />
+            Randstraße 75<br />
+            22525 Hamburg<br />
             Deutschland</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-3">Kontakt</h2>
-            <p>Telefon: +49 123 456789<br />
-            E-Mail: info@leadscaper.example</p>
+            <p>Telefon: 015782260593<br />
+            E-Mail: info@deimannconsulting.com</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-3">Vertreten durch</h2>
-            <p>Max Mustermann<br />
-            Geschäftsführer</p>
+            <p>Janik Deimann</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-3">Handelsregister</h2>
-            <p>Registergericht: Amtsgericht Musterstadt<br />
-            Registernummer: HRB 12345</p>
+            <p>Registergericht: Amtsgericht Hamburg<br />
+            Registernummer: HRB 164162</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold mb-3">Umsatzsteuer-ID</h2>
             <p>Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br />
-            DE123456789</p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold mb-3">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
-            <p>Max Mustermann<br />
-            Musterstraße 123<br />
-            12345 Musterstadt<br />
-            Deutschland</p>
+            DE332747716</p>
           </section>
         </div>
       </div>
