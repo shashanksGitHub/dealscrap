@@ -82,8 +82,12 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm install"
+args = "kill-port 3000 5000"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx vite --host 0.0.0.0 --port 3000"
+args = "NODE_ENV=development node server/index.js & "
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd client && npx vite --host 0.0.0.0 --port 3000"
