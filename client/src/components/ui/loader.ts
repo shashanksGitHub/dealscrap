@@ -1,5 +1,6 @@
 "use client";
 
-import { Loader2 as LucideLoader } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
-export const Loader2 = LucideLoader;
+export { Loader2 };
+export default Loader2;
