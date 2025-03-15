@@ -83,7 +83,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
               <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                 <SearchIcon className="h-6 w-6 text-primary" />
@@ -211,7 +211,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Industries Section - Desktop Optimiert */}
+      {/* Industries Section */}
       <section className="bg-muted/10 py-16">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -220,7 +220,7 @@ export default function LandingPage() {
               Perfekt abgestimmt auf die Bedürfnisse verschiedener Branchen
             </p>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {industries.map((industry, index) => (
               <div key={index} className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
                 <div className="flex items-center gap-3 mb-3">
@@ -236,7 +236,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Benefits Section - Desktop Optimiert */}
+      {/* Benefits Section */}
       <section id="benefits" className="bg-muted/5 py-16">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center mb-12">
@@ -245,7 +245,7 @@ export default function LandingPage() {
               Unser Tool wurde entwickelt, um Ihren Vertriebsprozess zu optimieren
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, index) => (
               <div key={index} className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
                 <div className="flex items-center gap-3 mb-3">
