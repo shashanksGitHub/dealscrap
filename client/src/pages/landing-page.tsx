@@ -6,6 +6,7 @@ import CookieBanner from "@/components/cookie-banner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { Footer } from "@/components/layout/footer";
+import { ActivityBubble } from "@/components/activity-bubble";
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -231,6 +232,7 @@ export default function LandingPage() {
 
       <Footer />
       <CookieBanner />
+      <ActivityBubble />
     </div>
   );
 }
