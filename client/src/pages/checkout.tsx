@@ -8,9 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Loader2, ArrowLeftIcon, CreditCard } from "lucide-react";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { Footer } from "@/components/layout/footer";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
@@ -25,13 +30,50 @@ const CREDIT_PACKAGES: Record<string, { credits: number; price: number }> = {
   '600': { credits: 1000, price: 600 }
 };
 
+const billingSchema = z.object({
+  companyName: z.string().min(1, "Firmenname ist erforderlich"),
+  street: z.string().min(1, "Straße ist erforderlich"),
+  city: z.string().min(1, "Stadt ist erforderlich"),
+  postalCode: z.string().min(5, "PLZ muss mindestens 5 Zeichen lang sein"),
+  vatId: z.string().optional()
+});
+
+type BillingFormData = z.infer<typeof billingSchema>;
+
 const CheckoutForm = ({ amount }: { amount: number }) => {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const form = useForm<BillingFormData>({
+    resolver: zodResolver(billingSchema),
+    defaultValues: {
+      companyName: "",
+      street: "",
+      city: "",
+      postalCode: "",
+      vatId: ""
+    }
+  });
+
+  const onSubmitBilling = async (data: BillingFormData) => {
+    try {
+      const response = await apiRequest("POST", "/api/save-billing-info", data);
+      if (response.ok) {
+        setShowPayment(true);
+      }
+    } catch (error) {
+      toast({
+        title: "Fehler",
+        description: "Billing-Informationen konnten nicht gespeichert werden",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
@@ -66,8 +108,78 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
     }
   };
 
+  if (!showPayment) {
+    return (
+      <form onSubmit={form.handleSubmit(onSubmitBilling)} className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="companyName">Firmenname *</Label>
+            <Input 
+              id="companyName"
+              {...form.register("companyName")}
+              placeholder="Ihre Firma GmbH"
+            />
+            {form.formState.errors.companyName && (
+              <p className="text-sm text-destructive mt-1">{form.formState.errors.companyName.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="street">Straße und Hausnummer *</Label>
+            <Input 
+              id="street"
+              {...form.register("street")}
+              placeholder="Musterstraße 123"
+            />
+            {form.formState.errors.street && (
+              <p className="text-sm text-destructive mt-1">{form.formState.errors.street.message}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="postalCode">PLZ *</Label>
+              <Input 
+                id="postalCode"
+                {...form.register("postalCode")}
+                placeholder="12345"
+              />
+              {form.formState.errors.postalCode && (
+                <p className="text-sm text-destructive mt-1">{form.formState.errors.postalCode.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="city">Ort *</Label>
+              <Input 
+                id="city"
+                {...form.register("city")}
+                placeholder="Berlin"
+              />
+              {form.formState.errors.city && (
+                <p className="text-sm text-destructive mt-1">{form.formState.errors.city.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="vatId">USt-IdNr. (optional)</Label>
+            <Input 
+              id="vatId"
+              {...form.register("vatId")}
+              placeholder="DE123456789"
+            />
+          </div>
+        </div>
+
+        <Button type="submit" className="w-full" size="lg">
+          Weiter zur Zahlung
+        </Button>
+      </form>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handlePayment} className="space-y-6">
       <div className="rounded-lg border border-border p-4 bg-muted/5">
         <div className="flex justify-between items-center">
           <div>
@@ -206,7 +318,7 @@ export default function Checkout() {
             <CardHeader>
               <CardTitle>Kreditpaket kaufen</CardTitle>
               <CardDescription>
-                Sicher bezahlen mit Stripe
+                Bitte geben Sie Ihre Rechnungsinformationen ein
               </CardDescription>
             </CardHeader>
             <CardContent>
