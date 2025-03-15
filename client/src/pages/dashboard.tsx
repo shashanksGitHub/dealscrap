@@ -8,11 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { SearchIcon, LogOutIcon, DownloadIcon, PlayCircleIcon } from "lucide-react";
+import { SearchIcon, LogOutIcon, DownloadIcon, PlayCircleIcon, Loader2 } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
-import { Loader2 } from "@/components/ui/loader";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
