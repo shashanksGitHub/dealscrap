@@ -13,27 +13,26 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
-      {/* Hero Section */}
-      <section className="pt-24 md:pt-32 lg:pt-44 pb-16 md:pb-24 lg:pb-32 px-4 relative overflow-hidden">
-        {/* Animierter Hintergrund */}
+      {/* Hero Section - Optimiert */}
+      <section className="pt-16 md:pt-24 lg:pt-32 pb-12 md:pb-16 lg:pb-24 px-4 relative overflow-hidden">
+        {/* Animierter Hintergrund bleibt unverändert */}
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(black,transparent_70%)] -z-10" />
         <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl opacity-70 animate-blob"></div>
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-blue-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
-
         <div className="container mx-auto">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4 animate-fade-in">
               <Zap className="h-4 w-4" />
               <span>Höchsteffiziente Leadgenerierung durch KI-Technologie</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 md:mb-8 bg-gradient-to-r from-primary via-violet-500 to-blue-500 bg-clip-text text-transparent leading-tight animate-gradient">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 md:mb-6 bg-gradient-to-r from-primary via-violet-500 to-blue-500 bg-clip-text text-transparent leading-tight animate-gradient">
               Einfach & kostengünstig B2B-Leads scrapen
             </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground mb-8 md:mb-10 max-w-3xl mx-auto px-4 animate-fade-in-up">
+            <p className="text-lg sm:text-xl text-muted-foreground mb-6 md:mb-8 max-w-3xl mx-auto px-4 animate-fade-in-up">
               Finden Sie qualifizierte Geschäftskontakte mit unserem leistungsstarken Tool und steigern Sie Ihren Vertriebserfolg.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 mb-12 animate-fade-in-up animation-delay-300">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center px-4 mb-8 animate-fade-in-up animation-delay-300">
               <Link href="/auth">
                 <Button size="lg" className="w-full sm:w-auto rounded-full text-base md:text-lg px-6 md:px-8 py-4 md:py-6 h-auto font-medium bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105">
                   Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-5 w-5" />
@@ -46,49 +45,47 @@ export default function LandingPage() {
               </Link>
             </div>
             <div className="flex justify-center animate-fade-in-up animation-delay-500">
-              <DSGVOBadge />
+              <DSGVOBadge size="sm" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section mit verbesserten Cards */}
-      <section id="features" className="py-16 md:py-20 px-4">
+      {/* Features Section - Optimiert */}
+      <section id="features" className="py-12 md:py-16 px-4">
         <div className="container mx-auto">
-          <div className="text-center mb-12 md:mb-16">
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Einfache Lead-Generierung mit LeadScraper</h2>
-            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
+            <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
               Unser Tool bietet alles, was Sie für eine erfolgreiche Lead-Generierung benötigen
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-            <div className="group bg-background/50 backdrop-blur-sm p-6 md:p-8 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
-              <div className="bg-primary/10 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                <SearchIcon className="h-6 w-6 text-primary" />
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            <div className="group bg-background/50 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
+              <div className="bg-primary/10 w-10 h-10 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <SearchIcon className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="text-lg md:text-xl font-medium mb-2">Präzise Suche</h3>
-              <p className="text-sm md:text-base text-muted-foreground">
+              <h3 className="text-lg font-medium mb-2">Präzise Suche</h3>
+              <p className="text-sm text-muted-foreground">
                 Finden Sie genau die Leads, die Sie suchen, mit unseren fortschrittlichen Filteroptionen.
               </p>
             </div>
-
-            <div className="group bg-background/50 backdrop-blur-sm p-6 md:p-8 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
-              <div className="bg-primary/10 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                <GlobeIcon className="h-6 w-6 text-primary" />
+            <div className="group bg-background/50 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
+              <div className="bg-primary/10 w-10 h-10 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <GlobeIcon className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="text-lg md:text-xl font-medium mb-2">Globale Abdeckung</h3>
-              <p className="text-sm md:text-base text-muted-foreground">
+              <h3 className="text-lg font-medium mb-2">Globale Abdeckung</h3>
+              <p className="text-sm text-muted-foreground">
                 Zugriff auf Millionen von Unternehmen in Deutschland und weltweit, regelmäßig aktualisiert.
               </p>
             </div>
-
-            <div className="group bg-background/50 backdrop-blur-sm p-6 md:p-8 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
-              <div className="bg-primary/10 w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                <ShieldCheck className="h-6 w-6 text-primary" />
+            <div className="group bg-background/50 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
+              <div className="bg-primary/10 w-10 h-10 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                <ShieldCheck className="h-5 w-5 text-primary" />
               </div>
-              <h3 className="text-lg md:text-xl font-medium mb-2">Verifizierte Daten</h3>
-              <p className="text-sm md:text-base text-muted-foreground">
+              <h3 className="text-lg font-medium mb-2">Verifizierte Daten</h3>
+              <p className="text-sm text-muted-foreground">
                 Alle Daten werden vor dem Export validiert, um höchste Qualitätsstandards zu gewährleisten.
               </p>
             </div>
@@ -191,7 +188,6 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
             </div>
-
             <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg">
@@ -201,7 +197,6 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
             </div>
-
             <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg">
@@ -211,7 +206,6 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
             </div>
-
             <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg">
@@ -221,7 +215,6 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
             </div>
-
             <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg">
@@ -231,7 +224,6 @@ export default function LandingPage() {
               </div>
               <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
             </div>
-
             <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg">
@@ -266,7 +258,6 @@ export default function LandingPage() {
                 Zugriff auf Millionen von Unternehmenskontakten in Deutschland und weltweit.
               </p>
             </div>
-
             <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
@@ -278,7 +269,6 @@ export default function LandingPage() {
                 Filtern Sie nach Branche, Standort, Unternehmensgröße und mehr.
               </p>
             </div>
-
             <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
@@ -290,7 +280,6 @@ export default function LandingPage() {
                 Alle Daten werden unter Einhaltung der Datenschutzgrundverordnung verarbeitet.
               </p>
             </div>
-
             <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
@@ -302,7 +291,6 @@ export default function LandingPage() {
                 Integrieren Sie LeadScraper nahtlos in Ihre bestehenden Systeme.
               </p>
             </div>
-
             <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
@@ -314,7 +302,6 @@ export default function LandingPage() {
                 Exportieren Sie Ihre Leads in verschiedenen Formaten wie CSV, Excel oder direkt in Ihr CRM.
               </p>
             </div>
-
             <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
               <div className="flex items-center gap-3 mb-3">
                 <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
@@ -335,7 +322,6 @@ export default function LandingPage() {
         <div className="container mx-auto">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold mb-8 md:mb-10 text-center">Häufig gestellte Fragen</h2>
-
             <Accordion type="single" collapsible className="w-full">
               {faqs.map((faq, index) => (
                 <AccordionItem key={index} value={`item-${index + 1}`}>

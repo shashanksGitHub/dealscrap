@@ -20,10 +20,10 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="flex-grow grid md:grid-cols-2 pt-20">
-        <div className="flex items-center justify-center p-8">
-          <div className="w-full max-w-sm space-y-8">
-            <DSGVOBadge />
+      <div className="flex-grow grid md:grid-cols-2 pt-12 md:pt-16">
+        <div className="flex items-center justify-center p-6 md:p-8">
+          <div className="w-full max-w-sm space-y-6">
+            <DSGVOBadge size="sm" className="mx-auto" />
             <Tabs defaultValue="login">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Anmelden</TabsTrigger>
