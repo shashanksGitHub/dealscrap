@@ -65,12 +65,12 @@ export function ActivityBubble() {
                 {activities[currentActivity].name} hat gerade {activities[currentActivity].leads} Leads gescraped.
               </p>
               <div className="flex items-center gap-1 mt-2">
-                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-100/20 text-emerald-500 text-xs font-medium">
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-100/20 text-emerald-700 text-xs font-medium">
                   <Check className="w-3 h-3" />
                   Verifiziert
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  • Gerade eben
+                  • vor {Math.floor(Math.random() * 10) + 1} Minuten
                 </span>
               </div>
             </div>
