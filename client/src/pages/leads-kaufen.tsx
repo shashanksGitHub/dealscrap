@@ -4,16 +4,18 @@ import { Helmet } from "react-helmet";
 import { Footer } from "@/components/layout/footer";
 import { 
   CheckCircle2, 
-  AlertCircle, 
   ArrowRight, 
-  DollarSign, 
-  Target, 
-  Search,
   ShieldCheck,
   Users,
   LineChart,
   Settings
 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function LeadsKaufenPage() {
   return (
@@ -33,9 +35,9 @@ export default function LeadsKaufenPage() {
           <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl opacity-70 animate-blob" />
           <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
 
-          <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+          <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              <h1 className="scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl mb-6">
                 Leads kaufen – Hochwertige B2B-Kontakte in Sekunden erhalten
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -46,11 +48,13 @@ export default function LeadsKaufenPage() {
         </section>
 
         {/* Warum Leads kaufen? */}
-        <section id="was-sind-leads" className="py-16 bg-muted/5">
-          <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+        <section className="py-24 bg-muted/5">
+          <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl lg:text-3xl font-bold mb-6">Warum Leads kaufen dein Business schneller wachsen lässt</h2>
-              <div className="grid sm:grid-cols-2 gap-6 mt-8">
+              <h2 className="scroll-m-20 text-3xl font-bold tracking-tight mb-8 text-center">
+                Warum Leads kaufen dein Business schneller wachsen lässt
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-8">
                 <div className="flex gap-4">
                   <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
                   <div>
@@ -85,27 +89,29 @@ export default function LeadsKaufenPage() {
         </section>
 
         {/* So funktioniert's */}
-        <section className="py-16">
-          <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-6 text-center">In 3 Schritten zu deinen perfekten Leads</h2>
-            <div className="grid sm:grid-cols-3 gap-8 mt-12">
+        <section className="py-24">
+          <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">
+            <h2 className="scroll-m-20 text-3xl font-bold tracking-tight mb-12 text-center">
+              In 3 Schritten zu deinen perfekten Leads
+            </h2>
+            <div className="grid sm:grid-cols-3 gap-8">
               <div className="bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10">
-                <Search className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-lg font-medium mb-2">1. Registrieren & Filter setzen</h3>
+                <LineChart className="h-8 w-8 text-primary mb-4" />
+                <h3 className="font-medium text-lg mb-2">1. Registrieren & Filter setzen</h3>
                 <p className="text-sm text-muted-foreground">
                   Definiere Standort, Branche & weitere Kriterien für deine Wunschkunden
                 </p>
               </div>
               <div className="bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10">
-                <LineChart className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-lg font-medium mb-2">2. Automatische Lead-Generierung</h3>
+                <Users className="h-8 w-8 text-primary mb-4" />
+                <h3 className="font-medium text-lg mb-2">2. Automatische Lead-Generierung</h3>
                 <p className="text-sm text-muted-foreground">
                   Unser System scannt aktuelle Unternehmensdaten und filtert relevante Kontakte heraus
                 </p>
               </div>
               <div className="bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10">
-                <Users className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-lg font-medium mb-2">3. Leads sofort nutzen</h3>
+                <Settings className="h-8 w-8 text-primary mb-4" />
+                <h3 className="font-medium text-lg mb-2">3. Leads sofort nutzen</h3>
                 <p className="text-sm text-muted-foreground">
                   Exportiere deine Leads als CSV oder nutze sie direkt in deinem CRM
                 </p>
@@ -115,155 +121,74 @@ export default function LeadsKaufenPage() {
         </section>
 
         {/* Branchen & Anwendungsfälle */}
-        <section className="py-16 bg-muted/5">
-          <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-12 text-center">Leads kaufen – Branchen & Anwendungsfälle</h2>
+        <section className="py-24 bg-muted/5">
+          <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">
+            <h2 className="scroll-m-20 text-3xl font-bold tracking-tight mb-12 text-center">
+              Leads kaufen – Branchen & Anwendungsfälle
+            </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
-                <h3 className="text-lg font-medium mb-3">B2B Leads</h3>
+                <h3 className="font-medium text-lg mb-3">B2B Leads</h3>
                 <p className="text-muted-foreground">Perfekt für Agenturen, Berater & SaaS-Unternehmen</p>
               </div>
               <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
-                <h3 className="text-lg font-medium mb-3">Immobilien Leads</h3>
+                <h3 className="font-medium text-lg mb-3">Immobilien Leads</h3>
                 <p className="text-muted-foreground">Finde Unternehmen, die in neue Gewerbeimmobilien investieren</p>
               </div>
               <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
-                <h3 className="text-lg font-medium mb-3">E-Commerce Leads</h3>
+                <h3 className="font-medium text-lg mb-3">E-Commerce Leads</h3>
                 <p className="text-muted-foreground">Generiere Händlerkontakte für dein Online-Geschäft</p>
               </div>
               <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
-                <h3 className="text-lg font-medium mb-3">Handwerker Leads</h3>
+                <h3 className="font-medium text-lg mb-3">Handwerker Leads</h3>
                 <p className="text-muted-foreground">Erreiche Facility Manager & Bauunternehmen</p>
               </div>
               <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
-                <h3 className="text-lg font-medium mb-3">Finanz- & Versicherungsleads</h3>
+                <h3 className="font-medium text-lg mb-3">Finanz- & Versicherungsleads</h3>
                 <p className="text-muted-foreground">Verkaufe gezielt an Unternehmen mit Bedarf</p>
               </div>
               <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
-                <h3 className="text-lg font-medium mb-3">IT & Software Leads</h3>
+                <h3 className="font-medium text-lg mb-3">IT & Software Leads</h3>
                 <p className="text-muted-foreground">Finde Unternehmen, die deine digitalen Lösungen brauchen</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Worauf beim Lead-Kauf achten */}
-        <section className="py-16 bg-muted/5">
-          <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-6">Worauf Sie beim Lead-Kauf achten sollten</h2>
-            <div className="grid sm:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-xl font-semibold mb-4">Die wichtigsten Qualitätskriterien</h3>
-                <ul className="space-y-4">
-                  <li className="flex gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
-                    <span className="text-muted-foreground">Aktualität der Daten (nicht älter als 3 Monate)</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
-                    <span className="text-muted-foreground">Vollständigkeit der Kontaktinformationen</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
-                    <span className="text-muted-foreground">DSGVO-konforme Datenerhebung</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
-                    <span className="text-muted-foreground">Verifizierte Unternehmensangaben</span>
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-4">Häufige Fallstricke vermeiden</h3>
-                <ul className="space-y-4">
-                  <li className="flex gap-3">
-                    <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
-                    <span className="text-muted-foreground">Veraltete oder duplizierte Datensätze</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
-                    <span className="text-muted-foreground">Fehlende Opt-in Nachweise</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
-                    <span className="text-muted-foreground">Intransparente Preismodelle</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
-                    <span className="text-muted-foreground">Mangelnde Zielgruppengenauigkeit</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* LeadScraper Lösung */}
-        <section className="py-16">
-          <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-2xl lg:text-3xl font-bold mb-6">Die moderne Lösung: LeadScraper</h2>
-              <p className="text-muted-foreground mb-8">
-                Mit LeadScraper bieten wir Ihnen eine innovative Alternative zum klassischen Lead-Kauf. Generieren Sie hochwertige B2B-Leads in Echtzeit, DSGVO-konform und zu fairen Preisen.
-              </p>
-              <div className="grid sm:grid-cols-3 gap-6 mb-8">
-                <div className="flex flex-col items-center p-4">
-                  <ShieldCheck className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-medium mb-2">100% DSGVO-konform</h3>
-                  <p className="text-sm text-muted-foreground">Rechtssichere Lead-Generierung</p>
-                </div>
-                <div className="flex flex-col items-center p-4">
-                  <LineChart className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-medium mb-2">Beste Datenqualität</h3>
-                  <p className="text-sm text-muted-foreground">Verifizierte Geschäftskontakte</p>
-                </div>
-                <div className="flex flex-col items-center p-4">
-                  <Settings className="h-8 w-8 text-primary mb-3" />
-                  <h3 className="font-medium mb-2">Flexible Filterung</h3>
-                  <p className="text-sm text-muted-foreground">Präzise Zielgruppenauswahl</p>
-                </div>
-              </div>
-              <Link href="/auth">
-                <Button size="lg" className="rounded-full">
-                  Jetzt kostenlos testen <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-
         {/* FAQ Section */}
-        <section className="py-16">
-          <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+        <section className="py-24 bg-background">
+          <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl lg:text-3xl font-bold mb-6 text-center">Häufig gestellte Fragen zum Lead-Kauf</h2>
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-medium mb-2">Was kostet ein B2B Lead durchschnittlich?</h3>
-                  <p className="text-muted-foreground">
+              <h2 className="scroll-m-20 text-3xl font-bold tracking-tight mb-12 text-center">
+                Häufig gestellte Fragen zum Lead-Kauf
+              </h2>
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger>Was kostet ein B2B Lead durchschnittlich?</AccordionTrigger>
+                  <AccordionContent>
                     Die Kosten für B2B Leads variieren stark nach Qualität und Branche. Klassische Anbieter verlangen zwischen 50€ und 200€ pro Lead. Mit LeadScraper können Sie hochwertige Leads bereits ab 1€ generieren.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-2">Wie erkenne ich qualitativ hochwertige Leads?</h3>
-                  <p className="text-muted-foreground">
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                  <AccordionTrigger>Wie erkenne ich qualitativ hochwertige Leads?</AccordionTrigger>
+                  <AccordionContent>
                     Hochwertige Leads zeichnen sich durch aktuelle und vollständige Kontaktdaten, verifizierte Firmeninformationen und eine präzise Zielgruppenpassung aus.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-2">Sind gekaufte Leads DSGVO-konform?</h3>
-                  <p className="text-muted-foreground">
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-3">
+                  <AccordionTrigger>Sind gekaufte Leads DSGVO-konform?</AccordionTrigger>
+                  <AccordionContent>
                     LeadScraper garantiert zu 100% DSGVO-konforme Lead-Generierung.
-                  </p>
-                </div>
-              </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="py-16">
-          <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+        <section className="py-24">
+          <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center">
               <div className="flex gap-4 justify-center">
                 <Link href="/auth">
