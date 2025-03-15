@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Aktivitätsdaten mit realen Firmennamen
@@ -32,7 +32,7 @@ export function ActivityBubble() {
         setCurrentActivity((prev) => (prev + 1) % activities.length);
         setIsVisible(true);
       }, 500);
-    }, 8000); // Längere Anzeigedauer
+    }, 15000); // Längere Anzeigedauer
 
     return () => clearInterval(interval);
   }, []);
@@ -57,26 +57,21 @@ export function ActivityBubble() {
               <span className="sr-only">Schließen</span>
             </button>
 
-            <div className="flex items-start gap-3">
-              <div className="shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">
-                  Scrapingvorgang abgeschlossen
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {activities[currentActivity].name} hat gerade {activities[currentActivity].leads} Leads gescraped.
-                </p>
-                <div className="flex items-center gap-1 mt-2">
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                    <CheckCircle className="w-3 h-3" />
-                    Verifiziert
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    • Gerade eben
-                  </span>
-                </div>
+            <div>
+              <p className="text-sm font-medium">
+                Scrapingvorgang abgeschlossen
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {activities[currentActivity].name} hat gerade {activities[currentActivity].leads} Leads gescraped.
+              </p>
+              <div className="flex items-center gap-1 mt-2">
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                  <X className="w-3 h-3" /> {/*CheckCircle removed and replaced with X*/}
+                  Verifiziert
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  • Gerade eben
+                </span>
               </div>
             </div>
           </motion.div>
