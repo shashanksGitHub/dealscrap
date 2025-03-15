@@ -9,7 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 export function NavHeader() {
   const { user, logout } = useAuth();
 
-  // Fetch fresh user data on every render
+  // Fetch fresh user data every 5 seconds
   const { data: freshUserData } = useQuery({
     queryKey: ['/api/user'],
     queryFn: async () => {
@@ -28,6 +28,9 @@ export function NavHeader() {
   // Calculate the percentage of used credits
   const maxCredits = 100;
   const creditsPercentage = ((maxCredits - (currentUser?.credits || 0)) / maxCredits) * 100;
+
+  // Log credit updates
+  console.log('Current user credits:', currentUser?.credits);
 
   return (
     <header className="bg-background border-b">

@@ -34,6 +34,10 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ message: "Ungültiger Betrag" });
       }
 
+      // Log the current user and credit package details
+      console.log('User making purchase:', req.user);
+      console.log('Credit package:', CREDIT_PACKAGES[amount]);
+
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100, // Convert to cents
         currency: "eur",
@@ -47,6 +51,7 @@ export async function registerRoutes(router: Router) {
       });
 
       console.log('Payment intent created:', paymentIntent.id);
+      console.log('Payment intent metadata:', paymentIntent.metadata);
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
@@ -83,6 +88,7 @@ export async function registerRoutes(router: Router) {
       if (event.type === 'payment_intent.succeeded') {
         const paymentIntent = event.data.object;
         console.log('💰 Payment succeeded:', paymentIntent.id);
+        console.log('Payment metadata:', paymentIntent.metadata);
 
         try {
           // Ensure credits and userId are numbers
