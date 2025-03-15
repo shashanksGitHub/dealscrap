@@ -9,8 +9,8 @@ export function DSGVOBadge({ className, size = "default" }: DSGVOBadgeProps) {
   return (
     <div className={cn(
       "flex flex-col items-center justify-center p-3 text-center bg-white/50 backdrop-blur-sm rounded-xl border border-border/50 shadow-sm",
-      size === "sm" && "max-w-[200px]",
-      size === "default" && "max-w-[300px]",
+      size === "sm" && "max-w-[280px]",
+      size === "default" && "max-w-[400px]",
       className
     )}>
       <img
