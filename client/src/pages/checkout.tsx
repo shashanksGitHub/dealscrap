@@ -12,6 +12,7 @@ import { Loader2, ArrowLeftIcon, CreditCard } from "lucide-react";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Footer from "@/components/layout/footer";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
@@ -271,38 +272,48 @@ export default function Checkout() {
   }
 
   return (
-    <div className="min-h-screen py-20 px-4">
-      <div className="max-w-md mx-auto space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Kreditpaket kaufen</CardTitle>
-            <CardDescription>
-              Sicher bezahlen mit Stripe
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Elements stripe={stripePromise} options={{ 
-              clientSecret,
-              appearance: { 
-                theme: 'stripe',
-                variables: {
-                  colorPrimary: '#7c3aed',
-                  colorBackground: '#ffffff',
-                  colorText: '#1a1a1a',
-                }
-              },
-              paymentMethodTypes: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact']
-            }}>
-              <CheckoutForm 
-                amount={amount} 
-                credits={CREDIT_PACKAGES[amount.toString()]?.credits || 0} 
-              />
-            </Elements>
-          </CardContent>
-        </Card>
+    <div className="min-h-screen flex flex-col">
+      <div className="py-20 px-4 flex-grow">
+        <div className="max-w-md mx-auto space-y-8">
+          <Link href="/dashboard">
+            <Button variant="outline" className="mb-6">
+              <ArrowLeftIcon className="mr-2 h-4 w-4" />
+              Zurück zum Dashboard
+            </Button>
+          </Link>
 
-        <DSGVOBadge />
+          <Card>
+            <CardHeader>
+              <CardTitle>Kreditpaket kaufen</CardTitle>
+              <CardDescription>
+                Sicher bezahlen mit Stripe
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Elements stripe={stripePromise} options={{ 
+                clientSecret,
+                appearance: { 
+                  theme: 'stripe',
+                  variables: {
+                    colorPrimary: '#7c3aed',
+                    colorBackground: '#ffffff',
+                    colorText: '#1a1a1a',
+                  }
+                },
+                paymentMethodTypes: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact']
+              }}>
+                <CheckoutForm 
+                  amount={amount} 
+                  credits={CREDIT_PACKAGES[amount.toString()]?.credits || 0} 
+                />
+              </Elements>
+            </CardContent>
+          </Card>
+
+          <DSGVOBadge />
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }
