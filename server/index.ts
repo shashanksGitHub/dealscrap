@@ -91,48 +91,40 @@ async function startServer() {
 
     // Set environment based on NODE_ENV
     const isProduction = process.env.NODE_ENV === "production";
+    log(`Starting server in ${isProduction ? 'production' : 'development'} mode`);
 
-    if (!isProduction) {
-      log("Setting up development environment...");
-      process.env.NODE_ENV = "development";
+    // First set up auth as it's needed for protected routes
+    log("Setting up authentication...");
+    setupAuth(app);
 
-      // First set up auth as it's needed for protected routes
-      log("Setting up authentication...");
-      setupAuth(app);
+    // Then register API routes before any static middleware
+    log("Registering API routes...");
+    const apiRouter = express.Router();
+    await registerRoutes(apiRouter);
 
-      // Then register API routes before Vite middleware
-      log("Registering API routes...");
-      const apiRouter = express.Router();
-      await registerRoutes(apiRouter);
-
-      // Mount API router first with explicit content type
-      app.use('/api', (req, res, next) => {
-        // Special handling for Stripe webhooks
-        if (req.path === '/stripe-webhook') {
-          // Raw body needed for webhook signature verification
-          res.setHeader('Content-Type', 'application/json');
-          return next();
-        }
-        // Force JSON content type for other API routes
+    // Mount API router with explicit content type
+    app.use('/api', (req, res, next) => {
+      // Special handling for Stripe webhooks
+      if (req.path === '/stripe-webhook') {
         res.setHeader('Content-Type', 'application/json');
-        log(`Processing API request: ${req.method} ${req.path}`);
-        next();
-      }, apiRouter);
+        return next();
+      }
+      // Force JSON content type for other API routes
+      res.setHeader('Content-Type', 'application/json');
+      log(`Processing API request: ${req.method} ${req.path}`);
+      next();
+    }, apiRouter);
 
-      // Finally set up Vite middleware
-      log("Setting up Vite middleware...");
-      await setupVite(app, server);
-
-      app.use(errorHandler);
-    } else {
-      log("Setting up production environment...");
-      setupAuth(app);
-      const apiRouter = express.Router();
-      await registerRoutes(apiRouter);
-      app.use('/api', apiRouter);
+    if (isProduction) {
+      log("Setting up production static file serving...");
       serveStatic(app);
-      app.use(errorHandler);
+    } else {
+      log("Setting up development Vite middleware...");
+      await setupVite(app, server);
     }
+
+    // Add error handler last
+    app.use(errorHandler);
 
     const port = Number(process.env.PORT || 5000);
 
