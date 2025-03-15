@@ -36,12 +36,23 @@ app.use((req, res, next) => {
     'https://replit.com',
     'https://*.replit.dev',
     'http://localhost:3000',
-    'http://localhost:5000'
+    'http://localhost:5000',
+    'https://d275e6c7-6b37-45ce-8254-4e1e9b0dcd4b-00-23twek6n0llzu.riker.replit.dev'
   ];
 
   const origin = req.headers.origin;
-  if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.replit.dev'))) {
-    res.header('Access-Control-Allow-Origin', origin);
+  if (origin) {
+    const isAllowed = allowedOrigins.some(allowedOrigin => {
+      if (allowedOrigin.includes('*')) {
+        const pattern = new RegExp(allowedOrigin.replace('*', '.*'));
+        return pattern.test(origin);
+      }
+      return allowedOrigin === origin;
+    });
+
+    if (isAllowed) {
+      res.header('Access-Control-Allow-Origin', origin);
+    }
   }
 
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
