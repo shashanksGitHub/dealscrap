@@ -67,27 +67,6 @@ export function TestimonialCarousel() {
 
   return (
     <div className="w-full relative">
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={previousTestimonial}
-          className="rounded-full hover:bg-background/80"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </Button>
-      </div>
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={nextTestimonial}
-          className="rounded-full hover:bg-background/80"
-        >
-          <ChevronRight className="h-6 w-6" />
-        </Button>
-      </div>
-
       <AnimatePresence mode="wait">
         {isVisible && (
           <motion.div
@@ -96,9 +75,27 @@ export function TestimonialCarousel() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border"
+            className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border relative"
           >
-            <blockquote className="text-base mb-4">
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={previousTestimonial}
+                className="h-8 w-8 p-0 opacity-50 hover:opacity-100 transition-opacity"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={nextTestimonial}
+                className="h-8 w-8 p-0 opacity-50 hover:opacity-100 transition-opacity"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <blockquote className="text-base mb-4 pr-20">
               "{testimonials[currentTestimonial].text}"
             </blockquote>
             <div>
