@@ -13,15 +13,17 @@ export function DSGVOBadge({ className, size = "default" }: DSGVOBadgeProps) {
       size === "default" && "w-[200px]",
       className
     )}>
-      <img
-        src="/images/dsgvo-logo.png"
-        alt="DSGVO-konform"
-        className={cn(
-          "object-contain mb-3",
-          size === "sm" && "h-12",
-          size === "default" && "h-16"
-        )}
-      />
+      <div className={cn(
+        "flex items-center justify-center mb-3",
+        size === "sm" && "h-8",
+        size === "default" && "h-12"
+      )}>
+        <img
+          src="/images/dsgvo-logo.png"
+          alt="DSGVO-konform"
+          className="object-contain h-full"
+        />
+      </div>
       <p className={cn(
         "font-medium mb-1",
         size === "sm" && "text-sm",
