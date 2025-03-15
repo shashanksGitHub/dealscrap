@@ -18,7 +18,7 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
-// Security headers including CSP for Stripe and Replit Assistant
+// Enhanced Security headers including CSP for Stripe and static assets
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
@@ -26,7 +26,9 @@ app.use((req, res, next) => {
     "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
     "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
     "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev wss://*.replit.dev; " +
-    "style-src 'self' 'unsafe-inline';"
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data: https: http:; " +
+    "font-src 'self' data:;"
   );
   next();
 });
@@ -139,7 +141,21 @@ async function startServer() {
       // Updated path to serve static files from the correct build directory
       const publicDir = path.resolve(__dirname, '../dist/public');
       log(`Serving static files from: ${publicDir}`);
-      app.use(express.static(publicDir));
+
+      // Serve static files with proper MIME types
+      app.use(express.static(publicDir, {
+        index: false, // Disable directory indexing
+        extensions: ['html', 'htm'], // Try these extensions for extensionless URLs
+        setHeaders: (res, path) => {
+          // Set proper caching headers
+          if (path.endsWith('.html')) {
+            res.setHeader('Cache-Control', 'no-cache');
+          } else {
+            // Cache static assets for 1 year
+            res.setHeader('Cache-Control', 'public, max-age=31536000');
+          }
+        }
+      }));
 
       // Serve index.html for all routes in production
       app.get('*', (_req, res) => {
