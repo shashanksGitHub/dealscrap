@@ -41,35 +41,38 @@ export async function registerRoutes(router: Router) {
 
       let customerId = user.stripeCustomerId;
 
-      // Create new customer if none exists
-      if (!customerId) {
-        const customer = await stripe.customers.create({
-          email: user.email,
+      try {
+        if (!customerId) {
+          const customer = await stripe.customers.create({
+            email: user.email,
+            metadata: {
+              userId: user.id.toString()
+            }
+          });
+          user = await storage.setStripeCustomerId(user.id, customer.id);
+          customerId = customer.id;
+        }
+
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: amount * 100, // Convert to cents
+          currency: "eur",
+          customer: customerId,
+          setup_future_usage: 'off_session', // Enable saving payment method
           metadata: {
-            userId: user.id.toString()
-          }
+            userId: user.id.toString(),
+            credits: CREDIT_PACKAGES[amount].credits.toString()
+          },
+          payment_method_types: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact'],
         });
-        user = await storage.setStripeCustomerId(user.id, customer.id);
-        customerId = customer.id;
+
+        res.json({ clientSecret: paymentIntent.client_secret });
+      } catch (stripeError: any) {
+        console.error('Stripe API error:', stripeError);
+        res.status(400).json({ 
+          message: "Fehler bei der Stripe-Verarbeitung",
+          details: stripeError.message 
+        });
       }
-
-      // Create payment intent
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount * 100, // Convert to cents
-        currency: "eur",
-        customer: customerId,
-        setup_future_usage: 'off_session', // Enable saving payment method
-        metadata: {
-          userId: user.id.toString(),
-          credits: CREDIT_PACKAGES[amount].credits.toString()
-        },
-        payment_method_types: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact'],
-        automatic_payment_methods: {
-          enabled: true,
-        },
-      });
-
-      res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
       res.status(500).json({ 

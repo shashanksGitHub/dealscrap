@@ -33,7 +33,6 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [vatId, setVatId] = useState("");
-  const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,8 +97,6 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
             mode: 'billing',
             fields: {
               phone: 'always',
-              company: 'always',
-              vat_id: 'always'
             },
             validation: {
               phone: {
@@ -200,7 +197,6 @@ export default function Checkout() {
   const [error, setError] = useState<string | null>(null);
   const [match, params] = useRoute("/checkout/:amount");
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const initializePayment = async () => {
@@ -242,41 +238,47 @@ export default function Checkout() {
 
   if (error) {
     return (
-      <div className="min-h-screen py-20 px-4">
-        <div className="max-w-md mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-destructive">Fehler</CardTitle>
-              <CardDescription>{error}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href="/dashboard">
-                <Button className="mt-4">
-                  <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                  Zurück zum Dashboard
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-grow py-20 px-4">
+          <div className="max-w-md mx-auto">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-destructive">Fehler</CardTitle>
+                <CardDescription>{error}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link href="/dashboard">
+                  <Button className="w-full">
+                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                    Zurück zum Dashboard
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   if (!clientSecret) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-grow flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="py-20 px-4 flex-grow">
+      <div className="flex-grow py-20 px-4">
         <div className="max-w-md mx-auto space-y-8">
           <Link href="/dashboard">
-            <Button variant="outline" className="mb-6">
+            <Button variant="outline" className="w-full">
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
               Zurück zum Dashboard
             </Button>
@@ -299,8 +301,7 @@ export default function Checkout() {
                     colorBackground: '#ffffff',
                     colorText: '#1a1a1a',
                   }
-                },
-                paymentMethodTypes: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact']
+                }
               }}>
                 <CheckoutForm 
                   amount={amount} 
