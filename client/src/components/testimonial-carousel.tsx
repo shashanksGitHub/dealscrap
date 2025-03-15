@@ -66,7 +66,7 @@ export function TestimonialCarousel() {
   }, []);
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2">
       <Button
         variant="ghost"
         size="sm"
@@ -76,7 +76,7 @@ export function TestimonialCarousel() {
         <ChevronLeft className="h-4 w-4" />
       </Button>
 
-      <div className="flex-grow">
+      <div className="w-full">
         <AnimatePresence mode="wait">
           {isVisible && (
             <motion.div
@@ -85,7 +85,7 @@ export function TestimonialCarousel() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border"
+              className="bg-background/80 backdrop-blur-sm px-8 py-6 rounded-lg border"
             >
               <div className="flex gap-1 mb-3">
                 {[...Array(5)].map((_, i) => (
