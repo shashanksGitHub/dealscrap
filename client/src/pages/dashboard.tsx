@@ -158,7 +158,7 @@ export default function Dashboard() {
                 </Button>
                 {user?.credits === 0 && (
                   <p className="text-base text-destructive text-center">
-                    Sie benötigen Credits für die Lead-Suche
+                    Bitte wählen Sie eines der Credit-Pakete
                   </p>
                 )}
               </div>
