@@ -12,15 +12,7 @@ import {
   ShieldCheck,
   Users,
   LineChart,
-  Settings,
-  Factory,
-  Database,
-  Code,
-  Megaphone,
-  ShoppingCart,
-  Wallet,
-  Coins,
-  Download
+  Settings
 } from "lucide-react";
 
 export default function LeadsKaufenPage() {
@@ -53,27 +45,38 @@ export default function LeadsKaufenPage() {
           </div>
         </section>
 
-        {/* Was sind Leads? */}
+        {/* Warum Leads kaufen? */}
         <section id="was-sind-leads" className="py-16 bg-muted/5">
           <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl lg:text-3xl font-bold mb-6">Was sind Leads und warum sind sie so wertvoll?</h2>
-              <p className="text-muted-foreground mb-6">
-                Ein Lead ist ein potenzieller Kunde, der Interesse an Ihren Produkten oder Dienstleistungen gezeigt hat. Im B2B-Bereich sind Leads besonders wertvoll, da sie den ersten Schritt zu langfristigen und lukrativen Geschäftsbeziehungen darstellen.
-              </p>
+              <h2 className="text-2xl lg:text-3xl font-bold mb-6">Warum Leads kaufen dein Business schneller wachsen lässt</h2>
               <div className="grid sm:grid-cols-2 gap-6 mt-8">
                 <div className="flex gap-4">
                   <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
                   <div>
-                    <h3 className="font-medium mb-2">Qualifizierte Kontakte</h3>
-                    <p className="text-sm text-muted-foreground">Vorqualifizierte Geschäftskontakte, die bereits Interesse gezeigt haben</p>
+                    <h3 className="font-medium mb-2">Keine Kaltakquise mehr</h3>
+                    <p className="text-sm text-muted-foreground">Erhalte sofort geprüfte Kontakte statt mühsamer Recherchen</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <Target className="h-6 w-6 text-primary shrink-0" />
+                  <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
                   <div>
-                    <h3 className="font-medium mb-2">Zielgerichtete Akquise</h3>
-                    <p className="text-sm text-muted-foreground">Gezielte Ansprache von Unternehmen, die zu Ihrem Angebot passen</p>
+                    <h3 className="font-medium mb-2">Zeitersparnis für dein Team</h3>
+                    <p className="text-sm text-muted-foreground">Konzentriere dich auf Abschlüsse statt auf Suche</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
+                  <div>
+                    <h3 className="font-medium mb-2">Passgenaue Kontakte</h3>
+                    <p className="text-sm text-muted-foreground">Filtere Leads nach Branche, Standort & Unternehmensgröße</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
+                  <div>
+                    <h3 className="font-medium mb-2">Sofortige Lieferung</h3>
+                    <p className="text-sm text-muted-foreground">Erhalte deine Leads direkt im Dashboard & als CSV-Export</p>
                   </div>
                 </div>
               </div>
@@ -81,31 +84,64 @@ export default function LeadsKaufenPage() {
           </div>
         </section>
 
-        {/* Arten von Leads */}
+        {/* So funktioniert's */}
         <section className="py-16">
           <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-            <h2 className="text-2xl lg:text-3xl font-bold mb-6 text-center">Verschiedene Arten von Leads</h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+            <h2 className="text-2xl lg:text-3xl font-bold mb-6 text-center">In 3 Schritten zu deinen perfekten Leads</h2>
+            <div className="grid sm:grid-cols-3 gap-8 mt-12">
               <div className="bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10">
                 <Search className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-lg font-medium mb-2">Cold Leads</h3>
+                <h3 className="text-lg font-medium mb-2">1. Registrieren & Filter setzen</h3>
                 <p className="text-sm text-muted-foreground">
-                  Geschäftskontakte, die noch nicht mit Ihrer Marke interagiert haben. Diese Leads erfordern intensive Aufbauarbeit.
+                  Definiere Standort, Branche & weitere Kriterien für deine Wunschkunden
+                </p>
+              </div>
+              <div className="bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10">
+                <LineChart className="h-8 w-8 text-primary mb-4" />
+                <h3 className="text-lg font-medium mb-2">2. Automatische Lead-Generierung</h3>
+                <p className="text-sm text-muted-foreground">
+                  Unser System scannt aktuelle Unternehmensdaten und filtert relevante Kontakte heraus
                 </p>
               </div>
               <div className="bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10">
                 <Users className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-lg font-medium mb-2">Marketing Qualified Leads</h3>
+                <h3 className="text-lg font-medium mb-2">3. Leads sofort nutzen</h3>
                 <p className="text-sm text-muted-foreground">
-                  Kontakte, die bereits Interesse durch Interaktionen mit Ihrem Marketing-Content gezeigt haben.
+                  Exportiere deine Leads als CSV oder nutze sie direkt in deinem CRM
                 </p>
               </div>
-              <div className="bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10">
-                <DollarSign className="h-8 w-8 text-primary mb-4" />
-                <h3 className="text-lg font-medium mb-2">Sales Qualified Leads</h3>
-                <p className="text-sm text-muted-foreground">
-                  Hochwertige Leads, die bereit für den direkten Verkaufskontakt sind und konkretes Kaufinteresse zeigen.
-                </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Branchen & Anwendungsfälle */}
+        <section className="py-16 bg-muted/5">
+          <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
+            <h2 className="text-2xl lg:text-3xl font-bold mb-12 text-center">Leads kaufen – Branchen & Anwendungsfälle</h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
+                <h3 className="text-lg font-medium mb-3">B2B Leads</h3>
+                <p className="text-muted-foreground">Perfekt für Agenturen, Berater & SaaS-Unternehmen</p>
+              </div>
+              <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
+                <h3 className="text-lg font-medium mb-3">Immobilien Leads</h3>
+                <p className="text-muted-foreground">Finde Unternehmen, die in neue Gewerbeimmobilien investieren</p>
+              </div>
+              <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
+                <h3 className="text-lg font-medium mb-3">E-Commerce Leads</h3>
+                <p className="text-muted-foreground">Generiere Händlerkontakte für dein Online-Geschäft</p>
+              </div>
+              <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
+                <h3 className="text-lg font-medium mb-3">Handwerker Leads</h3>
+                <p className="text-muted-foreground">Erreiche Facility Manager & Bauunternehmen</p>
+              </div>
+              <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
+                <h3 className="text-lg font-medium mb-3">Finanz- & Versicherungsleads</h3>
+                <p className="text-muted-foreground">Verkaufe gezielt an Unternehmen mit Bedarf</p>
+              </div>
+              <div className="p-6 rounded-xl border bg-background/50 backdrop-blur-sm">
+                <h3 className="text-lg font-medium mb-3">IT & Software Leads</h3>
+                <p className="text-muted-foreground">Finde Unternehmen, die deine digitalen Lösungen brauchen</p>
               </div>
             </div>
           </div>
@@ -197,7 +233,7 @@ export default function LeadsKaufenPage() {
         </section>
 
         {/* FAQ Section */}
-        <section className="py-16 bg-muted/5">
+        <section className="py-16">
           <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-2xl lg:text-3xl font-bold mb-6 text-center">Häufig gestellte Fragen zum Lead-Kauf</h2>
