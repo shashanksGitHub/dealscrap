@@ -1,4 +1,4 @@
-import { ArrowRightIcon, CheckIcon, GlobeIcon, SearchIcon, Check, ShieldCheck, Zap, Users, BarChart, Code, Megaphone, ShoppingCart, Wallet, Factory } from "lucide-react";
+import { ArrowRightIcon, CheckIcon, GlobeIcon, SearchIcon, Check, ShieldCheck, Zap, Users, BarChart, Code, Megaphone, ShoppingCart, Wallet, Factory, Database, Target, Download, Coins } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -255,12 +255,77 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20">
-                <h3 className="text-base md:text-lg font-medium mb-2">{benefit.title}</h3>
-                <p className="text-sm text-muted-foreground">{benefit.description}</p>
+            <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <Database className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">Große Datenbank</h3>
               </div>
-            ))}
+              <p className="text-sm text-muted-foreground">
+                Zugriff auf Millionen von Unternehmenskontakten in Deutschland und weltweit.
+              </p>
+            </div>
+
+            <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <Target className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">Zielgenaue Filterung</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Filtern Sie nach Branche, Standort, Unternehmensgröße und mehr.
+              </p>
+            </div>
+
+            <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">DSGVO-konform</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Alle Daten werden unter Einhaltung der Datenschutzgrundverordnung verarbeitet.
+              </p>
+            </div>
+
+            <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <Code className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">API-Zugang</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Integrieren Sie LeadScraper nahtlos in Ihre bestehenden Systeme.
+              </p>
+            </div>
+
+            <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <Download className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">Einfacher Export</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Exportieren Sie Ihre Leads in verschiedenen Formaten wie CSV, Excel oder direkt in Ihr CRM.
+              </p>
+            </div>
+
+            <div className="p-4 md:p-5 rounded-xl border border-muted/30 bg-card/50 transition-all hover:bg-card hover:border-primary/20 group">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
+                  <Coins className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">Günstiger als die Konkurrenz</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Wettbewerbsfähige Preise bei höchster Datenqualität und Benutzerfreundlichkeit.
+              </p>
+            </div>
           </div>
         </div>
       </section>
