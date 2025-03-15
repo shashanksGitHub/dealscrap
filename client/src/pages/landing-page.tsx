@@ -47,8 +47,12 @@ export default function LandingPage() {
               </Link>
             </div>
             <div className="flex justify-center gap-8 animate-fade-in-up animation-delay-500">
-              <DSGVOBadge size="sm" />
-              <HamburgBadge size="sm" />
+              <div className="transform transition-all duration-300">
+                <DSGVOBadge size="sm" />
+              </div>
+              <div className="transform transition-all duration-300">
+                <HamburgBadge size="sm" />
+              </div>
             </div>
           </div>
         </div>
