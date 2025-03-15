@@ -33,7 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryKey: ["/api/user"],
     queryFn: getQueryFn({ on401: "returnNull" }),
     refetchOnWindowFocus: true,
-    staleTime: 0
+    staleTime: 0,
+    refetchInterval: 5000 // Refetch every 5 seconds
   });
 
   const refreshUserData = async () => {

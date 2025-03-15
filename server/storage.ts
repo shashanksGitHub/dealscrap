@@ -118,6 +118,7 @@ export class MemStorage implements IStorage {
 
   async addCredits(userId: number, amount: number): Promise<User> {
     console.log(`Adding credits - User ID: ${userId}, Amount: ${amount}`);
+
     const user = await this.getUser(userId);
     if (!user) {
       console.error(`User not found: ${userId}`);
@@ -125,19 +126,24 @@ export class MemStorage implements IStorage {
     }
 
     const currentCredits = user.credits || 0;
-    console.log(`Current credits: ${currentCredits}`);
+    console.log(`Current credits for user ${userId}: ${currentCredits}`);
 
-    const updatedUser = {
+    // Create a completely new user object with updated credits
+    const updatedUser: User = {
       ...user,
       credits: currentCredits + amount
     };
 
-    console.log(`Updated user with new credits:`, updatedUser);
+    // Store the updated user object in the Map
     this.users.set(userId, updatedUser);
 
-    // Verify the update
+    // Verify the update was successful
     const verifiedUser = await this.getUser(userId);
-    console.log(`Verified updated user:`, verifiedUser);
+    console.log(`Verified updated user credits: ${verifiedUser?.credits}`);
+
+    if (!verifiedUser || verifiedUser.credits !== updatedUser.credits) {
+      throw new Error("Failed to verify credit update");
+    }
 
     return updatedUser;
   }
@@ -153,6 +159,7 @@ export class MemStorage implements IStorage {
     this.users.set(userId, updatedUser);
     return updatedUser;
   }
+
   async createLead(lead: Omit<Lead, "id" | "createdAt">): Promise<Lead> {
     const id = this.currentLeadId++;
     const newLead: Lead = {
