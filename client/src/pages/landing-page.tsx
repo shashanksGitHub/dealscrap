@@ -1,10 +1,11 @@
-import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, ChevronDownIcon, GlobeIcon, SearchIcon } from "lucide-react";
+import { ArrowRightIcon, CheckIcon, GlobeIcon, SearchIcon } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import CookieBanner from "@/components/cookie-banner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
+import { Footer } from "@/components/layout/footer";
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -223,48 +224,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 md:py-20 px-4">
-        <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">Bereit, Ihre Lead-Generierung zu revolutionieren?</h2>
-            <p className="text-base md:text-lg text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto">
-              Starten Sie noch heute mit LeadScraper und entdecken Sie, wie einfach moderne Lead-Generierung sein kann.
-            </p>
-            <Link href="/auth">
-              <Button size="lg" className="w-full sm:w-auto rounded-full text-base md:text-lg px-6 md:px-8 py-4 md:py-6 h-auto font-medium">
-                Jetzt kostenloses Konto erstellen
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8 md:py-10 px-4 border-t border-muted/20">
-        <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-0">
-            <div className="text-center md:text-left">
-              <div className="text-xl md:text-2xl font-bold text-primary mb-2">LeadScraper</div>
-              <p className="text-sm text-muted-foreground">© 2024 LeadScraper GmbH. Alle Rechte vorbehalten.</p>
-            </div>
-            <div className="flex flex-wrap gap-4 md:gap-6 justify-center">
-              <Link href="/impressum" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Impressum
-              </Link>
-              <Link href="/datenschutz" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Datenschutz
-              </Link>
-              <Link href="/agb" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                AGB
-              </Link>
-              <Link href="/kontakt" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                Kontakt
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <CookieBanner />
     </div>
