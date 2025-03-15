@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
@@ -46,6 +47,7 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
   const elements = useElements();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const { refreshUserData } = useAuth();
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +60,7 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
     setIsProcessing(true);
 
     try {
+      console.log('Starting payment confirmation...');
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         redirect: 'if_required',
@@ -74,9 +77,10 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
           variant: "destructive",
         });
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        console.log('Payment successful:', paymentIntent);
+
         // Force a refresh of the user data
-        await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-        await queryClient.refetchQueries({ queryKey: ['/api/user'] });
+        await refreshUserData();
 
         toast({
           title: "Zahlung erfolgreich",
@@ -149,6 +153,7 @@ export default function Checkout() {
   const [error, setError] = useState<string | null>(null);
   const [match, params] = useRoute("/checkout/:amount");
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     const initializePayment = async () => {
@@ -166,13 +171,18 @@ export default function Checkout() {
       setAmount(numAmount);
 
       try {
-        const response = await apiRequest("POST", "/api/create-payment-intent", { amount: numAmount });
+        console.log('Creating payment intent for user:', user?.id);
+        const response = await apiRequest("POST", "/api/create-payment-intent", { 
+          amount: numAmount,
+          userId: user?.id // Make sure we pass the userId
+        });
         const data = await response.json();
 
         if (!data.clientSecret) {
           throw new Error('Keine Client Secret in der Antwort');
         }
 
+        console.log('Payment intent created successfully');
         setClientSecret(data.clientSecret);
       } catch (error: any) {
         console.error('Fehler beim Erstellen der Zahlung:', error);
@@ -186,7 +196,7 @@ export default function Checkout() {
     };
 
     initializePayment();
-  }, [match, params?.amount, toast]);
+  }, [match, params?.amount, toast, user]);
 
   if (error) {
     return (

@@ -29,14 +29,11 @@ export async function registerRoutes(router: Router) {
 
       const { amount } = req.body;
       console.log('Creating payment intent for amount:', amount);
+      console.log('User ID:', req.user.id);
 
       if (!CREDIT_PACKAGES[amount]) {
         return res.status(400).json({ message: "Ungültiger Betrag" });
       }
-
-      // Log the current user and credit package details
-      console.log('User making purchase:', req.user);
-      console.log('Credit package:', CREDIT_PACKAGES[amount]);
 
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100, // Convert to cents
