@@ -118,12 +118,14 @@ async function startServer() {
 
     if (isProduction) {
       log("Setting up production static file serving...");
-      // Serve static files from the client/dist directory
-      app.use(express.static(path.resolve(__dirname, '../client/dist')));
+      // Updated path to serve static files from the correct build directory
+      const publicDir = path.resolve(__dirname, '../dist/public');
+      log(`Serving static files from: ${publicDir}`);
+      app.use(express.static(publicDir));
 
       // Serve index.html for all routes in production
       app.get('*', (_req, res) => {
-        res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
+        res.sendFile(path.resolve(publicDir, 'index.html'));
       });
     } else {
       log("Setting up development Vite middleware...");
