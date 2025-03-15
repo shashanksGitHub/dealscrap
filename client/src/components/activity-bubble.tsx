@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { X, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Aktivitätsdaten mit realen Firmennamen
@@ -65,8 +65,8 @@ export function ActivityBubble() {
                 {activities[currentActivity].name} hat gerade {activities[currentActivity].leads} Leads gescraped.
               </p>
               <div className="flex items-center gap-1 mt-2">
-                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                  <X className="w-3 h-3" /> {/*CheckCircle removed and replaced with X*/}
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-100/20 text-emerald-500 text-xs font-medium">
+                  <Check className="w-3 h-3" />
                   Verifiziert
                 </span>
                 <span className="text-xs text-muted-foreground">
