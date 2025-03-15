@@ -3,34 +3,14 @@ import { insertUserSchema, loginSchema } from "@shared/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Redirect } from "wouter";
 import { Footer } from "@/components/layout/footer";
 import { Star, Lock, Mail, CheckCircle } from "lucide-react";
-
-const testimonials = [
-  {
-    name: "Michael Weber",
-    position: "Vertriebsleiter",
-    company: "TechSolutions GmbH",
-    text: "LeadScraper hat unseren Vertriebsprozess revolutioniert. Wir konnten unsere Conversion-Rate um 300% steigern."
-  },
-  {
-    name: "Sarah Schmidt",
-    position: "Marketing Director",
-    company: "Digital Marketing Pro",
-    text: "Die Qualität der Leads ist hervorragend. Endlich ein Tool, das hält was es verspricht."
-  },
-  {
-    name: "Andreas Müller",
-    position: "CEO",
-    company: "Sales Innovation AG",
-    text: "Einfach zu bedienen und extrem effektiv. Bestes Lead-Tool auf dem deutschen Markt."
-  }
-];
+import { TestimonialCarousel } from "@/components/testimonial-carousel";
 
 export default function AuthPage() {
   const { user } = useAuth();
@@ -75,22 +55,7 @@ export default function AuthPage() {
               </div>
             </div>
 
-            <div className="space-y-6">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="bg-background/80 backdrop-blur-sm p-4 rounded-lg border">
-                  <div className="flex gap-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-primary text-primary" />
-                    ))}
-                  </div>
-                  <p className="text-sm mb-3">{testimonial.text}</p>
-                  <div className="text-sm">
-                    <p className="font-medium">{testimonial.name}</p>
-                    <p className="text-muted-foreground">{testimonial.position}, {testimonial.company}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TestimonialCarousel />
 
             <div className="space-y-4">
               <div className="flex items-center gap-3">
