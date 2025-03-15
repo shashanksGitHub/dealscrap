@@ -1,4 +1,4 @@
-import { ArrowRightIcon, CheckIcon, GlobeIcon, SearchIcon } from "lucide-react";
+import { ArrowRightIcon, CheckIcon, GlobeIcon, SearchIcon, Check } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -163,6 +163,56 @@ export default function LandingPage() {
               <div className="absolute -top-4 -left-4 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">3</div>
               <h3 className="text-lg md:text-xl font-semibold mb-4">Leads herunterladen & kontaktieren</h3>
               <p className="text-sm md:text-base text-muted-foreground">Exportiere deine Leads als CSV und starte deine Kampagne.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Strengths Section */}
+      <section className="py-16 md:py-20 px-4 bg-muted/5">
+        <div className="container mx-auto">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Was uns auszeichnet</h2>
+            <p className="text-base md:text-lg text-muted-foreground">
+              Wir setzen neue Maßstäbe in der B2B-Lead-Generierung
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 bg-primary/10 p-2 rounded-lg">
+                <Check className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Größte B2B-Kontaktdatenbank</h3>
+                <p className="text-sm text-muted-foreground">Millionen verifizierter Geschäftskontakte in Deutschland</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 bg-primary/10 p-2 rounded-lg">
+                <Check className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">KI-gestützte Filterung</h3>
+                <p className="text-sm text-muted-foreground">Innovative Technologie für präzise Zielgruppenauswahl</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 bg-primary/10 p-2 rounded-lg">
+                <Check className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">100% DSGVO-konform</h3>
+                <p className="text-sm text-muted-foreground">Alle Prozesse entsprechen den aktuellen Datenschutzrichtlinien</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 bg-primary/10 p-2 rounded-lg">
+                <Check className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">Beste Datenqualität</h3>
+                <p className="text-sm text-muted-foreground">Kontinuierlich geprüfte und aktualisierte Kontaktdaten</p>
+              </div>
             </div>
           </div>
         </div>

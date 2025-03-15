@@ -48,19 +48,10 @@ export function Footer() {
           </div>
           <div>
             <h3 className="font-semibold mb-4">Über uns</h3>
-            <div className="text-muted-foreground space-y-2">
+            <div className="text-muted-foreground">
               <p>
                 LeadScraper ist Deutschlands innovativste B2B-Lead-Plattform. Mit modernster KI-Technologie und DSGVO-konformen Prozessen revolutionieren wir die Leadgenerierung.
               </p>
-              <p>
-                Unsere Stärken:
-              </p>
-              <ul className="list-disc list-inside">
-                <li>Größte B2B-Kontaktdatenbank Deutschlands</li>
-                <li>Innovative KI-gestützte Filterung</li>
-                <li>100% DSGVO-konform</li>
-                <li>Beste Datenqualität am Markt</li>
-              </ul>
             </div>
           </div>
         </div>
