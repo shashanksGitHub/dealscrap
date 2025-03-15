@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Lock, ShieldCheck, CreditCard, Award, Building2 } from "lucide-react";
+import { Lock, ShieldCheck, CreditCard, Award, Building2, Flag } from "lucide-react";
 
 export function Footer() {
   return (
@@ -13,7 +13,7 @@ export function Footer() {
             Starten Sie noch heute mit LeadScraper und entdecken Sie, wie einfach moderne Lead-Generierung sein kann.
           </p>
           <Link href="/auth">
-            <Button size="lg" className="w-full sm:w-auto rounded-full text-base md:text-lg px-6 md:px-8 py-4 md:py-6 h-auto font-medium">
+            <Button size="lg" className="w-full sm:w-auto rounded-full px-6 md:px-8 py-4 md:py-6 h-auto text-base md:text-lg font-medium">
               Jetzt kostenloses Konto erstellen
             </Button>
           </Link>
@@ -84,12 +84,18 @@ export function Footer() {
               </div>
               <span>Geprüfte Qualität</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="bg-primary/5 p-2 rounded-full">
-                <Building2 className="h-4 w-4 text-primary" />
-              </div>
-              <span>Made in Germany</span>
+          </div>
+        </div>
+
+        {/* Made in Germany Badge */}
+        <div className="flex justify-center mt-8">
+          <div className="bg-background/50 backdrop-blur-sm border border-primary/10 rounded-xl p-4 flex items-center gap-3">
+            <div className="relative w-6 h-4 rounded overflow-hidden shadow-sm">
+              <div className="absolute inset-0 bg-black"></div>
+              <div className="absolute inset-y-0 w-full bg-red-600" style={{ top: '33.33%' }}></div>
+              <div className="absolute inset-y-0 w-full bg-yellow-400" style={{ top: '66.66%' }}></div>
             </div>
+            <span className="font-medium">Made in Germany</span>
           </div>
         </div>
 
