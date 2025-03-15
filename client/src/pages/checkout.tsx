@@ -45,33 +45,6 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
   const elements = useElements();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
-
-  const form = useForm<BillingFormData>({
-    resolver: zodResolver(billingSchema),
-    defaultValues: {
-      companyName: "",
-      street: "",
-      city: "",
-      postalCode: "",
-      vatId: ""
-    }
-  });
-
-  const onSubmitBilling = async (data: BillingFormData) => {
-    try {
-      const response = await apiRequest("POST", "/api/save-billing-info", data);
-      if (response.ok) {
-        setShowPayment(true);
-      }
-    } catch (error) {
-      toast({
-        title: "Fehler",
-        description: "Billing-Informationen konnten nicht gespeichert werden",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,8 +57,9 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
     setIsProcessing(true);
 
     try {
-      const { error } = await stripe.confirmPayment({
+      const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
+        redirect: 'if_required',
         confirmParams: {
           return_url: `${window.location.origin}/dashboard`,
         },
@@ -98,6 +72,12 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
           description: error.message || "Ein Fehler ist aufgetreten",
           variant: "destructive",
         });
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        toast({
+          title: "Zahlung erfolgreich",
+          description: "Ihre Credits wurden gutgeschrieben",
+        });
+        window.location.href = "/dashboard";
       }
     } catch (error: any) {
       console.error('Payment processing error:', error);
@@ -110,76 +90,6 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
       setIsProcessing(false);
     }
   };
-
-  if (!showPayment) {
-    return (
-      <form onSubmit={form.handleSubmit(onSubmitBilling)} className="space-y-6">
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="companyName">Firmenname *</Label>
-            <Input 
-              id="companyName"
-              {...form.register("companyName")}
-              placeholder="Ihre Firma GmbH"
-            />
-            {form.formState.errors.companyName && (
-              <p className="text-sm text-destructive mt-1">{form.formState.errors.companyName.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="street">Straße und Hausnummer *</Label>
-            <Input 
-              id="street"
-              {...form.register("street")}
-              placeholder="Musterstraße 123"
-            />
-            {form.formState.errors.street && (
-              <p className="text-sm text-destructive mt-1">{form.formState.errors.street.message}</p>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="postalCode">PLZ *</Label>
-              <Input 
-                id="postalCode"
-                {...form.register("postalCode")}
-                placeholder="12345"
-              />
-              {form.formState.errors.postalCode && (
-                <p className="text-sm text-destructive mt-1">{form.formState.errors.postalCode.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="city">Ort *</Label>
-              <Input 
-                id="city"
-                {...form.register("city")}
-                placeholder="Berlin"
-              />
-              {form.formState.errors.city && (
-                <p className="text-sm text-destructive mt-1">{form.formState.errors.city.message}</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="vatId">USt-IdNr. (optional)</Label>
-            <Input 
-              id="vatId"
-              {...form.register("vatId")}
-              placeholder="DE123456789"
-            />
-          </div>
-        </div>
-
-        <Button type="submit" className="w-full" size="lg">
-          Weiter zur Zahlung
-        </Button>
-      </form>
-    );
-  }
 
   return (
     <form onSubmit={handlePayment} className="space-y-6">
@@ -321,7 +231,7 @@ export default function Checkout() {
             <CardHeader>
               <CardTitle>Kreditpaket kaufen</CardTitle>
               <CardDescription>
-                Bitte geben Sie Ihre Rechnungsinformationen ein
+                Wählen Sie Ihre bevorzugte Zahlungsmethode
               </CardDescription>
             </CardHeader>
             <CardContent>
