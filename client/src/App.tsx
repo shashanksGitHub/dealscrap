@@ -15,6 +15,7 @@ import Datenschutz from "@/pages/datenschutz";
 import AGB from "@/pages/agb";
 import Checkout from "@/pages/checkout";
 import LeadsKaufen from "@/pages/leads-kaufen";
+import Dashboard from "@/pages/dashboard";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -31,6 +32,7 @@ function Router() {
         <Route path="/datenschutz" component={Datenschutz} />
         <Route path="/agb" component={AGB} />
         <ProtectedRoute path="/blog/new" component={NewBlogPost} />
+        <ProtectedRoute path="/dashboard" component={Dashboard} />
         <ProtectedRoute path="/checkout/:amount" component={Checkout} />
         <Route component={NotFound} />
       </Switch>
