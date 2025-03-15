@@ -12,7 +12,7 @@ import { Loader2, ArrowLeftIcon, CreditCard } from "lucide-react";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Footer from "@/components/layout/footer";
+import { Footer } from "@/components/layout/footer";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
