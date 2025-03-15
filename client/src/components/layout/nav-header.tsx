@@ -7,7 +7,7 @@ export function NavHeader() {
 
   return (
     <header className="bg-background border-b">
-      <div className="container mx-auto py-4 px-4">
+      <div className="max-w-[1200px] mx-auto py-4 px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <Link href="/" className="text-xl font-bold text-primary">
             LeadScraper
