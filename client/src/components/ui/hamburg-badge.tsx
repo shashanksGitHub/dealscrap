@@ -29,15 +29,14 @@ export function HamburgBadge({ size = "default", className }: BadgeProps) {
         size === "sm" && "text-sm",
         size === "default" && "text-base"
       )}>
-        Entwickelt in
-        Hamburg
+        Aus Hamburg
       </p>
       <p className={cn(
         size === "sm" && "text-xs",
         size === "default" && "text-sm",
         "text-muted-foreground"
       )}>
-        Für den DACH-Markt
+        Entwickelt für den DACH-Raum
       </p>
     </div>
   );
