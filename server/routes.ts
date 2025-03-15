@@ -33,46 +33,19 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ message: "Ungültiger Betrag" });
       }
 
-      // Get or create Stripe customer
-      let user = await storage.getUser(req.user.id);
-      if (!user) {
-        return res.status(404).json({ message: "Benutzer nicht gefunden" });
-      }
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount * 100, // Convert to cents
+        currency: "eur",
+        automatic_payment_methods: {
+          enabled: true,
+          allow_redirects: 'always'
+        },
+        metadata: {
+          credits: CREDIT_PACKAGES[amount].credits.toString()
+        },
+      });
 
-      let customerId = user.stripeCustomerId;
-
-      try {
-        if (!customerId) {
-          const customer = await stripe.customers.create({
-            email: user.email,
-            metadata: {
-              userId: user.id.toString()
-            }
-          });
-          user = await storage.setStripeCustomerId(user.id, customer.id);
-          customerId = customer.id;
-        }
-
-        const paymentIntent = await stripe.paymentIntents.create({
-          amount: amount * 100, // Convert to cents
-          currency: "eur",
-          customer: customerId,
-          setup_future_usage: 'off_session', // Enable saving payment method
-          metadata: {
-            userId: user.id.toString(),
-            credits: CREDIT_PACKAGES[amount].credits.toString()
-          },
-          payment_method_types: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact'],
-        });
-
-        res.json({ clientSecret: paymentIntent.client_secret });
-      } catch (stripeError: any) {
-        console.error('Stripe API error:', stripeError);
-        res.status(400).json({ 
-          message: "Fehler bei der Stripe-Verarbeitung",
-          details: stripeError.message 
-        });
-      }
+      res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
       res.status(500).json({ 

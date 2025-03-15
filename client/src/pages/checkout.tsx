@@ -1,17 +1,15 @@
 /// <reference types="vite/client" />
 
-import { useStripe, Elements, PaymentElement, AddressElement, useElements } from '@stripe/react-stripe-js';
+import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation, useRoute, Link } from "wouter";
+import { useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2, ArrowLeftIcon, CreditCard } from "lucide-react";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Footer } from "@/components/layout/footer";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
@@ -27,12 +25,11 @@ const CREDIT_PACKAGES: Record<string, { credits: number; price: number }> = {
   '600': { credits: 1000, price: 600 }
 };
 
-const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) => {
+const CheckoutForm = ({ amount }: { amount: number }) => {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [vatId, setVatId] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,12 +45,6 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/dashboard`,
-          payment_method_data: {
-            billing_details: {
-              // Stripe will automatically populate this with the AddressElement data
-            },
-          },
-          setup_future_usage: 'off_session', // This enables saving the payment method
         },
       });
 
@@ -78,10 +69,10 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="rounded-lg border border-border p-4 bg-muted/5">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center">
           <div>
             <h3 className="font-medium">Ausgewähltes Paket</h3>
-            <p className="text-sm text-muted-foreground">{credits} Credits</p>
+            <p className="text-sm text-muted-foreground">{CREDIT_PACKAGES[amount]?.credits} Credits</p>
           </div>
           <div className="text-right">
             <p className="font-medium">{amount}€</p>
@@ -90,80 +81,7 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
         </div>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium">Rechnungsadresse</h3>
-        <AddressElement 
-          options={{
-            mode: 'billing',
-            fields: {
-              phone: 'always',
-            },
-            validation: {
-              phone: {
-                required: 'always',
-              },
-            },
-            display: {
-              name: 'split',
-            },
-            defaultValues: {
-              firstName: '',
-              lastName: '',
-              address: {
-                line1: '',
-                line2: '',
-                city: '',
-                state: '',
-                postal_code: '',
-                country: 'DE',
-              },
-            },
-          }}
-        />
-
-        <div className="space-y-2">
-          <Label htmlFor="company">Firmenname</Label>
-          <Input 
-            id="company" 
-            name="company"
-            placeholder="Musterfirma GmbH"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="vat">USt-ID</Label>
-          <Input 
-            id="vat" 
-            name="vat"
-            placeholder="DE123456789"
-            value={vatId}
-            onChange={(e) => setVatId(e.target.value)}
-          />
-          <p className="text-xs text-muted-foreground">
-            Für Unternehmen aus der EU: Geben Sie Ihre gültige USt-ID an
-          </p>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium">Zahlungsinformationen</h3>
-        <PaymentElement 
-          options={{
-            paymentMethodOrder: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact'],
-            defaultValues: {
-              billingDetails: {
-                name: '',
-                email: '',
-                phone: '',
-              }
-            },
-            fields: {
-              billingDetails: 'never' // We're collecting this via AddressElement
-            }
-          }}
-        />
-      </div>
+      <PaymentElement />
 
       <Button 
         type="submit" 
@@ -303,10 +221,7 @@ export default function Checkout() {
                   }
                 }
               }}>
-                <CheckoutForm 
-                  amount={amount} 
-                  credits={CREDIT_PACKAGES[amount.toString()]?.credits || 0} 
-                />
+                <CheckoutForm amount={amount} />
               </Elements>
             </CardContent>
           </Card>
