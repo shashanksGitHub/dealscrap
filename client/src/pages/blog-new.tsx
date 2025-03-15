@@ -9,11 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
+import { NavHeader } from "@/components/layout/nav-header";
+import { Footer } from "@/components/layout/footer";
 
 export default function NewBlogPost() {
   const { toast } = useToast();
   const { user } = useAuth();
-  
+
   const form = useForm({
     resolver: zodResolver(insertBlogPostSchema),
     defaultValues: {
@@ -37,14 +39,14 @@ export default function NewBlogPost() {
       queryClient.invalidateQueries({ queryKey: ['/api/blog-posts'] });
       toast({
         title: "Erfolg!",
-        description: "Ihr Blog-Beitrag wurde erfolgreich erstellt.",
+        description: "Ihr Ratgeber-Beitrag wurde erfolgreich erstellt.",
       });
       window.location.href = '/blog';
     },
     onError: () => {
       toast({
         title: "Fehler",
-        description: "Der Blog-Beitrag konnte nicht erstellt werden.",
+        description: "Der Beitrag konnte nicht erstellt werden.",
         variant: "destructive",
       });
     },
@@ -55,51 +57,63 @@ export default function NewBlogPost() {
   }
 
   if (!user) {
-    return <div>Bitte melden Sie sich an, um einen Blog-Beitrag zu erstellen.</div>;
+    return (
+      <div className="min-h-screen bg-background">
+        <NavHeader />
+        <div className="container mx-auto py-8">
+          <div className="text-center">Bitte melden Sie sich an, um einen Ratgeber-Beitrag zu erstellen.</div>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Neuen Blog-Beitrag erstellen</h1>
-      
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Titel</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="content"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Inhalt</FormLabel>
-                <FormControl>
-                  <Textarea {...field} className="min-h-[200px]" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <div className="min-h-screen bg-background">
+      <NavHeader />
+      <div className="container mx-auto py-8">
+        <h1 className="text-3xl font-bold mb-8">Neuen Ratgeber-Beitrag erstellen</h1>
 
-          <Button 
-            type="submit" 
-            disabled={mutation.isPending}
-          >
-            {mutation.isPending ? "Wird erstellt..." : "Beitrag erstellen"}
-          </Button>
-        </form>
-      </Form>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Titel</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Inhalt</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} className="min-h-[200px]" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button 
+              type="submit" 
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? "Wird erstellt..." : "Beitrag erstellen"}
+            </Button>
+          </form>
+        </Form>
+      </div>
+      <Footer />
     </div>
   );
 }

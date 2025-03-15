@@ -49,7 +49,7 @@ export default function BlogPage() {
 
         <div className="container mx-auto text-center">
           <BookOpenIcon className="h-12 w-12 text-primary mx-auto mb-6" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Unser Blog</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Ratgeber für Leadgenerierung</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Erfahren Sie mehr über Lead-Generierung, Vertriebsstrategien und wie Sie Ihr Business erfolgreich ausbauen können
           </p>

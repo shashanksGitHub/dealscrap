@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 
 export function NavHeader() {
-  const { isAuthenticated, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <header className="bg-background border-b">
@@ -12,20 +12,27 @@ export function NavHeader() {
             LeadScraper
           </Link>
           <nav>
-            {isAuthenticated ? (
-              <div className="flex items-center gap-4">
-                <Link href="/dashboard" className="text-muted-foreground hover:text-primary">
-                  Dashboard
+            <div className="flex items-center gap-4">
+              {!user && (
+                <Link href="/blog" className="text-muted-foreground hover:text-primary">
+                  Ratgeber für Leadgenerierung
                 </Link>
-                <button onClick={logout} className="text-muted-foreground hover:text-primary">
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <Link href="/auth" className="text-muted-foreground hover:text-primary">
-                Login
-              </Link>
-            )}
+              )}
+              {user ? (
+                <>
+                  <Link href="/dashboard" className="text-muted-foreground hover:text-primary">
+                    Dashboard
+                  </Link>
+                  <button onClick={logout} className="text-muted-foreground hover:text-primary">
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link href="/auth" className="text-muted-foreground hover:text-primary">
+                  Login
+                </Link>
+              )}
+            </div>
           </nav>
         </div>
       </div>
