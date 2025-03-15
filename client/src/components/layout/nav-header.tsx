@@ -56,7 +56,7 @@ export function NavHeader() {
                   <div className="relative w-12 h-12">
                     <Progress 
                       value={creditsPercentage} 
-                      className={`absolute inset-0 h-full w-full rounded-full ${currentUser.credits === 0 ? '[&>div]:bg-destructive/20' : '[&>div]:bg-primary/20'}`}
+                      className={`absolute inset-0 h-full w-full rounded-full ${currentUser.credits === 0 ? '[&>div]:bg-destructive/40' : '[&>div]:bg-primary/20'}`}
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className={`text-lg font-semibold ${currentUser.credits === 0 ? 'text-background' : 'text-primary'}`}>
