@@ -14,7 +14,14 @@ import {
   Users,
   LineChart,
   Settings,
-  FileCheck
+  Factory,
+  Database,
+  Code,
+  Megaphone,
+  ShoppingCart,
+  Wallet,
+  Coins,
+  Download
 } from "lucide-react";
 
 export default function LeadsKaufenPage() {
@@ -34,7 +41,7 @@ export default function LeadsKaufenPage() {
           <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(black,transparent_70%)] -z-10" />
           <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl opacity-70 animate-blob" />
           <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
-          
+
           <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
@@ -221,7 +228,7 @@ export default function LeadsKaufenPage() {
                 <div>
                   <h3 className="font-medium mb-2">Sind gekaufte Leads DSGVO-konform?</h3>
                   <p className="text-muted-foreground">
-                    Nicht automatisch. Achten Sie auf nachweisbare Opt-ins und transparente Datenerhebung. LeadScraper garantiert zu 100% DSGVO-konforme Lead-Generierung.
+                    LeadScraper garantiert zu 100% DSGVO-konforme Lead-Generierung.
                   </p>
                 </div>
               </div>
@@ -233,10 +240,6 @@ export default function LeadsKaufenPage() {
         <section className="py-16">
           <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-2xl lg:text-3xl font-bold mb-6">Starten Sie jetzt mit der professionellen Lead-Generierung</h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                Testen Sie LeadScraper und überzeugen Sie sich selbst von der Qualität unserer Leads.
-              </p>
               <div className="flex gap-4 justify-center">
                 <Link href="/auth">
                   <Button size="lg" className="rounded-full">
