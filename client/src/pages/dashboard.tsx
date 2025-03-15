@@ -30,12 +30,12 @@ export default function Dashboard() {
   const scrapeMutation = useMutation({
     mutationFn: async (data: { query: string; location: string }) => {
       if (!data.query.trim() || !data.location.trim()) {
-        throw new Error("Query and location cannot be empty");
+        throw new Error("Suchbegriff und Standort dürfen nicht leer sein");
       }
 
       const locationRegex = /^[a-zA-Z\s-]+$/;
       if (!locationRegex.test(data.location)) {
-        throw new Error("Invalid location format");
+        throw new Error("Ungültiges Standortformat");
       }
 
       const res = await apiRequest("POST", "/api/scrape", data);
@@ -44,13 +44,13 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
       toast({
-        title: "Success",
-        description: "Lead scraped successfully",
+        title: "Erfolgreich",
+        description: "Lead erfolgreich gefunden",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: "Fehler",
         description: error.message,
         variant: "destructive",
       });
@@ -92,7 +92,7 @@ export default function Dashboard() {
             <span className="text-sm md:text-base">Credits: {user?.credits}</span>
             <Button variant="outline" size="sm" onClick={() => logout()}>
               <LogOutIcon className="w-4 h-4 mr-2" />
-              <span className="hidden md:inline">Logout</span>
+              <span className="hidden md:inline">Abmelden</span>
             </Button>
           </div>
         </div>
@@ -124,27 +124,27 @@ export default function Dashboard() {
         <div className="grid md:grid-cols-2 gap-8">
           <Card>
             <CardHeader>
-              <CardTitle>Scrape New Leads</CardTitle>
+              <CardTitle>Neue Leads finden</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="query">Business Type</Label>
+                  <Label htmlFor="query">Unternehmensart</Label>
                   <Input
                     id="query"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="e.g. Restaurant"
+                    placeholder="z.B. Restaurant"
                     disabled={scrapeMutation.isPending}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="location">Standort</Label>
                   <Input
                     id="location"
                     value={searchLocation}
                     onChange={(e) => setSearchLocation(e.target.value)}
-                    placeholder="e.g. Berlin"
+                    placeholder="z.B. Berlin"
                     disabled={scrapeMutation.isPending}
                   />
                 </div>
@@ -157,15 +157,15 @@ export default function Dashboard() {
                   {scrapeMutation.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Scraping...
+                      Suche läuft...
                     </>
                   ) : (
-                    "Start Scraping"
+                    "Suche starten"
                   )}
                 </Button>
                 {user?.credits === 0 && (
                   <p className="text-sm text-destructive text-center">
-                    You need credits to scrape leads
+                    Sie benötigen Credits für die Lead-Suche
                   </p>
                 )}
               </div>
@@ -174,7 +174,7 @@ export default function Dashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Buy Credits</CardTitle>
+              <CardTitle>Credits kaufen</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -212,14 +212,14 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Your Leads</CardTitle>
+            <CardTitle>Ihre Leads</CardTitle>
             <Button 
               variant="outline" 
               onClick={handleExport}
               disabled={isLeadsLoading || leads.length === 0}
             >
               <DownloadIcon className="w-4 h-4 mr-2" />
-              <span className="hidden md:inline">Export CSV</span>
+              <span className="hidden md:inline">Als CSV exportieren</span>
             </Button>
           </CardHeader>
           <CardContent>
@@ -227,20 +227,20 @@ export default function Dashboard() {
               {isLeadsLoading ? (
                 <div className="p-8 text-center">
                   <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                  <p className="text-sm text-muted-foreground">Loading leads...</p>
+                  <p className="text-sm text-muted-foreground">Leads werden geladen...</p>
                 </div>
               ) : leads.length === 0 ? (
                 <div className="p-8 text-center">
-                  <p className="text-sm text-muted-foreground">No leads found</p>
+                  <p className="text-sm text-muted-foreground">Keine Leads gefunden</p>
                 </div>
               ) : (
                 <table className="w-full">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="p-2 text-left text-sm font-medium">Business Name</th>
-                      <th className="p-2 text-left text-sm font-medium hidden md:table-cell">Address</th>
-                      <th className="p-2 text-left text-sm font-medium">Phone</th>
-                      <th className="p-2 text-left text-sm font-medium hidden md:table-cell">Email</th>
+                      <th className="p-2 text-left text-sm font-medium">Firmenname</th>
+                      <th className="p-2 text-left text-sm font-medium hidden md:table-cell">Adresse</th>
+                      <th className="p-2 text-left text-sm font-medium">Telefon</th>
+                      <th className="p-2 text-left text-sm font-medium hidden md:table-cell">E-Mail</th>
                       <th className="p-2 text-left text-sm font-medium hidden lg:table-cell">Website</th>
                     </tr>
                   </thead>
