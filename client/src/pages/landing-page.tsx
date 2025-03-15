@@ -127,7 +127,7 @@ export default function LandingPage() {
               Starten Sie in nur 3 Schritten mit der automatisierten Lead-Generierung
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="bg-background/60 backdrop-blur-lg p-8 rounded-2xl border border-primary/10 relative">
               <div className="absolute -top-4 -left-4 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold">1</div>
               <h3 className="text-lg font-semibold mb-3">Registrieren & Suchfilter setzen</h3>
