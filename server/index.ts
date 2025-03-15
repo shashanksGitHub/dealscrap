@@ -1,5 +1,5 @@
 import "../shim.js";
-import "tsconfig-paths/register";
+import "tsconfig-paths/register.js";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
