@@ -4,6 +4,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { setupAuth } from "./auth";
+import path from "path";
 
 const app = express();
 
@@ -18,7 +19,6 @@ app.use(express.urlencoded({ extended: false }));
 
 // Security headers including CSP for Stripe and Replit Assistant
 app.use((req, res, next) => {
-  const hostname = req.hostname;
   res.setHeader(
     'Content-Security-Policy',
     "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
@@ -38,7 +38,8 @@ app.use((req, res, next) => {
     'http://localhost:3000',
     'http://localhost:5000',
     'https://leadscraper.de',
-    'https://www.leadscraper.de'
+    'https://www.leadscraper.de',
+    'https://lead-harvester-1-scalingup.replit.app'
   ];
 
   const origin = req.headers.origin;
@@ -117,7 +118,13 @@ async function startServer() {
 
     if (isProduction) {
       log("Setting up production static file serving...");
-      serveStatic(app);
+      // Serve static files from the client/dist directory
+      app.use(express.static(path.resolve(__dirname, '../client/dist')));
+
+      // Serve index.html for all routes in production
+      app.get('*', (_req, res) => {
+        res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
+      });
     } else {
       log("Setting up development Vite middleware...");
       await setupVite(app, server);
