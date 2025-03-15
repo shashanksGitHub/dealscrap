@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Lock, ShieldCheck, CreditCard, Award, Building2, Flag } from "lucide-react";
+import { Lock, ShieldCheck, CreditCard, Award } from "lucide-react";
 
 export function Footer() {
   return (
@@ -25,9 +25,9 @@ export function Footer() {
           </p>
         </div>
 
-        {/* Footer Links */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
+        {/* Links & About Section */}
+        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 mb-16">
+          <div className="text-center">
             <h3 className="font-semibold mb-4">Links</h3>
             <ul className="space-y-2">
               <li>
@@ -47,7 +47,7 @@ export function Footer() {
               </li>
             </ul>
           </div>
-          <div>
+          <div className="text-center">
             <h3 className="font-semibold mb-4">Über uns</h3>
             <div className="text-muted-foreground">
               <p>
