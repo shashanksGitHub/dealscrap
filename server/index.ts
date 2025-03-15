@@ -5,6 +5,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { setupAuth } from "./auth";
 import path from "path";
+import { recoveryService } from "./services/recovery";
 
 const app = express();
 
@@ -77,11 +78,22 @@ app.use((req, res, next) => {
   next();
 });
 
-// Error handler middleware
-const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunction) => {
+// Enhanced error handler middleware with recovery mechanism
+const errorHandler = async (err: any, _req: Request, res: Response, _next: NextFunction) => {
   const status = err.status || err.statusCode || 500;
   const message = err.message || "Internal Server Error";
+
   log(`Error: ${message}`);
+
+  // Attempt recovery for critical errors
+  if (status >= 500) {
+    try {
+      await recoveryService.handleDeploymentError(err);
+    } catch (recoveryError) {
+      log(`Recovery failed: ${recoveryError}`);
+    }
+  }
+
   res.status(status).json({ message });
 };
 
@@ -93,6 +105,12 @@ async function startServer() {
     // Set environment based on NODE_ENV
     const isProduction = process.env.NODE_ENV === "production";
     log(`Starting server in ${isProduction ? 'production' : 'development'} mode`);
+
+    // Check all services before proceeding
+    const serviceStatus = await recoveryService.checkServices();
+    if (!Object.values(serviceStatus).every(status => status)) {
+      throw new Error("Critical services are not available");
+    }
 
     // First set up auth as it's needed for protected routes
     log("Setting up authentication...");
@@ -141,23 +159,27 @@ async function startServer() {
       log(`Server running at http://0.0.0.0:${port} in ${process.env.NODE_ENV} mode`);
     });
 
-    server.on('error', (error: any) => {
+    server.on('error', async (error: any) => {
       if (error.code === 'EADDRINUSE') {
         log(`Error: Port ${port} is already in use`);
       } else {
         log(`Server error: ${error.message}`);
+        // Attempt recovery for server errors
+        await recoveryService.handleDeploymentError(error);
       }
       process.exit(1);
     });
 
-  } catch (error) {
+  } catch (error: any) {
     log(`Fatal error during server initialization: ${error}`);
+    await recoveryService.handleDeploymentError(error);
     process.exit(1);
   }
 }
 
-// Start the server
-startServer().catch((error) => {
+// Start the server with error handling
+startServer().catch(async (error) => {
   log(`Unhandled error during server startup: ${error}`);
+  await recoveryService.handleDeploymentError(error);
   process.exit(1);
 });
