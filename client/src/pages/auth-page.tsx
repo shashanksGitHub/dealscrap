@@ -45,7 +45,7 @@ export default function AuthPage() {
         </div>
 
         <div className="hidden md:flex flex-col justify-center bg-muted/5 p-12 border-l">
-          <div className="max-w-lg mx-auto space-y-8">
+          <div className="max-w-lg mx-auto space-y-12">
             <div>
               <h2 className="text-3xl font-bold">Über 1.000 zufriedene Kunden</h2>
             </div>

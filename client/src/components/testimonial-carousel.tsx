@@ -92,7 +92,7 @@ export function TestimonialCarousel() {
                   <Star key={i} className="h-4 w-4 fill-primary text-primary" />
                 ))}
               </div>
-              <blockquote className="text-base mb-4">
+              <blockquote className="text-lg mb-4">
                 "{testimonials[currentTestimonial].text}"
               </blockquote>
               <div>
