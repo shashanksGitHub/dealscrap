@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Lock, ShieldCheck, CreditCard, Award, Building2, Heart } from "lucide-react";
+import { Lock, ShieldCheck, CreditCard, Award } from "lucide-react";
 
 export function Footer() {
   return (
@@ -23,48 +23,6 @@ export function Footer() {
               support@leadscraper.de
             </a>
           </p>
-        </div>
-
-        {/* Trust Badges */}
-        <div className="mb-16 pt-8 border-t">
-          <div className="flex flex-wrap justify-center gap-8 mb-8">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="bg-primary/5 p-2 rounded-full">
-                <Lock className="h-4 w-4 text-primary" />
-              </div>
-              <span>256-bit SSL</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="bg-primary/5 p-2 rounded-full">
-                <ShieldCheck className="h-4 w-4 text-primary" />
-              </div>
-              <span>DSGVO-konform</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="bg-primary/5 p-2 rounded-full">
-                <CreditCard className="h-4 w-4 text-primary" />
-              </div>
-              <span>Sichere Zahlung</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="bg-primary/5 p-2 rounded-full">
-                <Award className="h-4 w-4 text-primary" />
-              </div>
-              <span>Geprüfte Qualität</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="bg-primary/5 p-2 rounded-full">
-                <Building2 className="h-4 w-4 text-primary" />
-              </div>
-              <span>IHK-Mitglied</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className="bg-primary/5 p-2 rounded-full">
-                <Heart className="h-4 w-4 text-primary" />
-              </div>
-              <span>Made with love in Germany</span>
-            </div>
-          </div>
         </div>
 
         {/* Made in Germany Badge */}
