@@ -66,57 +66,56 @@ export function TestimonialCarousel() {
   }, []);
 
   return (
-    <div className="w-full relative">
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={previousTestimonial}
-          className="h-8 w-8 p-0 opacity-50 hover:opacity-100 transition-opacity rounded-full"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-      </div>
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 z-10">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={nextTestimonial}
-          className="h-8 w-8 p-0 opacity-50 hover:opacity-100 transition-opacity rounded-full"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+    <div className="flex items-center gap-4">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={previousTestimonial}
+        className="h-8 w-8 p-0 opacity-50 hover:opacity-100 transition-opacity rounded-full shrink-0"
+      >
+        <ChevronLeft className="h-4 w-4" />
+      </Button>
+
+      <div className="flex-grow">
+        <AnimatePresence mode="wait">
+          {isVisible && (
+            <motion.div
+              key={currentTestimonial}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+              className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border"
+            >
+              <div className="flex gap-1 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-4 w-4 fill-primary text-primary" />
+                ))}
+              </div>
+              <blockquote className="text-base mb-4">
+                "{testimonials[currentTestimonial].text}"
+              </blockquote>
+              <div>
+                <p className="font-medium">
+                  {testimonials[currentTestimonial].name}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {testimonials[currentTestimonial].position}, {testimonials[currentTestimonial].company}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <AnimatePresence mode="wait">
-        {isVisible && (
-          <motion.div
-            key={currentTestimonial}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border"
-          >
-            <div className="flex gap-1 mb-3">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-4 w-4 fill-primary text-primary" />
-              ))}
-            </div>
-            <blockquote className="text-base mb-4">
-              "{testimonials[currentTestimonial].text}"
-            </blockquote>
-            <div>
-              <p className="font-medium">
-                {testimonials[currentTestimonial].name}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {testimonials[currentTestimonial].position}, {testimonials[currentTestimonial].company}
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={nextTestimonial}
+        className="h-8 w-8 p-0 opacity-50 hover:opacity-100 transition-opacity rounded-full shrink-0"
+      >
+        <ChevronRight className="h-4 w-4" />
+      </Button>
     </div>
   );
 }
