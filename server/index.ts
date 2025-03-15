@@ -29,31 +29,23 @@ app.use((req, res, next) => {
 });
 
 // CORS middleware with proper configuration for Stripe
-if (process.env.NODE_ENV === "development") {
-  app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, stripe-signature");
-    if (req.method === "OPTIONS") {
-      return res.sendStatus(200);
-    }
-    next();
-  });
-}
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, stripe-signature");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
-// Request logging with improved error handling
+// Request logging with improved error handling 
 app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
     const duration = Date.now() - start;
     log(`${req.method} ${req.path} ${res.statusCode} in ${duration}ms`);
   });
-  next();
-});
-
-// Debug logging
-app.use((req, res, next) => {
-  log(`Session ID: ${req.sessionID || 'none'}, Auth: ${req.isAuthenticated?.() || false}, Path: ${req.path}`);
   next();
 });
 

@@ -8,7 +8,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-02-24.acacia",
+  apiVersion: "2024-02-24",
 });
 
 // Credit package mapping
@@ -21,7 +21,7 @@ const CREDIT_PACKAGES = {
 
 export async function registerRoutes(router: Router) {
   // Stripe payment routes
-  router.post("/api/create-payment-intent", async (req, res) => {
+  router.post("/create-payment-intent", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
         return res.status(401).json({ message: "Nicht authentifiziert" });
@@ -91,12 +91,12 @@ export async function registerRoutes(router: Router) {
   });
 
   // Stripe webhook for handling successful payments
-  router.post("/api/stripe-webhook", async (req, res) => {
+  router.post("/stripe-webhook", async (req, res) => {
     const sig = req.headers['stripe-signature'];
 
     try {
       const event = stripe.webhooks.constructEvent(
-        req.body,
+        (req as any).rawBody,
         sig,
         process.env.STRIPE_WEBHOOK_SECRET
       );
@@ -112,13 +112,13 @@ export async function registerRoutes(router: Router) {
       res.json({ received: true });
     } catch (error) {
       console.error('Webhook Error:', error.message);
-      return res.status(400).send(`Webhook Error: ${error.message}`);
+      return res.status(400).json({ error: `Webhook Error: ${error.message}` });
     }
   });
 
   // Credit management
   router.post("/credits/add", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
     const amount = parseInt(req.body.amount);
     if (isNaN(amount) || amount <= 0) {
       return res.status(400).json({ message: "Invalid credit amount" });
@@ -130,7 +130,7 @@ export async function registerRoutes(router: Router) {
 
   // Lead management
   router.get("/leads", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
     const leads = await storage.getLeadsByUserId(req.user.id);
     res.json(leads);
   });
@@ -150,9 +150,8 @@ export async function registerRoutes(router: Router) {
     res.json(post);
   });
 
-  // Protected route for authenticated users
   router.post("/blog-posts", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
 
     try {
       const validatedData = insertBlogPostSchema.parse({
@@ -167,36 +166,8 @@ export async function registerRoutes(router: Router) {
     }
   });
 
-  // Webhook route for Zapier integration with Form data support
-  router.post("/webhook/blog-posts", validateApiKey, async (req, res) => {
-    console.log('Received webhook request for blog post creation');
-    console.log('Request body:', req.body);
-    console.log('Content-Type:', req.get('Content-Type'));
-
-    try {
-      const data = req.body;
-      console.log('Processing data:', data);
-
-      const validatedData = insertBlogPostSchema.parse({
-        title: data.title,
-        content: data.content,
-        authorId: parseInt(process.env.DEFAULT_AUTHOR_ID || "1")
-      });
-
-      console.log('Data validation successful:', validatedData);
-
-      const post = await storage.createBlogPost(validatedData);
-
-      console.log('Blog post created successfully:', post.id);
-      res.status(201).json(post);
-    } catch (error) {
-      console.error('Error creating blog post:', error);
-      res.status(400).json({ message: "Invalid blog post data", error: (error as Error).message });
-    }
-  });
-
   router.post("/scrape", async (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
     const { query, location } = req.body;
 
     if (!query || !location) {
