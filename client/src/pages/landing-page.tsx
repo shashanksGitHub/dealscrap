@@ -1,4 +1,4 @@
-import { ArrowRightIcon, CheckIcon, GlobeIcon, SearchIcon, Check, ShieldCheck, Zap, Users, BarChart } from "lucide-react";
+import { ArrowRightIcon, CheckIcon, GlobeIcon, SearchIcon, Check, ShieldCheck, Zap, Users, BarChart, Code, Megaphone, ShoppingCart, Wallet, Factory } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -182,12 +182,65 @@ export default function LandingPage() {
             <p className="text-base md:text-lg text-muted-foreground">Perfekt abgestimmt auf die Bedürfnisse verschiedener Branchen</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {["IT & Software", "Marketing & Werbung", "Beratung & Consulting", "Handel & E-Commerce", "Finanzen & Versicherung", "Handwerk & Industrie"].map((industry) => (
-              <div key={industry} className="bg-background/50 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all">
-                <h3 className="text-base md:text-lg font-medium mb-2">{industry}</h3>
-                <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
+            <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Code className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">IT & Software</h3>
               </div>
-            ))}
+              <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
+            </div>
+
+            <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Megaphone className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">Marketing & Werbung</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
+            </div>
+
+            <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">Beratung & Consulting</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
+            </div>
+
+            <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <ShoppingCart className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">Handel & E-Commerce</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
+            </div>
+
+            <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Wallet className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">Finanzen & Versicherung</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
+            </div>
+
+            <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <Factory className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="text-base md:text-lg font-medium">Handwerk & Industrie</h3>
+              </div>
+              <p className="text-sm text-muted-foreground">Maßgeschneiderte Lead-Generierung für Ihre Branche</p>
+            </div>
           </div>
         </div>
       </section>
