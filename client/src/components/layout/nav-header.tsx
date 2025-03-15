@@ -17,7 +17,9 @@ export function NavHeader() {
       const data = await response.json();
       return data;
     },
-    enabled: !!user // Only run query if user is logged in
+    enabled: !!user, // Only run query if user is logged in
+    refetchInterval: 5000, // Refetch every 5 seconds while component is mounted
+    staleTime: 0 // Consider data immediately stale
   });
 
   // Use the latest user data from the query

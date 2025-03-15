@@ -95,34 +95,59 @@ export async function registerRoutes(router: Router) {
           console.log(`Processing payment for user ${userId}`);
           console.log(`Adding ${credits} credits from payment ${paymentIntent.id}`);
 
+          // Get current user and verify existence
           const user = await storage.getUser(userId);
           if (!user) {
             throw new Error(`User ${userId} not found`);
           }
 
           console.log(`Current credits for user ${userId}: ${user.credits}`);
+
+          // Add credits
           const updatedUser = await storage.addCredits(userId, credits);
           console.log(`Successfully updated credits for user ${userId}. New balance: ${updatedUser.credits}`);
 
+          // Send success response with updated information
           return res.json({ 
             received: true,
             userId: userId,
             credits: updatedUser.credits,
             message: 'Credits added successfully'
           });
-        } catch (error) {
+        } catch (error: any) {
           console.error('Failed to add credits:', error);
-          return res.status(200).json({
+          return res.status(500).json({
             received: true,
-            warning: `Failed to process credits: ${error.message}`
+            error: true,
+            message: `Failed to process credits: ${error.message}`
           });
         }
       }
 
       res.json({ received: true });
-    } catch (err) {
+    } catch (err: any) {
       console.error('❌ Webhook Error:', err.message);
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+    }
+  });
+
+  // Get user info
+  router.get("/user", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Nicht authentifiziert" });
+    }
+
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "Benutzer nicht gefunden" });
+      }
+
+      console.log(`Sending user info - ID: ${user.id}, Credits: ${user.credits}`);
+      res.json(user);
+    } catch (error: any) {
+      console.error('Error fetching user info:', error);
+      res.status(500).json({ message: "Fehler beim Abrufen der Benutzerinformationen" });
     }
   });
 

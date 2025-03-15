@@ -45,7 +45,10 @@ export class MemStorage implements IStorage {
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    console.log(`Getting user with ID: ${id}`);
+    const user = this.users.get(id);
+    console.log(`Found user:`, user);
+    return user;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
@@ -63,15 +66,17 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: Omit<InsertUser, "passwordConfirm">): Promise<User> {
     const id = this.currentUserId++;
     const user: User = {
-      ...insertUser,
       id,
+      email: insertUser.email,
+      password: insertUser.password,
       credits: 0,
       isActive: true,
       createdAt: new Date(),
       resetToken: null,
       resetTokenExpiry: null,
-      stripeCustomerId: '' // Initialize with empty string
+      stripeCustomerId: ''
     };
+    console.log(`Creating new user:`, user);
     this.users.set(id, user);
     return user;
   }
@@ -112,19 +117,27 @@ export class MemStorage implements IStorage {
   }
 
   async addCredits(userId: number, amount: number): Promise<User> {
+    console.log(`Adding credits - User ID: ${userId}, Amount: ${amount}`);
     const user = await this.getUser(userId);
-    if (!user) throw new Error("User not found");
+    if (!user) {
+      console.error(`User not found: ${userId}`);
+      throw new Error("User not found");
+    }
 
-    console.log(`Current credits for user ${userId}: ${user.credits}`);
-    console.log(`Adding ${amount} credits`);
+    const currentCredits = user.credits || 0;
+    console.log(`Current credits: ${currentCredits}`);
 
     const updatedUser = {
       ...user,
-      credits: (user.credits || 0) + amount // Ensure credits is initialized if undefined
+      credits: currentCredits + amount
     };
 
+    console.log(`Updated user with new credits:`, updatedUser);
     this.users.set(userId, updatedUser);
-    console.log(`Updated credits for user ${userId}: ${updatedUser.credits}`);
+
+    // Verify the update
+    const verifiedUser = await this.getUser(userId);
+    console.log(`Verified updated user:`, verifiedUser);
 
     return updatedUser;
   }
