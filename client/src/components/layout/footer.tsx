@@ -25,40 +25,8 @@ export function Footer() {
           </p>
         </div>
 
-        {/* Links & About Section */}
-        <div className="max-w-3xl mx-auto mb-16">
-          <div className="grid grid-cols-2 gap-12 items-start">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold mb-6">Links</h3>
-              <ul className="space-y-3">
-                <li>
-                  <Link href="/impressum" className="text-muted-foreground hover:text-primary transition-colors">
-                    Impressum
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/datenschutz" className="text-muted-foreground hover:text-primary transition-colors">
-                    Datenschutz
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/agb" className="text-muted-foreground hover:text-primary transition-colors">
-                    AGB
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="text-center">
-              <h3 className="text-lg font-semibold mb-6">Über uns</h3>
-              <p className="text-muted-foreground">
-                LeadScraper ist Deutschlands innovativste B2B-Lead-Plattform. Mit modernster KI-Technologie und DSGVO-konformen Prozessen revolutionieren wir die Leadgenerierung.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Trust Badges */}
-        <div className="mt-12 pt-8 border-t">
+        <div className="mb-16 pt-8 border-t">
           <div className="flex flex-wrap justify-center gap-8 mb-8">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <div className="bg-primary/5 p-2 rounded-full">
@@ -88,7 +56,7 @@ export function Footer() {
         </div>
 
         {/* Made in Germany Badge */}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mb-16">
           <div className="bg-background/50 backdrop-blur-sm border border-primary/10 rounded-xl p-4 flex items-center gap-3">
             <div className="relative w-6 h-4 rounded overflow-hidden shadow-sm">
               <div className="absolute inset-0 bg-black"></div>
@@ -99,8 +67,19 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-8 pt-8 border-t text-center text-muted-foreground">
+        {/* Footer Links & Copyright */}
+        <div className="flex flex-col items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex justify-center gap-8">
+            <Link href="/impressum" className="hover:text-primary transition-colors">
+              Impressum
+            </Link>
+            <Link href="/datenschutz" className="hover:text-primary transition-colors">
+              Datenschutz
+            </Link>
+            <Link href="/agb" className="hover:text-primary transition-colors">
+              AGB
+            </Link>
+          </div>
           <p>&copy; {new Date().getFullYear()} LeadScraper. Alle Rechte vorbehalten.</p>
         </div>
       </div>
