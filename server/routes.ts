@@ -28,43 +28,63 @@ export async function registerRoutes(router: Router) {
       }
 
       const { amount } = req.body;
+
+      console.log('Creating payment intent for amount:', amount);
+
       if (!CREDIT_PACKAGES[amount]) {
+        console.error('Invalid amount requested:', amount);
         return res.status(400).json({ message: "Ungültiger Betrag" });
       }
 
       // Create or get Stripe customer
       let user = await storage.getUser(req.user.id);
-      let customerId = user.stripeCustomerId;
-
-      if (!customerId) {
-        const customer = await stripe.customers.create({
-          email: user.email,
-          metadata: {
-            userId: user.id.toString()
-          }
-        });
-        user = await storage.setStripeCustomerId(user.id, customer.id);
-        customerId = customer.id;
+      if (!user) {
+        console.error('User not found:', req.user.id);
+        return res.status(404).json({ message: "Benutzer nicht gefunden" });
       }
 
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount * 100, // Convert to cents
-        currency: "eur",
-        customer: customerId,
-        metadata: {
-          userId: user.id.toString(),
-          credits: CREDIT_PACKAGES[amount].credits.toString()
-        },
-        automatic_payment_methods: {
-          enabled: true,
-        },
-      });
+      let customerId = user.stripeCustomerId;
 
-      res.json({ clientSecret: paymentIntent.client_secret });
+      try {
+        if (!customerId) {
+          console.log('Creating new Stripe customer for user:', user.id);
+          const customer = await stripe.customers.create({
+            email: user.email,
+            metadata: {
+              userId: user.id.toString()
+            }
+          });
+          user = await storage.setStripeCustomerId(user.id, customer.id);
+          customerId = customer.id;
+        }
+
+        console.log('Creating payment intent with customer:', customerId);
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: amount * 100, // Convert to cents
+          currency: "eur",
+          customer: customerId,
+          metadata: {
+            userId: user.id.toString(),
+            credits: CREDIT_PACKAGES[amount].credits.toString()
+          },
+          automatic_payment_methods: {
+            enabled: true,
+          },
+        });
+
+        console.log('Payment intent created successfully:', paymentIntent.id);
+        res.json({ clientSecret: paymentIntent.client_secret });
+      } catch (stripeError: any) {
+        console.error('Stripe API error:', stripeError);
+        res.status(400).json({ 
+          message: "Fehler bei der Stripe-Verarbeitung",
+          details: stripeError.message 
+        });
+      }
     } catch (error: any) {
       console.error('Payment intent creation error:', error);
       res.status(500).json({ 
-        message: "Fehler bei der Zahlungsinitialisierung. Bitte versuchen Sie es später erneut.",
+        message: "Fehler bei der Zahlungsinitialisierung",
         details: error.message 
       });
     }

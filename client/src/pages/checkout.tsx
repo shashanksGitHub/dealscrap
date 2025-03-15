@@ -14,6 +14,7 @@ import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
 }
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const CREDIT_PACKAGES: Record<string, { credits: number; price: number }> = {
@@ -28,6 +29,7 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
   const elements = useElements();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,9 +51,15 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
 
       if (error) {
         console.error('Zahlungsbestätigung fehlgeschlagen:', error);
+        let errorMessage = "Bei der Verarbeitung der Zahlung ist ein Fehler aufgetreten.";
+
+        if (error.type === "card_error" || error.type === "validation_error") {
+          errorMessage = error.message || errorMessage;
+        }
+
         toast({
           title: "Zahlung fehlgeschlagen",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
       }
@@ -62,9 +70,9 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
         description: "Bei der Verarbeitung der Zahlung ist ein Fehler aufgetreten.",
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
-
-    setIsProcessing(false);
   };
 
   return (
@@ -130,18 +138,18 @@ export default function Checkout() {
       setAmount(numAmount);
 
       try {
+        console.log('Initializing payment for amount:', numAmount);
         const response = await apiRequest("POST", "/api/create-payment-intent", { amount: numAmount });
+        const data = await response.json();
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: "Unbekannter Fehler" }));
-          throw new Error(errorData.message || 'Fehler beim Erstellen der Zahlung');
+        if (!data.clientSecret) {
+          throw new Error('Keine Client Secret in der Antwort');
         }
 
-        const data = await response.json();
         setClientSecret(data.clientSecret);
       } catch (error: any) {
         console.error('Fehler beim Erstellen der Zahlung:', error);
-        setError(error.message);
+        setError(error.message || 'Fehler beim Erstellen der Zahlung');
         toast({
           title: "Fehler",
           description: "Die Zahlung konnte nicht initialisiert werden. Bitte versuchen Sie es später erneut.",
