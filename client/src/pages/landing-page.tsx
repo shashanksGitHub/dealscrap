@@ -21,7 +21,7 @@ export default function LandingPage() {
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
         <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-blue-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-4000" />
 
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12 lg:py-20">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-8 py-12 lg:py-20">
           <div className="max-w-2xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4 animate-fade-in">
               <Zap className="h-3.5 w-3.5" />
@@ -54,7 +54,7 @@ export default function LandingPage() {
 
       {/* Features Section - Desktop Optimiert */}
       <section id="features" className="bg-muted/5 py-16">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">Einfache Lead-Generierung mit LeadScraper</h2>
             <p className="text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -99,7 +99,7 @@ export default function LandingPage() {
       {/* Process Section - Desktop Optimiert */}
       <section className="py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent -z-10" />
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">So einfach funktioniert Leadscraper.de</h2>
             <p className="text-base lg:text-lg text-muted-foreground">
@@ -134,7 +134,7 @@ export default function LandingPage() {
 
       {/* Strengths Section - Desktop Optimiert */}
       <section className="bg-muted/5 py-16">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">Was uns auszeichnet</h2>
             <p className="text-base lg:text-lg text-muted-foreground">
@@ -192,7 +192,7 @@ export default function LandingPage() {
 
       {/* Industries Section - Desktop Optimiert */}
       <section className="bg-muted/10 py-16">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">Für wen ist Leadscraper.de gemacht?</h2>
             <p className="text-base lg:text-lg text-muted-foreground">
@@ -217,7 +217,7 @@ export default function LandingPage() {
 
       {/* Benefits Section - Desktop Optimiert */}
       <section id="benefits" className="bg-muted/5 py-16">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">Warum LeadScraper?</h2>
             <p className="text-base lg:text-lg text-muted-foreground">
@@ -242,7 +242,7 @@ export default function LandingPage() {
 
       {/* FAQ Section - Desktop Optimiert */}
       <section id="faq" className="py-16">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-2xl lg:text-3xl font-bold mb-8 text-center">Häufig gestellte Fragen</h2>
             <Accordion type="single" collapsible className="w-full">

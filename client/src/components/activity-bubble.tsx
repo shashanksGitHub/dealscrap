@@ -40,7 +40,7 @@ export function ActivityBubble() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed max-w-[1400px] mx-auto left-1/2 -translate-x-1/2 bottom-6 px-6 lg:px-12 w-full">
+    <div className="fixed max-w-[1200px] mx-auto left-1/2 -translate-x-1/2 bottom-6 px-6 lg:px-8 w-full">
       <AnimatePresence>
         {isVisible && (
           <motion.div
