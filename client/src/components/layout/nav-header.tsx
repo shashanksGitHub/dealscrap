@@ -59,15 +59,9 @@ export function NavHeader() {
                       className="absolute inset-0 h-full w-full rounded-full [&>div]:bg-primary/20"
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      {currentUser?.credits === 0 ? (
-                        <Link href="/dashboard" className="text-sm font-semibold text-primary hover:underline">
-                          Jetzt aufladen
-                        </Link>
-                      ) : (
-                        <span className="text-lg font-semibold text-primary">
-                          {currentUser?.credits}
-                        </span>
-                      )}
+                      <span className={`text-lg font-semibold ${currentUser.credits === 0 ? 'text-destructive' : 'text-primary'}`}>
+                        {currentUser.credits}
+                      </span>
                     </div>
                   </div>
                   <Button variant="outline" size="sm" onClick={logout}>
