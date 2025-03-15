@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Loader2, ArrowLeftIcon, CreditCard } from "lucide-react";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
@@ -29,6 +31,7 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
   const elements = useElements();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [vatId, setVatId] = useState("");
   const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,7 +85,7 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
           </div>
           <div className="text-right">
             <p className="font-medium">{amount}€</p>
-            <p className="text-sm text-muted-foreground">inkl. MwSt.</p>
+            <p className="text-sm text-muted-foreground">zzgl. MwSt.</p>
           </div>
         </div>
       </div>
@@ -94,6 +97,8 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
             mode: 'billing',
             fields: {
               phone: 'always',
+              company: 'always',
+              vat_id: 'always'
             },
             validation: {
               phone: {
@@ -106,7 +111,6 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
             defaultValues: {
               firstName: '',
               lastName: '',
-              company: '',
               address: {
                 line1: '',
                 line2: '',
@@ -118,11 +122,49 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
             },
           }}
         />
+
+        <div className="space-y-2">
+          <Label htmlFor="company">Firmenname</Label>
+          <Input 
+            id="company" 
+            name="company"
+            placeholder="Musterfirma GmbH"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="vat">USt-ID</Label>
+          <Input 
+            id="vat" 
+            name="vat"
+            placeholder="DE123456789"
+            value={vatId}
+            onChange={(e) => setVatId(e.target.value)}
+          />
+          <p className="text-xs text-muted-foreground">
+            Für Unternehmen aus der EU: Geben Sie Ihre gültige USt-ID an
+          </p>
+        </div>
       </div>
 
       <div className="space-y-4">
         <h3 className="text-sm font-medium">Zahlungsinformationen</h3>
-        <PaymentElement />
+        <PaymentElement 
+          options={{
+            paymentMethodOrder: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact'],
+            defaultValues: {
+              billingDetails: {
+                name: '',
+                email: '',
+                phone: '',
+              }
+            },
+            fields: {
+              billingDetails: 'never' // We're collecting this via AddressElement
+            }
+          }}
+        />
       </div>
 
       <Button 
@@ -143,6 +185,10 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
           </>
         )}
       </Button>
+
+      <p className="text-xs text-center text-muted-foreground">
+        Mit der Zahlung akzeptieren Sie unsere AGB und Datenschutzbestimmungen
+      </p>
     </form>
   );
 };
@@ -244,7 +290,8 @@ export default function Checkout() {
                   colorBackground: '#ffffff',
                   colorText: '#1a1a1a',
                 }
-              } 
+              },
+              paymentMethodTypes: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact']
             }}>
               <CheckoutForm 
                 amount={amount} 

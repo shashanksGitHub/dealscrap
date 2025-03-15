@@ -63,6 +63,7 @@ export async function registerRoutes(router: Router) {
           userId: user.id.toString(),
           credits: CREDIT_PACKAGES[amount].credits.toString()
         },
+        payment_method_types: ['card', 'sepa_debit', 'sofort', 'giropay', 'ideal', 'bancontact'],
         automatic_payment_methods: {
           enabled: true,
         },
@@ -99,6 +100,36 @@ export async function registerRoutes(router: Router) {
     } catch (error: any) {
       res.status(500).json({ 
         message: "Fehler beim Abrufen der Zahlungsmethoden",
+        details: error.message 
+      });
+    }
+  });
+
+  // Update customer billing details
+  router.post("/update-billing-details", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Nicht authentifiziert" });
+      }
+
+      const { company, vatId } = req.body;
+
+      const user = await storage.getUser(req.user.id);
+      if (!user?.stripeCustomerId) {
+        return res.status(400).json({ message: "Kein Stripe-Kunde gefunden" });
+      }
+
+      await stripe.customers.update(user.stripeCustomerId, {
+        metadata: {
+          company,
+          vatId
+        }
+      });
+
+      res.json({ status: "success" });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: "Fehler beim Aktualisieren der Rechnungsdaten",
         details: error.message 
       });
     }
