@@ -5,7 +5,7 @@ import { Lock, ShieldCheck, CreditCard, Award, Building2 } from "lucide-react";
 export function Footer() {
   return (
     <footer className="bg-background border-t">
-      <div className="container mx-auto py-16">
+      <div className="max-w-[1200px] mx-auto py-16 px-6 lg:px-8">
         {/* CTA Section */}
         <div className="max-w-4xl mx-auto text-center mb-16">
           <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">Bereit, Ihre Lead-Generierung zu revolutionieren?</h2>
