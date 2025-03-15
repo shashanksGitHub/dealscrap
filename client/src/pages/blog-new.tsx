@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
-import { NavHeader } from "@/components/layout/nav-header";
 import { Footer } from "@/components/layout/footer";
 
 export default function NewBlogPost() {
@@ -59,7 +58,6 @@ export default function NewBlogPost() {
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
-        <NavHeader />
         <div className="container mx-auto py-8">
           <div className="text-center">Bitte melden Sie sich an, um einen Ratgeber-Beitrag zu erstellen.</div>
         </div>
@@ -70,7 +68,6 @@ export default function NewBlogPost() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NavHeader />
       <div className="container mx-auto py-8">
         <h1 className="text-3xl font-bold mb-8">Neuen Ratgeber-Beitrag erstellen</h1>
 

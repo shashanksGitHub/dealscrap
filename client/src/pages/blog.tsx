@@ -8,7 +8,6 @@ import { formatDistance } from "date-fns";
 import { de } from "date-fns/locale";
 import { Link } from "wouter";
 import { ArrowLeftIcon, PlusIcon, BookOpenIcon } from "lucide-react";
-import { NavHeader } from "@/components/layout/nav-header";
 import { Footer } from "@/components/layout/footer";
 
 export default function BlogPage() {
@@ -21,7 +20,6 @@ export default function BlogPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <NavHeader />
         <div className="container mx-auto py-8 pt-24">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-1/4"></div>
@@ -39,7 +37,6 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NavHeader />
 
       {/* Hero Section */}
       <section className="pt-32 pb-24 relative overflow-hidden border-b">

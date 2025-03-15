@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
 
 export function NavHeader() {
   const { user, logout } = useAuth();
@@ -28,8 +29,10 @@ export function NavHeader() {
                   </button>
                 </>
               ) : (
-                <Link href="/auth" className="text-muted-foreground hover:text-primary">
-                  Login
+                <Link href="/auth">
+                  <Button variant="outline" size="sm" className="ml-4">
+                    Login
+                  </Button>
                 </Link>
               )}
             </div>
