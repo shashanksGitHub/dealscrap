@@ -176,10 +176,10 @@ export default function Dashboard() {
                   <Button
                     key={pkg.id}
                     onClick={() => handlePurchase(pkg.price)}
-                    variant={pkg.recommended ? "default" : "outline"}
+                    variant="outline"
                     className={cn(
                       "relative flex flex-col items-center justify-center gap-2 p-6 h-auto min-h-[140px]",
-                      pkg.recommended && "border-2 border-primary shadow-lg scale-105"
+                      pkg.recommended && "border-2 border-primary shadow-lg"
                     )}
                   >
                     {pkg.recommended && (
@@ -206,8 +206,8 @@ export default function Dashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-2xl font-bold tracking-tight">Ihre Leads</CardTitle>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleExport}
               disabled={isLeadsLoading || leads.length === 0}
               size="lg"
