@@ -94,7 +94,7 @@ export async function registerRoutes(router: Router) {
 
           console.log(`Adding ${credits} credits to user ${userId}`);
           const updatedUser = await storage.addCredits(userId, credits);
-          console.log('Credits added successfully:', updatedUser.credits);
+          console.log('Credits added successfully. New credit balance:', updatedUser.credits);
         } catch (error) {
           console.error('Failed to add credits:', error);
           return res.status(200).json({

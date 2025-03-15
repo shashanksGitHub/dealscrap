@@ -16,6 +16,7 @@ import { Footer } from "@/components/layout/footer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { queryClient } from "@/lib/queryClient";
 
 if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
   throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
@@ -73,11 +74,18 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
           variant: "destructive",
         });
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        // Invalidate the user query to force a refresh of the credits
+        await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+
         toast({
           title: "Zahlung erfolgreich",
           description: "Ihre Credits wurden gutgeschrieben",
         });
-        window.location.href = "/dashboard";
+
+        // Short delay to allow the query to refresh
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 1000);
       }
     } catch (error: any) {
       console.error('Payment processing error:', error);
