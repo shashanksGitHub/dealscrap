@@ -33,12 +33,38 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ message: "Ungültiger Betrag" });
       }
 
+      // Get or create Stripe customer
+      let user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "Benutzer nicht gefunden" });
+      }
+
+      let customerId = user.stripeCustomerId;
+
+      // Create new customer if none exists
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: {
+            userId: user.id.toString()
+          }
+        });
+        user = await storage.setStripeCustomerId(user.id, customer.id);
+        customerId = customer.id;
+      }
+
+      // Create payment intent
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount * 100, // Convert to cents
         currency: "eur",
-        payment_method_types: ['card'],
+        customer: customerId,
+        setup_future_usage: 'off_session', // Enable saving payment method
         metadata: {
+          userId: user.id.toString(),
           credits: CREDIT_PACKAGES[amount].credits.toString()
+        },
+        automatic_payment_methods: {
+          enabled: true,
         },
       });
 
@@ -47,6 +73,72 @@ export async function registerRoutes(router: Router) {
       console.error('Payment intent creation error:', error);
       res.status(500).json({ 
         message: "Fehler bei der Zahlungsinitialisierung",
+        details: error.message 
+      });
+    }
+  });
+
+  // Get saved payment methods
+  router.get("/payment-methods", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Nicht authentifiziert" });
+      }
+
+      const user = await storage.getUser(req.user.id);
+      if (!user?.stripeCustomerId) {
+        return res.json({ paymentMethods: [] });
+      }
+
+      const paymentMethods = await stripe.paymentMethods.list({
+        customer: user.stripeCustomerId,
+        type: 'card',
+      });
+
+      res.json({ paymentMethods: paymentMethods.data });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: "Fehler beim Abrufen der Zahlungsmethoden",
+        details: error.message 
+      });
+    }
+  });
+
+  // Pay with saved payment method
+  router.post("/pay-with-saved-method", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Nicht authentifiziert" });
+      }
+
+      const { amount, paymentMethodId } = req.body;
+
+      if (!CREDIT_PACKAGES[amount]) {
+        return res.status(400).json({ message: "Ungültiger Betrag" });
+      }
+
+      const user = await storage.getUser(req.user.id);
+      if (!user?.stripeCustomerId) {
+        return res.status(400).json({ message: "Kein Stripe-Kunde gefunden" });
+      }
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount * 100,
+        currency: "eur",
+        customer: user.stripeCustomerId,
+        payment_method: paymentMethodId,
+        off_session: true,
+        confirm: true,
+        metadata: {
+          userId: user.id.toString(),
+          credits: CREDIT_PACKAGES[amount].credits.toString()
+        }
+      });
+
+      res.json({ status: "success", paymentIntent });
+    } catch (error: any) {
+      res.status(500).json({ 
+        message: "Fehler bei der Zahlung",
         details: error.message 
       });
     }
@@ -65,7 +157,7 @@ export async function registerRoutes(router: Router) {
       if (event.type === 'payment_intent.succeeded') {
         const paymentIntent = event.data.object;
         const credits = parseInt(paymentIntent.metadata.credits);
-        const userId = parseInt(paymentIntent.metadata.userId); // Added userId parsing
+        const userId = parseInt(paymentIntent.metadata.userId);
         await storage.addCredits(userId, credits);
       }
 

@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
+import { useStripe, Elements, PaymentElement, AddressElement, useElements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
 import { apiRequest } from "@/lib/queryClient";
@@ -45,6 +45,12 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/dashboard`,
+          payment_method_data: {
+            billing_details: {
+              // Stripe will automatically populate this with the AddressElement data
+            },
+          },
+          setup_future_usage: 'off_session', // This enables saving the payment method
         },
       });
 
@@ -81,7 +87,43 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
         </div>
       </div>
 
-      <PaymentElement />
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium">Rechnungsadresse</h3>
+        <AddressElement 
+          options={{
+            mode: 'billing',
+            fields: {
+              phone: 'always',
+            },
+            validation: {
+              phone: {
+                required: 'always',
+              },
+            },
+            display: {
+              name: 'split',
+            },
+            defaultValues: {
+              firstName: '',
+              lastName: '',
+              company: '',
+              address: {
+                line1: '',
+                line2: '',
+                city: '',
+                state: '',
+                postal_code: '',
+                country: 'DE',
+              },
+            },
+          }}
+        />
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium">Zahlungsinformationen</h3>
+        <PaymentElement />
+      </div>
 
       <Button 
         type="submit" 
