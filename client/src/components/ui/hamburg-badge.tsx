@@ -1,33 +1,41 @@
 import { cn } from "@/lib/utils";
 
 type BadgeProps = {
-  size?: "sm" | "md";
+  size?: "sm" | "default";
   className?: string;
 };
 
-export function HamburgBadge({ size = "md", className }: BadgeProps) {
+export function HamburgBadge({ size = "default", className }: BadgeProps) {
   return (
     <div className={cn(
-      "flex flex-col items-center gap-2 p-4 rounded-lg bg-white shadow-sm border",
-      size === "sm" ? "max-w-[160px]" : "max-w-[200px]",
+      "flex flex-col items-center justify-center p-4 text-center bg-white rounded-xl border border-border/50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+      size === "sm" && "w-[160px]",
+      size === "default" && "w-[200px]",
       className
     )}>
       <img
         src="/DEU_Hamburg_COA.svg.png"
         alt="Hamburg Wappen"
         className={cn(
-          "h-auto",
-          size === "sm" ? "w-16" : "w-20"
+          "object-contain mb-3",
+          size === "sm" && "h-12",
+          size === "default" && "h-16"
         )}
       />
-      <div className="text-center">
-        <p className={cn(
-          "text-gray-700 font-medium",
-          size === "sm" ? "text-sm" : "text-base"
-        )}>
-          Ansässig in Hamburg
-        </p>
-      </div>
+      <p className={cn(
+        "font-medium mb-1",
+        size === "sm" && "text-sm",
+        size === "default" && "text-base"
+      )}>
+        Ansässig in Hamburg
+      </p>
+      <p className={cn(
+        size === "sm" && "text-xs",
+        size === "default" && "text-sm",
+        "text-muted-foreground"
+      )}>
+        Ihr regionaler Partner
+      </p>
     </div>
   );
 }
