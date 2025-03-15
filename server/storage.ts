@@ -69,7 +69,8 @@ export class MemStorage implements IStorage {
       isActive: true,
       createdAt: new Date(),
       resetToken: null,
-      resetTokenExpiry: null
+      resetTokenExpiry: null,
+      stripeCustomerId: '' // Initialize with empty string
     };
     this.users.set(id, user);
     return user;
@@ -153,8 +154,10 @@ export class MemStorage implements IStorage {
   async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
     const id = this.currentBlogPostId++;
     const newPost: BlogPost = {
-      ...post,
       id,
+      authorId: post.authorId,
+      title: post.title,
+      content: post.content,
       isPublished: false,
       createdAt: new Date(),
       updatedAt: new Date()

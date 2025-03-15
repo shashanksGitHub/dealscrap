@@ -12,6 +12,7 @@ import { SearchIcon, LogOutIcon, DownloadIcon, PlayCircleIcon } from "lucide-rea
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
+import { Loader2 } from "@/components/ui/loader";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -20,12 +21,23 @@ export default function Dashboard() {
   const [searchLocation, setSearchLocation] = useState("");
   const [, setLocation] = useLocation();
 
-  const { data: leads = [] } = useQuery<Lead[]>({
+  const { data: leads = [], isLoading: isLeadsLoading } = useQuery<Lead[]>({
     queryKey: ["/api/leads"],
+    initialData: [],
+    refetchOnWindowFocus: false
   });
 
   const scrapeMutation = useMutation({
     mutationFn: async (data: { query: string; location: string }) => {
+      if (!data.query.trim() || !data.location.trim()) {
+        throw new Error("Query and location cannot be empty");
+      }
+
+      const locationRegex = /^[a-zA-Z\s-]+$/;
+      if (!locationRegex.test(data.location)) {
+        throw new Error("Invalid location format");
+      }
+
       const res = await apiRequest("POST", "/api/scrape", data);
       return res.json();
     },
@@ -45,20 +57,9 @@ export default function Dashboard() {
     },
   });
 
-  const handleScrape = () => {
-    if (!query || !searchLocation) {
-      toast({
-        title: "Error",
-        description: "Please enter both query and location",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    scrapeMutation.mutate({ query, location: searchLocation });
-  };
-
   const handleExport = () => {
+    if (!leads.length) return;
+
     const csv = leads.map((lead: Lead) =>
       Object.values(lead).join(",")
     ).join("\n");
@@ -98,7 +99,6 @@ export default function Dashboard() {
       </nav>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
-        {/* Product Demo Video */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
@@ -122,7 +122,6 @@ export default function Dashboard() {
         </Card>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Scrape Form */}
           <Card>
             <CardHeader>
               <CardTitle>Scrape New Leads</CardTitle>
@@ -136,6 +135,7 @@ export default function Dashboard() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="e.g. Restaurant"
+                    disabled={scrapeMutation.isPending}
                   />
                 </div>
                 <div>
@@ -145,15 +145,23 @@ export default function Dashboard() {
                     value={searchLocation}
                     onChange={(e) => setSearchLocation(e.target.value)}
                     placeholder="e.g. Berlin"
+                    disabled={scrapeMutation.isPending}
                   />
                 </div>
                 <Button
-                  onClick={handleScrape}
+                  onClick={() => scrapeMutation.mutate({ query, location: searchLocation })}
                   disabled={scrapeMutation.isPending || user?.credits === 0}
                   className="w-full"
                 >
                   <SearchIcon className="w-4 h-4 mr-2" />
-                  {scrapeMutation.isPending ? "Scraping..." : "Start Scraping"}
+                  {scrapeMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Scraping...
+                    </>
+                  ) : (
+                    "Start Scraping"
+                  )}
                 </Button>
                 {user?.credits === 0 && (
                   <p className="text-sm text-destructive text-center">
@@ -164,7 +172,6 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Credit Packages */}
           <Card>
             <CardHeader>
               <CardTitle>Buy Credits</CardTitle>
@@ -203,39 +210,53 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Leads Table */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Your Leads</CardTitle>
-            <Button variant="outline" onClick={handleExport}>
+            <Button 
+              variant="outline" 
+              onClick={handleExport}
+              disabled={isLeadsLoading || leads.length === 0}
+            >
               <DownloadIcon className="w-4 h-4 mr-2" />
               <span className="hidden md:inline">Export CSV</span>
             </Button>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto rounded-md border">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="p-2 text-left text-sm font-medium">Business Name</th>
-                    <th className="p-2 text-left text-sm font-medium hidden md:table-cell">Address</th>
-                    <th className="p-2 text-left text-sm font-medium">Phone</th>
-                    <th className="p-2 text-left text-sm font-medium hidden md:table-cell">Email</th>
-                    <th className="p-2 text-left text-sm font-medium hidden lg:table-cell">Website</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leads.map((lead: Lead) => (
-                    <tr key={lead.id} className="border-b">
-                      <td className="p-2 text-sm">{lead.businessName}</td>
-                      <td className="p-2 text-sm hidden md:table-cell">{lead.address}</td>
-                      <td className="p-2 text-sm">{lead.phone}</td>
-                      <td className="p-2 text-sm hidden md:table-cell">{lead.email}</td>
-                      <td className="p-2 text-sm hidden lg:table-cell">{lead.website}</td>
+              {isLeadsLoading ? (
+                <div className="p-8 text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                  <p className="text-sm text-muted-foreground">Loading leads...</p>
+                </div>
+              ) : leads.length === 0 ? (
+                <div className="p-8 text-center">
+                  <p className="text-sm text-muted-foreground">No leads found</p>
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b bg-muted/50">
+                      <th className="p-2 text-left text-sm font-medium">Business Name</th>
+                      <th className="p-2 text-left text-sm font-medium hidden md:table-cell">Address</th>
+                      <th className="p-2 text-left text-sm font-medium">Phone</th>
+                      <th className="p-2 text-left text-sm font-medium hidden md:table-cell">Email</th>
+                      <th className="p-2 text-left text-sm font-medium hidden lg:table-cell">Website</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {leads.map((lead: Lead) => (
+                      <tr key={lead.id} className="border-b">
+                        <td className="p-2 text-sm">{lead.businessName}</td>
+                        <td className="p-2 text-sm hidden md:table-cell">{lead.address}</td>
+                        <td className="p-2 text-sm">{lead.phone}</td>
+                        <td className="p-2 text-sm hidden md:table-cell">{lead.email}</td>
+                        <td className="p-2 text-sm hidden lg:table-cell">{lead.website}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </CardContent>
         </Card>
