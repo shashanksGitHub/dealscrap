@@ -29,14 +29,16 @@ export function DSGVOBadge({ className, size = "default" }: DSGVOBadgeProps) {
         size === "sm" && "text-sm",
         size === "default" && "text-base"
       )}>
-        DSGVO-konform & sicher
+        DSGVO-konform &
+        sicher
       </p>
       <p className={cn(
         size === "sm" && "text-xs",
         size === "default" && "text-sm",
         "text-muted-foreground"
       )}>
-        Höchste Sicherheitsstandards
+        Höchste
+        Sicherheitsstandards
       </p>
     </div>
   );

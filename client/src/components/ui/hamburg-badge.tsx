@@ -29,7 +29,8 @@ export function HamburgBadge({ size = "default", className }: BadgeProps) {
         size === "sm" && "text-sm",
         size === "default" && "text-base"
       )}>
-        Entwickelt in Hamburg
+        Entwickelt in
+        Hamburg
       </p>
       <p className={cn(
         size === "sm" && "text-xs",
