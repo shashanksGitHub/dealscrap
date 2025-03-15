@@ -2,13 +2,12 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
 
 export function NavHeader() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
-  // Berechne den Prozentsatz der verbrauchten Credits
-  // Annahme: Ein Nutzer startet mit 100 Credits
+  // Calculate the percentage of used credits
+  // Assuming a user starts with 100 credits
   const maxCredits = 100;
   const creditsPercentage = ((maxCredits - (user?.credits || 0)) / maxCredits) * 100;
 
@@ -32,24 +31,16 @@ export function NavHeader() {
                 </>
               )}
               {user ? (
-                <div className="flex items-center gap-2">
-                  <div className="relative w-8 h-8">
-                    <Progress 
-                      value={creditsPercentage} 
-                      className="absolute inset-0 h-full w-full rounded-full [&>div]:bg-primary"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+                <div className="relative w-12 h-12">
+                  <Progress 
+                    value={creditsPercentage} 
+                    className="absolute inset-0 h-full w-full rounded-full [&>div]:bg-primary/20"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-lg font-semibold text-primary">
                       {user.credits}
-                    </div>
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <span 
-                      onClick={logout}
-                      className="text-muted-foreground hover:text-primary"
-                    >
-                      Logout
                     </span>
-                  </Button>
+                  </div>
                 </div>
               ) : (
                 <Link href="/auth">
