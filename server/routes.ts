@@ -8,7 +8,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-02-24.acacia",
 });
 
 // Credit package mapping
@@ -20,11 +20,47 @@ const CREDIT_PACKAGES = {
 };
 
 export async function registerRoutes(router: Router) {
-  // Stripe webhook for handling successful payments
+  // Payment intent creation
+  router.post("/create-payment-intent", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ message: "Nicht authentifiziert" });
+      }
+
+      const { amount } = req.body;
+      console.log('Creating payment intent for amount:', amount);
+
+      if (!CREDIT_PACKAGES[amount]) {
+        return res.status(400).json({ message: "Ungültiger Betrag" });
+      }
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount * 100, // Convert to cents
+        currency: "eur",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          userId: req.user.id.toString(),
+          credits: CREDIT_PACKAGES[amount].credits.toString()
+        },
+      });
+
+      console.log('Payment intent created:', paymentIntent.id);
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      console.error('Payment intent creation error:', error);
+      res.status(500).json({ 
+        message: "Fehler bei der Zahlungsinitialisierung",
+        details: error.message 
+      });
+    }
+  });
+
+  // Stripe webhook handler
   router.post("/stripe-webhook", async (req, res) => {
     let event;
     try {
-      // Get the signature sent by Stripe
       const signature = req.headers['stripe-signature'];
 
       if (!process.env.STRIPE_WEBHOOK_SECRET) {
@@ -32,7 +68,6 @@ export async function registerRoutes(router: Router) {
       }
 
       try {
-        // Verify the event with the signature
         event = stripe.webhooks.constructEvent(
           (req as any).rawBody,
           signature,
@@ -43,7 +78,8 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ error: `Webhook Error: ${err.message}` });
       }
 
-      // Handle the event
+      console.log('Webhook event received:', event.type);
+
       if (event.type === 'payment_intent.succeeded') {
         const paymentIntent = event.data.object;
         console.log('💰 Payment succeeded:', paymentIntent.id);
@@ -61,7 +97,6 @@ export async function registerRoutes(router: Router) {
           console.log('Credits added successfully:', updatedUser.credits);
         } catch (error) {
           console.error('Failed to add credits:', error);
-          // We still return 200 to Stripe but log the error
           return res.status(200).json({
             received: true,
             warning: `Failed to process credits: ${error.message}`
@@ -73,42 +108,6 @@ export async function registerRoutes(router: Router) {
     } catch (err) {
       console.error('❌ Webhook Error:', err.message);
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
-    }
-  });
-
-  // Payment intent creation
-  router.post("/create-payment-intent", async (req, res) => {
-    try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Nicht authentifiziert" });
-      }
-
-      const { amount } = req.body;
-
-      if (!CREDIT_PACKAGES[amount]) {
-        return res.status(400).json({ message: "Ungültiger Betrag" });
-      }
-
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount * 100, // Convert to cents
-        currency: "eur",
-        automatic_payment_methods: {
-          enabled: true,
-          allow_redirects: 'always'
-        },
-        metadata: {
-          userId: req.user.id.toString(),
-          credits: CREDIT_PACKAGES[amount].credits.toString()
-        },
-      });
-
-      res.json({ clientSecret: paymentIntent.client_secret });
-    } catch (error: any) {
-      console.error('Payment intent creation error:', error);
-      res.status(500).json({ 
-        message: "Fehler bei der Zahlungsinitialisierung",
-        details: error.message 
-      });
     }
   });
 

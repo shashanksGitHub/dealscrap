@@ -77,6 +77,7 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
+      console.error('Stripe or elements not initialized');
       return;
     }
 
@@ -91,6 +92,7 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
       });
 
       if (error) {
+        console.error('Payment confirmation error:', error);
         toast({
           title: "Zahlung fehlgeschlagen",
           description: error.message || "Ein Fehler ist aufgetreten",
@@ -98,6 +100,7 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
         });
       }
     } catch (error: any) {
+      console.error('Payment processing error:', error);
       toast({
         title: "Fehler",
         description: "Bei der Verarbeitung der Zahlung ist ein Fehler aufgetreten.",
