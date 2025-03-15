@@ -8,13 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { SearchIcon, LogOutIcon, DownloadIcon, PlayCircleIcon, Loader2 } from "lucide-react";
+import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2 } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { useLocation } from "wouter";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
@@ -84,22 +84,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b">
-        <div className="container mx-auto max-w-[1200px] px-6 lg:px-8">
-          <div className="h-16 flex items-center justify-between">
-            <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Dashboard</h1>
-            <div className="flex items-center gap-4">
-              <Button variant="outline" onClick={() => logout()}>
-                <LogOutIcon className="w-4 h-4 mr-2" />
-                <span>Abmelden</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-24 space-y-16">
+      <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-12 space-y-16">
         {/* Tutorial Video */}
         <Card>
           <CardHeader>
