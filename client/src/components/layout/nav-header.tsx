@@ -32,30 +32,25 @@ export function NavHeader() {
                 </>
               )}
               {user ? (
-                <>
-                  <Link href="/dashboard" className="text-muted-foreground hover:text-primary">
-                    Dashboard
-                  </Link>
-                  <div className="flex items-center gap-2">
-                    <div className="relative w-8 h-8">
-                      <Progress 
-                        value={creditsPercentage} 
-                        className="absolute inset-0 h-full w-full rounded-full [&>div]:bg-primary"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                        {user.credits}
-                      </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative w-8 h-8">
+                    <Progress 
+                      value={creditsPercentage} 
+                      className="absolute inset-0 h-full w-full rounded-full [&>div]:bg-primary"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+                      {user.credits}
                     </div>
-                    <Button variant="outline" size="sm">
-                      <span 
-                        onClick={logout}
-                        className="text-muted-foreground hover:text-primary"
-                      >
-                        Logout
-                      </span>
-                    </Button>
                   </div>
-                </>
+                  <Button variant="outline" size="sm">
+                    <span 
+                      onClick={logout}
+                      className="text-muted-foreground hover:text-primary"
+                    >
+                      Logout
+                    </span>
+                  </Button>
+                </div>
               ) : (
                 <Link href="/auth">
                   <Button variant="outline" size="sm" className="ml-4">
