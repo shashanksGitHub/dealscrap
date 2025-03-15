@@ -72,3 +72,22 @@ export function NavHeader() {
     </header>
   );
 }
+export default function NavHeader() {
+  return (
+    <header className="w-full border-b">
+      <div className="container flex h-16 items-center">
+        <nav className="flex items-center space-x-4 lg:space-x-6">
+          <a href="/" className="text-sm font-medium transition-colors hover:text-primary">
+            Home
+          </a>
+          <a href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
+            Dashboard
+          </a>
+          <a href="/blog" className="text-sm font-medium transition-colors hover:text-primary">
+            Blog
+          </a>
+        </nav>
+      </div>
+    </header>
+  )
+}
