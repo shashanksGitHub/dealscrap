@@ -95,6 +95,11 @@ export function TestimonialCarousel() {
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
+            <div className="flex gap-1 mb-3">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="h-4 w-4 fill-primary text-primary" />
+              ))}
+            </div>
             <blockquote className="text-base mb-4 pr-20">
               "{testimonials[currentTestimonial].text}"
             </blockquote>
