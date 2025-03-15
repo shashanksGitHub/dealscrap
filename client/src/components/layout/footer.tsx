@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Lock, ShieldCheck, CreditCard, Award } from "lucide-react";
+import { Lock, ShieldCheck, CreditCard, Award, Shield } from "lucide-react";
 
 export function Footer() {
   return (
@@ -23,6 +23,45 @@ export function Footer() {
               support@leadscraper.de
             </a>
           </p>
+        </div>
+
+        {/* Trust Icons Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-16">
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="bg-primary/10 p-3 rounded-full mb-3">
+              <ShieldCheck className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-sm font-medium mb-1">DSGVO-konform</h3>
+            <p className="text-xs text-muted-foreground">100% Datenschutz-konform</p>
+          </div>
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="bg-primary/10 p-3 rounded-full mb-3">
+              <Lock className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-sm font-medium mb-1">SSL-Verschlüsselt</h3>
+            <p className="text-xs text-muted-foreground">Sichere Datenübertragung</p>
+          </div>
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="bg-primary/10 p-3 rounded-full mb-3">
+              <CreditCard className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-sm font-medium mb-1">Sichere Zahlung</h3>
+            <p className="text-xs text-muted-foreground">Via Stripe & PayPal</p>
+          </div>
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="bg-primary/10 p-3 rounded-full mb-3">
+              <Award className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-sm font-medium mb-1">Qualitätsgarantie</h3>
+            <p className="text-xs text-muted-foreground">Geprüfte Kontakte</p>
+          </div>
+          <div className="flex flex-col items-center text-center p-4">
+            <div className="bg-primary/10 p-3 rounded-full mb-3">
+              <Shield className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-sm font-medium mb-1">Sicherer Service</h3>
+            <p className="text-xs text-muted-foreground">Made in Germany</p>
+          </div>
         </div>
 
         {/* Made in Germany Badge */}
