@@ -15,6 +15,7 @@ import Impressum from "@/pages/impressum";
 import Datenschutz from "@/pages/datenschutz";
 import AGB from "@/pages/agb";
 import Checkout from "@/pages/checkout";
+import LeadsKaufen from "@/pages/leads-kaufen";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
         <Route path="/auth" component={AuthPage} />
         <Route path="/reset-password" component={ResetPassword} />
         <Route path="/blog" component={BlogPage} />
+        <Route path="/leads-kaufen" component={LeadsKaufen} />
         <Route path="/impressum" component={Impressum} />
         <Route path="/datenschutz" component={Datenschutz} />
         <Route path="/agb" component={AGB} />
