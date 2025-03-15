@@ -120,7 +120,7 @@ export class MemStorage implements IStorage {
 
     const updatedUser = {
       ...user,
-      credits: user.credits + amount
+      credits: (user.credits || 0) + amount // Ensure credits is initialized if undefined
     };
 
     this.users.set(userId, updatedUser);

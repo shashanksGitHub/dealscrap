@@ -225,13 +225,24 @@ export async function registerRoutes(router: Router) {
   // Credit management
   router.post("/credits/add", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
+
+    console.log('Adding credits for user:', req.user.id);
     const amount = parseInt(req.body.amount);
+
     if (isNaN(amount) || amount <= 0) {
+      console.error('Invalid credit amount:', amount);
       return res.status(400).json({ message: "Invalid credit amount" });
     }
 
-    const user = await storage.addCredits(req.user.id, amount);
-    res.json(user);
+    try {
+      console.log(`Adding ${amount} credits to user ${req.user.id}`);
+      const user = await storage.addCredits(req.user.id, amount);
+      console.log('Updated user credits:', user.credits);
+      res.json(user);
+    } catch (error) {
+      console.error('Error adding credits:', error);
+      res.status(500).json({ message: "Failed to add credits" });
+    }
   });
 
   // Lead management
