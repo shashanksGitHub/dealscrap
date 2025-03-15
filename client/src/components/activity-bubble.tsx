@@ -2,13 +2,23 @@ import { useEffect, useState } from "react";
 import { CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Beispielhafte Aktivitätsdaten - in der echten Implementierung würden diese von der API kommen
+// Aktivitätsdaten mit realen Firmennamen
 const activities = [
-  { name: "Max M. aus München", leads: 150, company: "Tech GmbH" },
-  { name: "Sarah K. aus Hamburg", leads: 75, company: "Marketing AG" },
-  { name: "Thomas B. aus Berlin", leads: 200, company: "Consulting UG" },
-  { name: "Lisa F. aus Frankfurt", leads: 100, company: "Sales GmbH" },
-  { name: "Michael R. aus Köln", leads: 125, company: "Digital GmbH" },
+  { name: "Müller & Partner GmbH", leads: 125, city: "München" },
+  { name: "Schneider IT Solutions KG", leads: 80, city: "Hamburg" },
+  { name: "Weber Consulting GmbH", leads: 200, city: "Berlin" },
+  { name: "Bergmann Logistik AG", leads: 150, city: "Frankfurt" },
+  { name: "Krause Engineering GmbH", leads: 95, city: "Köln" },
+  { name: "Schmidt Immobilien AG", leads: 175, city: "Stuttgart" },
+  { name: "Bachmann Software Solutions AG", leads: 130, city: "Düsseldorf" },
+  { name: "Huber Energie GmbH", leads: 110, city: "Leipzig" },
+  { name: "Becker Optik GmbH", leads: 85, city: "Dresden" },
+  { name: "Hoffmann Elektronik GmbH", leads: 160, city: "Nürnberg" },
+  { name: "Maier Medizintechnik KG", leads: 95, city: "München" },
+  { name: "Pfeiffer Chemie GmbH", leads: 140, city: "Hamburg" },
+  { name: "Keller & Partner AG", leads: 170, city: "Berlin" },
+  { name: "Voigt Transport GmbH", leads: 120, city: "Frankfurt" },
+  { name: "Roth Pharma KG", leads: 190, city: "Köln" }
 ];
 
 export function ActivityBubble() {
@@ -43,10 +53,10 @@ export function ActivityBubble() {
               </div>
               <div>
                 <p className="text-sm font-medium">
-                  {activities[currentActivity].name}
+                  {activities[currentActivity].name} aus {activities[currentActivity].city}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Hat gerade {activities[currentActivity].leads} Leads für {activities[currentActivity].company} gefunden
+                  Hat gerade {activities[currentActivity].leads} Leads gefunden
                 </p>
                 <div className="flex items-center gap-1 mt-2">
                   <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
