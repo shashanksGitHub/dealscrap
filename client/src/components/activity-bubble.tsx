@@ -40,14 +40,14 @@ export function ActivityBubble() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 z-50">
+    <div className="fixed max-w-[1400px] mx-auto left-1/2 -translate-x-1/2 bottom-6 px-6 lg:px-12 w-full">
       <AnimatePresence>
         {isVisible && (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="bg-background/80 backdrop-blur-lg border border-primary/10 rounded-lg p-4 shadow-lg max-w-sm"
+            className="bg-background/80 backdrop-blur-lg border border-primary/10 rounded-lg p-4 shadow-lg w-full sm:max-w-sm"
           >
             <button 
               onClick={() => setIsVisible(false)}
