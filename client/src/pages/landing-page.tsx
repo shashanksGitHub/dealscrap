@@ -5,7 +5,6 @@ import { useAuth } from "@/hooks/use-auth";
 import CookieBanner from "@/components/cookie-banner";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
-import { IHKBadge } from "@/components/ui/ihk-badge";
 import { HamburgBadge } from "@/components/ui/hamburg-badge";
 import { Footer } from "@/components/layout/footer";
 import { ActivityBubble } from "@/components/activity-bubble";
@@ -47,9 +46,8 @@ export default function LandingPage() {
                 </Button>
               </Link>
             </div>
-            <div className="flex justify-center gap-4 animate-fade-in-up animation-delay-500">
+            <div className="flex justify-center gap-8 animate-fade-in-up animation-delay-500">
               <DSGVOBadge size="sm" />
-              <IHKBadge size="sm" />
               <HamburgBadge size="sm" />
             </div>
           </div>
