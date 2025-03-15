@@ -74,18 +74,19 @@ const CheckoutForm = ({ amount }: { amount: number }) => {
           variant: "destructive",
         });
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        // Invalidate the user query to force a refresh of the credits
+        // Force a refresh of the user data
         await queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+        await queryClient.refetchQueries({ queryKey: ['/api/user'] });
 
         toast({
           title: "Zahlung erfolgreich",
           description: "Ihre Credits wurden gutgeschrieben",
         });
 
-        // Short delay to allow the query to refresh
+        // Give some time for the queries to update
         setTimeout(() => {
           window.location.href = "/dashboard";
-        }, 1000);
+        }, 2000);
       }
     } catch (error: any) {
       console.error('Payment processing error:', error);

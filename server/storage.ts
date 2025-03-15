@@ -115,11 +115,17 @@ export class MemStorage implements IStorage {
     const user = await this.getUser(userId);
     if (!user) throw new Error("User not found");
 
+    console.log(`Current credits for user ${userId}: ${user.credits}`);
+    console.log(`Adding ${amount} credits`);
+
     const updatedUser = {
       ...user,
       credits: user.credits + amount
     };
+
     this.users.set(userId, updatedUser);
+    console.log(`Updated credits for user ${userId}: ${updatedUser.credits}`);
+
     return updatedUser;
   }
 

@@ -92,9 +92,24 @@ export async function registerRoutes(router: Router) {
             throw new Error(`Invalid metadata - credits: ${credits}, userId: ${userId}`);
           }
 
-          console.log(`Adding ${credits} credits to user ${userId}`);
+          console.log(`Processing payment for user ${userId}`);
+          console.log(`Adding ${credits} credits from payment ${paymentIntent.id}`);
+
+          const user = await storage.getUser(userId);
+          if (!user) {
+            throw new Error(`User ${userId} not found`);
+          }
+
+          console.log(`Current credits for user ${userId}: ${user.credits}`);
           const updatedUser = await storage.addCredits(userId, credits);
-          console.log('Credits added successfully. New credit balance:', updatedUser.credits);
+          console.log(`Successfully updated credits for user ${userId}. New balance: ${updatedUser.credits}`);
+
+          return res.json({ 
+            received: true,
+            userId: userId,
+            credits: updatedUser.credits,
+            message: 'Credits added successfully'
+          });
         } catch (error) {
           console.error('Failed to add credits:', error);
           return res.status(200).json({
