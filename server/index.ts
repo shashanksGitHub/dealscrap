@@ -24,20 +24,21 @@ app.use((req, res, next) => {
     "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
     "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
     "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
-    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
+    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev wss://*.replit.dev; " +
     "style-src 'self' 'unsafe-inline';"
   );
   next();
 });
 
-// Enhanced CORS middleware
+// Enhanced CORS middleware with support for custom domains
 app.use((req, res, next) => {
   const allowedOrigins = [
     'https://replit.com',
     'https://*.replit.dev',
     'http://localhost:3000',
     'http://localhost:5000',
-    'https://d275e6c7-6b37-45ce-8254-4e1e9b0dcd4b-00-23twek6n0llzu.riker.replit.dev'
+    'https://leadscraper.de',
+    'https://www.leadscraper.de'
   ];
 
   const origin = req.headers.origin;
@@ -88,11 +89,12 @@ async function startServer() {
     log("Starting server initialization...");
     const server = await import('http').then(({ createServer }) => createServer(app));
 
-    // Force development mode for local development
-    process.env.NODE_ENV = "development";
+    // Set environment based on NODE_ENV
+    const isProduction = process.env.NODE_ENV === "production";
 
-    if (process.env.NODE_ENV === "development") {
+    if (!isProduction) {
       log("Setting up development environment...");
+      process.env.NODE_ENV = "development";
 
       // First set up auth as it's needed for protected routes
       log("Setting up authentication...");
