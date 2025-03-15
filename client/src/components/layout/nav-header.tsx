@@ -1,9 +1,16 @@
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 export function NavHeader() {
   const { user, logout } = useAuth();
+
+  // Berechne den Prozentsatz der verbrauchten Credits
+  // Annahme: Ein Nutzer startet mit 100 Credits
+  const maxCredits = 100;
+  const creditsPercentage = ((maxCredits - (user?.credits || 0)) / maxCredits) * 100;
 
   return (
     <header className="bg-background border-b">
@@ -29,9 +36,25 @@ export function NavHeader() {
                   <Link href="/dashboard" className="text-muted-foreground hover:text-primary">
                     Dashboard
                   </Link>
-                  <button onClick={logout} className="text-muted-foreground hover:text-primary">
-                    Logout
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-8 h-8">
+                      <Progress 
+                        value={creditsPercentage} 
+                        className="absolute inset-0 h-full w-full rounded-full [&>div]:bg-primary"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+                        {user.credits}
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      <span 
+                        onClick={logout}
+                        className="text-muted-foreground hover:text-primary"
+                      >
+                        Logout
+                      </span>
+                    </Button>
+                  </div>
                 </>
               ) : (
                 <Link href="/auth">

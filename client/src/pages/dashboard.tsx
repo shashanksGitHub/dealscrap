@@ -90,7 +90,6 @@ export default function Dashboard() {
           <div className="h-16 flex items-center justify-between">
             <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Dashboard</h1>
             <div className="flex items-center gap-4">
-              <span className="text-lg font-medium">Credits: {user?.credits}</span>
               <Button variant="outline" onClick={() => logout()}>
                 <LogOutIcon className="w-4 h-4 mr-2" />
                 <span>Abmelden</span>
