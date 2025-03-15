@@ -16,23 +16,38 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
-// Security headers including CSP for Stripe
+// Security headers including CSP for Stripe and Replit Assistant
 app.use((req, res, next) => {
+  const hostname = req.hostname;
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self' https://*.stripe.com https://*.stripe.network; " +
-    "frame-src 'self' https://*.stripe.com https://*.stripe.network; " +
-    "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network; " +
+    "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
+    "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
+    "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
+    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
     "style-src 'self' 'unsafe-inline';"
   );
   next();
 });
 
-// CORS middleware with proper configuration for Stripe
+// Enhanced CORS middleware
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
+  const allowedOrigins = [
+    'https://replit.com',
+    'https://*.replit.dev',
+    'http://localhost:3000',
+    'http://localhost:5000'
+  ];
+
+  const origin = req.headers.origin;
+  if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.replit.dev'))) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, stripe-signature");
+  res.header("Access-Control-Allow-Credentials", "true");
+
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
   }
