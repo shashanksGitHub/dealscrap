@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -17,13 +17,18 @@ import Checkout from "@/pages/checkout";
 import LeadsKaufen from "@/pages/leads-kaufen";
 import Dashboard from "@/pages/dashboard";
 import { ProtectedRoute } from "./lib/protected-route";
+import { useAuth } from "@/hooks/use-auth";
 
 function Router() {
+  const { user } = useAuth();
+
   return (
     <>
       <NavHeader />
       <Switch>
-        <Route path="/" component={LandingPage} />
+        <Route path="/">
+          {() => user ? <Redirect to="/dashboard" /> : <LandingPage />}
+        </Route>
         <Route path="/auth" component={AuthPage} />
         <Route path="/reset-password" component={ResetPassword} />
         <Route path="/blog" component={BlogPage} />
