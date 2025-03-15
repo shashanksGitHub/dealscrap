@@ -85,6 +85,7 @@ export async function registerRoutes(router: Router) {
         console.log('💰 Payment succeeded:', paymentIntent.id);
 
         try {
+          // Ensure credits and userId are numbers
           const credits = parseInt(paymentIntent.metadata.credits);
           const userId = parseInt(paymentIntent.metadata.userId);
 
@@ -107,6 +108,12 @@ export async function registerRoutes(router: Router) {
           const updatedUser = await storage.addCredits(userId, credits);
           console.log(`Successfully updated credits for user ${userId}. New balance: ${updatedUser.credits}`);
 
+          // Immediately verify the update
+          const verifiedUser = await storage.getUser(userId);
+          if (!verifiedUser || verifiedUser.credits !== updatedUser.credits) {
+            throw new Error('Credit update verification failed');
+          }
+
           // Send success response with updated information
           return res.json({ 
             received: true,
@@ -124,14 +131,14 @@ export async function registerRoutes(router: Router) {
         }
       }
 
-      res.json({ received: true });
+      return res.json({ received: true });
     } catch (err: any) {
       console.error('❌ Webhook Error:', err.message);
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
   });
 
-  // Get user info
+  // Get user info with additional verification
   router.get("/user", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Nicht authentifiziert" });

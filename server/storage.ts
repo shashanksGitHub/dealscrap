@@ -76,7 +76,7 @@ export class MemStorage implements IStorage {
       resetTokenExpiry: null,
       stripeCustomerId: ''
     };
-    console.log(`Creating new user:`, user);
+    console.log(`Creating new user with ID ${id}:`, user);
     this.users.set(id, user);
     return user;
   }
@@ -118,33 +118,35 @@ export class MemStorage implements IStorage {
 
   async addCredits(userId: number, amount: number): Promise<User> {
     console.log(`Adding credits - User ID: ${userId}, Amount: ${amount}`);
-
     const user = await this.getUser(userId);
+
     if (!user) {
       console.error(`User not found: ${userId}`);
       throw new Error("User not found");
     }
 
-    const currentCredits = user.credits || 0;
+    // Ensure credits is initialized
+    const currentCredits = typeof user.credits === 'number' ? user.credits : 0;
     console.log(`Current credits for user ${userId}: ${currentCredits}`);
 
-    // Create a completely new user object with updated credits
+    // Create a new user object with updated credits
     const updatedUser: User = {
       ...user,
       credits: currentCredits + amount
     };
 
-    // Store the updated user object in the Map
+    // Store the updated user
     this.users.set(userId, updatedUser);
+    console.log(`Updated credits for user ${userId} to ${updatedUser.credits}`);
 
     // Verify the update was successful
     const verifiedUser = await this.getUser(userId);
-    console.log(`Verified updated user credits: ${verifiedUser?.credits}`);
-
     if (!verifiedUser || verifiedUser.credits !== updatedUser.credits) {
+      console.error(`Failed to verify credit update for user ${userId}`);
       throw new Error("Failed to verify credit update");
     }
 
+    console.log(`Successfully verified credit update for user ${userId}`);
     return updatedUser;
   }
 
