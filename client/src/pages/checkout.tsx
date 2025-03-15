@@ -35,7 +35,6 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
     e.preventDefault();
 
     if (!stripe || !elements) {
-      console.error('Stripe oder Elements nicht initialisiert');
       return;
     }
 
@@ -50,21 +49,13 @@ const CheckoutForm = ({ amount, credits }: { amount: number; credits: number }) 
       });
 
       if (error) {
-        console.error('Zahlungsbestätigung fehlgeschlagen:', error);
-        let errorMessage = "Bei der Verarbeitung der Zahlung ist ein Fehler aufgetreten.";
-
-        if (error.type === "card_error" || error.type === "validation_error") {
-          errorMessage = error.message || errorMessage;
-        }
-
         toast({
           title: "Zahlung fehlgeschlagen",
-          description: errorMessage,
+          description: error.message || "Ein Fehler ist aufgetreten",
           variant: "destructive",
         });
       }
     } catch (error: any) {
-      console.error('Fehler bei der Zahlungsverarbeitung:', error);
       toast({
         title: "Fehler",
         description: "Bei der Verarbeitung der Zahlung ist ein Fehler aufgetreten.",
@@ -138,7 +129,6 @@ export default function Checkout() {
       setAmount(numAmount);
 
       try {
-        console.log('Initializing payment for amount:', numAmount);
         const response = await apiRequest("POST", "/api/create-payment-intent", { amount: numAmount });
         const data = await response.json();
 
@@ -149,7 +139,7 @@ export default function Checkout() {
         setClientSecret(data.clientSecret);
       } catch (error: any) {
         console.error('Fehler beim Erstellen der Zahlung:', error);
-        setError(error.message || 'Fehler beim Erstellen der Zahlung');
+        setError('Fehler beim Erstellen der Zahlung');
         toast({
           title: "Fehler",
           description: "Die Zahlung konnte nicht initialisiert werden. Bitte versuchen Sie es später erneut.",
