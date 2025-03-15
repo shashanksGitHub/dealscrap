@@ -40,7 +40,7 @@ export default function LandingPage() {
                   Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="#features">
+              <Link href="/leads-kaufen">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full px-6 py-5 h-auto text-base font-medium bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105">
                   Mehr erfahren
                 </Button>
@@ -74,7 +74,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section - Desktop Optimiert */}
-      <section id="features" className="bg-muted/5 py-16">
+      <section className="bg-muted/5 py-16">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">Einfache Lead-Generierung mit LeadScraper</h2>
