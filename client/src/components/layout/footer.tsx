@@ -26,31 +26,31 @@ export function Footer() {
         </div>
 
         {/* Links & About Section */}
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 mb-16">
-          <div className="text-center">
-            <h3 className="font-semibold mb-4">Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/impressum" className="text-muted-foreground hover:text-primary">
-                  Impressum
-                </Link>
-              </li>
-              <li>
-                <Link href="/datenschutz" className="text-muted-foreground hover:text-primary">
-                  Datenschutz
-                </Link>
-              </li>
-              <li>
-                <Link href="/agb" className="text-muted-foreground hover:text-primary">
-                  AGB
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div className="text-center">
-            <h3 className="font-semibold mb-4">Über uns</h3>
-            <div className="text-muted-foreground">
-              <p>
+        <div className="max-w-3xl mx-auto mb-16">
+          <div className="grid grid-cols-2 gap-12 items-start">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold mb-6">Links</h3>
+              <ul className="space-y-3">
+                <li>
+                  <Link href="/impressum" className="text-muted-foreground hover:text-primary transition-colors">
+                    Impressum
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/datenschutz" className="text-muted-foreground hover:text-primary transition-colors">
+                    Datenschutz
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/agb" className="text-muted-foreground hover:text-primary transition-colors">
+                    AGB
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div className="text-center">
+              <h3 className="text-lg font-semibold mb-6">Über uns</h3>
+              <p className="text-muted-foreground">
                 LeadScraper ist Deutschlands innovativste B2B-Lead-Plattform. Mit modernster KI-Technologie und DSGVO-konformen Prozessen revolutionieren wir die Leadgenerierung.
               </p>
             </div>
