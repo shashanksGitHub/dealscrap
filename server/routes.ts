@@ -20,7 +20,63 @@ const CREDIT_PACKAGES = {
 };
 
 export async function registerRoutes(router: Router) {
-  // Stripe payment routes
+  // Stripe webhook for handling successful payments
+  router.post("/stripe-webhook", async (req, res) => {
+    let event;
+    try {
+      // Get the signature sent by Stripe
+      const signature = req.headers['stripe-signature'];
+
+      if (!process.env.STRIPE_WEBHOOK_SECRET) {
+        throw new Error('Missing Stripe webhook secret');
+      }
+
+      try {
+        // Verify the event with the signature
+        event = stripe.webhooks.constructEvent(
+          (req as any).rawBody,
+          signature,
+          process.env.STRIPE_WEBHOOK_SECRET
+        );
+      } catch (err) {
+        console.error('⚠️ Webhook signature verification failed:', err.message);
+        return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+      }
+
+      // Handle the event
+      if (event.type === 'payment_intent.succeeded') {
+        const paymentIntent = event.data.object;
+        console.log('💰 Payment succeeded:', paymentIntent.id);
+
+        try {
+          const credits = parseInt(paymentIntent.metadata.credits);
+          const userId = parseInt(paymentIntent.metadata.userId);
+
+          if (isNaN(credits) || isNaN(userId)) {
+            throw new Error(`Invalid metadata - credits: ${credits}, userId: ${userId}`);
+          }
+
+          console.log(`Adding ${credits} credits to user ${userId}`);
+          const updatedUser = await storage.addCredits(userId, credits);
+          console.log('Credits added successfully:', updatedUser.credits);
+        } catch (error) {
+          console.error('Failed to add credits:', error);
+          // We still return 200 to Stripe but log the error
+          return res.status(200).json({
+            received: true,
+            warning: `Failed to process credits: ${error.message}`
+          });
+        }
+      }
+
+      res.json({ received: true });
+    } catch (err) {
+      console.error('❌ Webhook Error:', err.message);
+      return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+    }
+  });
+
+  // Payment intent creation
   router.post("/create-payment-intent", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
@@ -41,6 +97,7 @@ export async function registerRoutes(router: Router) {
           allow_redirects: 'always'
         },
         metadata: {
+          userId: req.user.id.toString(),
           credits: CREDIT_PACKAGES[amount].credits.toString()
         },
       });
@@ -148,30 +205,6 @@ export async function registerRoutes(router: Router) {
         message: "Fehler bei der Zahlung",
         details: error.message 
       });
-    }
-  });
-
-  // Stripe webhook for handling successful payments
-  router.post("/stripe-webhook", async (req, res) => {
-    const sig = req.headers['stripe-signature'];
-    try {
-      const event = stripe.webhooks.constructEvent(
-        (req as any).rawBody,
-        sig,
-        process.env.STRIPE_WEBHOOK_SECRET
-      );
-
-      if (event.type === 'payment_intent.succeeded') {
-        const paymentIntent = event.data.object;
-        const credits = parseInt(paymentIntent.metadata.credits);
-        const userId = parseInt(paymentIntent.metadata.userId);
-        await storage.addCredits(userId, credits);
-      }
-
-      res.json({ received: true });
-    } catch (error) {
-      console.error('Webhook Error:', error.message);
-      return res.status(400).json({ error: `Webhook Error: ${error.message}` });
     }
   });
 
