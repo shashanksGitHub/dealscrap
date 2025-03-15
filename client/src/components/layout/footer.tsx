@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Lock, ShieldCheck, CreditCard, Award } from "lucide-react";
+import { Lock, ShieldCheck, CreditCard, Award, Building2, Heart } from "lucide-react";
 
 export function Footer() {
   return (
@@ -51,6 +51,18 @@ export function Footer() {
                 <Award className="h-4 w-4 text-primary" />
               </div>
               <span>Geprüfte Qualität</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="bg-primary/5 p-2 rounded-full">
+                <Building2 className="h-4 w-4 text-primary" />
+              </div>
+              <span>IHK-Mitglied</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="bg-primary/5 p-2 rounded-full">
+                <Heart className="h-4 w-4 text-primary" />
+              </div>
+              <span>Made with love in Germany</span>
             </div>
           </div>
         </div>
