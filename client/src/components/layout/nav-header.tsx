@@ -15,9 +15,14 @@ export function NavHeader() {
           <nav>
             <div className="flex items-center gap-4">
               {!user && (
-                <Link href="/blog" className="text-muted-foreground hover:text-primary">
-                  Ratgeber für Leadgenerierung
-                </Link>
+                <>
+                  <Link href="/leads-kaufen" className="text-muted-foreground hover:text-primary">
+                    Leads kaufen
+                  </Link>
+                  <Link href="/blog" className="text-muted-foreground hover:text-primary">
+                    Ratgeber
+                  </Link>
+                </>
               )}
               {user ? (
                 <>
