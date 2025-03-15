@@ -14,7 +14,7 @@ export function IHKBadge({ size = "default", className }: BadgeProps) {
       className
     )}>
       <img
-        src="/Logo_570px_ihk.png"
+        src="/images/ihk-logo.png"
         alt="IHK Logo"
         className={cn(
           "object-contain mb-3",

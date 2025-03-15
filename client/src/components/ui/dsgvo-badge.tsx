@@ -14,7 +14,7 @@ export function DSGVOBadge({ className, size = "default" }: DSGVOBadgeProps) {
       className
     )}>
       <img
-        src="/assets/dsgvo-grey-523x480.png"
+        src="/images/dsgvo-logo.png"
         alt="DSGVO-konform"
         className={cn(
           "object-contain mb-3",

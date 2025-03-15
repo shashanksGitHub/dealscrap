@@ -14,7 +14,7 @@ export function HamburgBadge({ size = "default", className }: BadgeProps) {
       className
     )}>
       <img
-        src="/DEU_Hamburg_COA.svg.png"
+        src="/images/hamburg-logo.png"
         alt="Hamburg Wappen"
         className={cn(
           "object-contain mb-3",
