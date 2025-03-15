@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Lock, ShieldCheck, CreditCard, Award, Building2 } from "lucide-react";
 
 export function Footer() {
   return (
@@ -52,6 +53,42 @@ export function Footer() {
               <p>
                 LeadScraper ist Deutschlands innovativste B2B-Lead-Plattform. Mit modernster KI-Technologie und DSGVO-konformen Prozessen revolutionieren wir die Leadgenerierung.
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="mt-12 pt-8 border-t">
+          <div className="flex flex-wrap justify-center gap-8 mb-8">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="bg-primary/5 p-2 rounded-full">
+                <Lock className="h-4 w-4 text-primary" />
+              </div>
+              <span>256-bit SSL</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="bg-primary/5 p-2 rounded-full">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+              </div>
+              <span>DSGVO-konform</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="bg-primary/5 p-2 rounded-full">
+                <CreditCard className="h-4 w-4 text-primary" />
+              </div>
+              <span>Sichere Zahlung</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="bg-primary/5 p-2 rounded-full">
+                <Award className="h-4 w-4 text-primary" />
+              </div>
+              <span>Geprüfte Qualität</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="bg-primary/5 p-2 rounded-full">
+                <Building2 className="h-4 w-4 text-primary" />
+              </div>
+              <span>Made in Germany</span>
             </div>
           </div>
         </div>
