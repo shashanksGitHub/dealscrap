@@ -192,9 +192,7 @@ export default function Dashboard() {
                     )}
                     <span className="text-2xl font-bold">{pkg.credits} Credits</span>
                     <span className="text-3xl font-bold text-primary">€{pkg.price}</span>
-                    {pkg.recommended && (
-                      <span className="text-sm text-muted-foreground mt-1">Bester Preis pro Credit</span>
-                    )}
+
                   </Button>
                 ))}
               </div>

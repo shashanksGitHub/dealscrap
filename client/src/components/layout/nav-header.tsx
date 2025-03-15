@@ -2,9 +2,10 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { LogOutIcon } from "lucide-react";
 
 export function NavHeader() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // Calculate the percentage of used credits
   // Assuming a user starts with 100 credits
@@ -31,16 +32,22 @@ export function NavHeader() {
                 </>
               )}
               {user ? (
-                <div className="relative w-12 h-12">
-                  <Progress 
-                    value={creditsPercentage} 
-                    className="absolute inset-0 h-full w-full rounded-full [&>div]:bg-primary/20"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-lg font-semibold text-primary">
-                      {user.credits}
-                    </span>
+                <div className="flex items-center gap-4">
+                  <div className="relative w-12 h-12">
+                    <Progress 
+                      value={creditsPercentage} 
+                      className="absolute inset-0 h-full w-full rounded-full [&>div]:bg-primary/20"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-lg font-semibold text-primary">
+                        {user.credits}
+                      </span>
+                    </div>
                   </div>
+                  <Button variant="outline" size="sm" onClick={logout}>
+                    <LogOutIcon className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
                 </div>
               ) : (
                 <Link href="/auth">
