@@ -2,7 +2,6 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet";
 import { Footer } from "@/components/layout/footer";
-import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { 
   CheckCircle2, 
   AlertCircle, 
@@ -37,29 +36,19 @@ export default function LeadsKaufenPage() {
 
       <main>
         {/* Hero Section */}
-        <section className="pt-20 pb-16 relative overflow-hidden border-b">
+        <section className="pt-32 pb-24 relative overflow-hidden border-b">
           <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(black,transparent_70%)] -z-10" />
           <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl opacity-70 animate-blob" />
           <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
 
           <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
-                Leads kaufen: Der ultimative Ratgeber für 2025
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Leads kaufen – Hochwertige B2B-Kontakte in Sekunden erhalten
               </h1>
-              <p className="text-lg text-muted-foreground mb-8">
-                Erfahren Sie alles über den professionellen Einkauf von B2B-Leads: Von der Qualitätssicherung bis zur rechtssicheren Nutzung.
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Erhalten Sie sofort qualifizierte Leads für Ihr Business – gefiltert nach Branche, Standort & Unternehmensgröße.
               </p>
-              <div className="flex gap-4 justify-center flex-wrap">
-                <Link href="/auth">
-                  <Button size="lg" className="rounded-full">
-                    Jetzt kostenlos testen <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-                <Button variant="outline" size="lg" className="rounded-full" onClick={() => document.getElementById('was-sind-leads')?.scrollIntoView({ behavior: 'smooth' })}>
-                  Mehr erfahren
-                </Button>
-              </div>
             </div>
           </div>
         </section>
@@ -246,9 +235,6 @@ export default function LeadsKaufenPage() {
                     Kostenlos registrieren <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-              </div>
-              <div className="mt-8">
-                <DSGVOBadge size="sm" className="mx-auto" />
               </div>
             </div>
           </div>
