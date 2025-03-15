@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Redirect } from "wouter";
 import { Footer } from "@/components/layout/footer";
-import { Star, Lock, Mail, CheckCircle } from "lucide-react";
+import { Lock, Mail, CheckCircle } from "lucide-react";
 import { TestimonialCarousel } from "@/components/testimonial-carousel";
 
 export default function AuthPage() {
@@ -46,13 +46,8 @@ export default function AuthPage() {
 
         <div className="hidden md:flex flex-col justify-center bg-muted/5 p-12 border-l">
           <div className="max-w-lg mx-auto space-y-8">
-            <div className="space-y-4">
+            <div>
               <h2 className="text-3xl font-bold">Über 1.000 zufriedene Kunden</h2>
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-primary text-primary" />
-                ))}
-              </div>
             </div>
 
             <TestimonialCarousel />
@@ -60,7 +55,7 @@ export default function AuthPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-5 w-5 text-primary" />
-                <span>30 Tage Geld-zurück-Garantie</span>
+                <span>Die besten Daten</span>
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-5 w-5 text-primary" />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Using the same companies as in activity-bubble.tsx
 const testimonials = [
@@ -40,20 +41,53 @@ export function TestimonialCarousel() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
 
+  const nextTestimonial = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      setIsVisible(true);
+    }, 300);
+  };
+
+  const previousTestimonial = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+      setIsVisible(true);
+    }, 300);
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setIsVisible(false);
-      setTimeout(() => {
-        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-        setIsVisible(true);
-      }, 500);
-    }, 8000); // Longer display duration for readability
+      nextTestimonial();
+    }, 8000);
 
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={previousTestimonial}
+          className="rounded-full hover:bg-background/80"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </Button>
+      </div>
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={nextTestimonial}
+          className="rounded-full hover:bg-background/80"
+        >
+          <ChevronRight className="h-6 w-6" />
+        </Button>
+      </div>
+
       <AnimatePresence mode="wait">
         {isVisible && (
           <motion.div
@@ -61,14 +95,9 @@ export function TestimonialCarousel() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
             className="bg-background/80 backdrop-blur-sm p-6 rounded-lg border"
           >
-            <div className="flex gap-1 mb-3">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-5 w-5 fill-primary text-primary" />
-              ))}
-            </div>
             <blockquote className="text-base mb-4">
               "{testimonials[currentTestimonial].text}"
             </blockquote>
