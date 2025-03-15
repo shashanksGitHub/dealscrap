@@ -1,93 +1,36 @@
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { Button } from "@/components/ui/button";
-import { Menu, LogOut } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function NavHeader() {
-  const { user, logout } = useAuth();
-
-  const PublicNavLinks = () => (
-    <>
-      <Link href="#features">
-        <a className="text-muted-foreground hover:text-foreground transition-colors">Funktionen</a>
-      </Link>
-      <Link href="#benefits">
-        <a className="text-muted-foreground hover:text-foreground transition-colors">Vorteile</a>
-      </Link>
-      <Link href="#pricing">
-        <a className="text-muted-foreground hover:text-foreground transition-colors">Preise</a>
-      </Link>
-      <Link href="#faq">
-        <a className="text-muted-foreground hover:text-foreground transition-colors">FAQ</a>
-      </Link>
-    </>
-  );
-
-  const AuthenticatedNavLinks = () => (
-    <button
-      onClick={() => logout()}
-      className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
-    >
-      <LogOut className="h-4 w-4" />
-      Abmelden
-    </button>
-  );
+  const { isAuthenticated, logout } = useAuth();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto flex justify-between items-center py-4">
-        <Link href={user ? "/dashboard" : "/"}>
-          <a className="text-2xl font-bold text-primary">LeadScraper</a>
-        </Link>
-        <div className="flex items-center gap-6">
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            {user ? <AuthenticatedNavLinks /> : <PublicNavLinks />}
+    <header className="bg-background border-b">
+      <div className="container mx-auto py-4 px-4">
+        <div className="flex justify-between items-center">
+          <Link href="/" className="text-xl font-bold text-primary">
+            LeadScraper
+          </Link>
+          <nav>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-4">
+                <Link href="/dashboard" className="text-muted-foreground hover:text-primary">
+                  Dashboard
+                </Link>
+                <button onClick={logout} className="text-muted-foreground hover:text-primary">
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link href="/auth" className="text-muted-foreground hover:text-primary">
+                Login
+              </Link>
+            )}
           </nav>
-
-          {/* Mobile Navigation */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:w-[300px]">
-              <nav className="flex flex-col gap-4 mt-8">
-                {user ? <AuthenticatedNavLinks /> : <PublicNavLinks />}
-              </nav>
-            </SheetContent>
-          </Sheet>
-
-          {!user && (
-            <Link href="/auth">
-              <a>
-                <Button size="sm">Kostenloses Konto</Button>
-              </a>
-            </Link>
-          )}
         </div>
       </div>
     </header>
   );
 }
-export default function NavHeader() {
-  return (
-    <header className="w-full border-b">
-      <div className="container flex h-16 items-center">
-        <nav className="flex items-center space-x-4 lg:space-x-6">
-          <a href="/" className="text-sm font-medium transition-colors hover:text-primary">
-            Home
-          </a>
-          <a href="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
-            Dashboard
-          </a>
-          <a href="/blog" className="text-sm font-medium transition-colors hover:text-primary">
-            Blog
-          </a>
-        </nav>
-      </div>
-    </header>
-  )
-}
+
+export default NavHeader;
