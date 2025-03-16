@@ -114,7 +114,7 @@ export default function Dashboard() {
             </motion.div>
             Leads erfolgreich gefunden! 🎉
           </div>
-        ),
+        ) as any,
         description: (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -131,7 +131,7 @@ export default function Dashboard() {
               Sie können die Leads jetzt in der untenstehenden Liste einsehen oder als CSV-Datei exportieren.
             </p>
           </motion.div>
-        ),
+        ) as any,
         duration: 6000,
       });
     },
@@ -196,7 +196,7 @@ export default function Dashboard() {
               </motion.div>
               Credits erfolgreich aufgeladen! ⭐
             </div>
-          ),
+          ) as any,
           description: (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -211,7 +211,7 @@ export default function Dashboard() {
                 Sie werden jetzt zur sicheren Zahlungsabwicklung weitergeleitet.
               </p>
             </motion.div>
-          ),
+          ) as any,
           duration: 4000,
         });
 
