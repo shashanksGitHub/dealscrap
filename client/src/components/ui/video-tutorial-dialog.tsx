@@ -1,4 +1,3 @@
-```tsx
 import {
   Dialog,
   DialogContent,
@@ -71,4 +70,3 @@ export function VideoTutorialDialog({
     </Dialog>
   );
 }
-```

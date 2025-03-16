@@ -1,4 +1,3 @@
-```typescript
 import fs from 'fs';
 import path from 'path';
 
@@ -13,4 +12,3 @@ if (!fs.existsSync(targetDir)) {
 
 // Kopiere das Video
 fs.copyFileSync(sourceVideo, targetVideo);
-```
