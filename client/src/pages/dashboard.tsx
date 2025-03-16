@@ -79,7 +79,7 @@ export default function Dashboard() {
   ];
 
   const handlePurchase = (price: number) => {
-    // Directly navigate to checkout page with the selected price
+    // Direkt zum Checkout mit dem ausgewählten Preis weiterleiten
     setLocation(`/checkout/${price}`);
   };
 

@@ -63,6 +63,7 @@ export default function Checkout() {
       });
       const { checkoutUrl } = await response.json();
 
+      // Redirect to Mollie checkout
       window.location.href = checkoutUrl;
     } catch (error: any) {
       console.error('Error initiating payment:', error);
