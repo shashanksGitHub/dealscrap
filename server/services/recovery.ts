@@ -2,7 +2,6 @@ import { log } from "../vite";
 
 interface ServiceStatus {
   database: boolean;
-  stripe: boolean;
   auth: boolean;
 }
 
@@ -24,7 +23,6 @@ export class DeploymentRecovery {
   async checkServices(): Promise<ServiceStatus> {
     const status: ServiceStatus = {
       database: false,
-      stripe: false,
       auth: false
     };
 
@@ -34,18 +32,6 @@ export class DeploymentRecovery {
       log("✓ Database connection verified", "recovery");
     } catch (error) {
       log(`✗ Database connection failed: ${error}`, "recovery");
-    }
-
-    try {
-      // Stripe check will be implemented here
-      if (process.env.STRIPE_SECRET_KEY) {
-        status.stripe = true;
-        log("✓ Stripe configuration verified", "recovery");
-      } else {
-        log("✗ Stripe configuration missing", "recovery");
-      }
-    } catch (error) {
-      log(`✗ Stripe verification failed: ${error}`, "recovery");
     }
 
     try {
@@ -70,7 +56,7 @@ export class DeploymentRecovery {
 
     try {
       const services = await this.checkServices();
-      
+
       if (!Object.values(services).every(status => status)) {
         log("Not all services are healthy. Waiting before next recovery attempt...", "recovery");
         await new Promise(resolve => setTimeout(resolve, this.RECOVERY_TIMEOUT));
@@ -88,12 +74,11 @@ export class DeploymentRecovery {
 
   async handleDeploymentError(error: Error): Promise<void> {
     log(`Deployment error detected: ${error.message}`, "recovery");
-    
+
     const recovered = await this.attemptRecovery(error);
-    
+
     if (!recovered) {
       log("Recovery failed - system requires manual intervention", "recovery");
-      // Hier können wir später Benachrichtigungen implementieren
     }
   }
 }

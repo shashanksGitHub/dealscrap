@@ -6,7 +6,6 @@ import { ArrowLeftIcon } from "lucide-react";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { Footer } from "@/components/layout/footer";
 
-// Temporary credit packages mapping until we implement new payment system
 const CREDIT_PACKAGES: Record<string, { credits: number; price: number }> = {
   '100': { credits: 100, price: 100 },
   '200': { credits: 250, price: 200 },
@@ -19,15 +18,14 @@ export default function Checkout() {
 
   useEffect(() => {
     if (!match || !params?.amount || !CREDIT_PACKAGES[params.amount]) {
-      // Redirect to dashboard if amount is invalid
       window.location.href = "/dashboard";
     }
   }, [match, params?.amount]);
 
   const amount = params?.amount ? parseInt(params.amount) : 0;
-  const package = CREDIT_PACKAGES[amount];
+  const creditPackage = CREDIT_PACKAGES[amount];
 
-  if (!package) {
+  if (!creditPackage) {
     return null;
   }
 
@@ -46,7 +44,7 @@ export default function Checkout() {
             <CardHeader>
               <CardTitle>Kreditpaket kaufen</CardTitle>
               <CardDescription>
-                Zahlungsabwicklung temporär deaktiviert
+                Zahlungsabwicklung vorübergehend deaktiviert
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -54,7 +52,7 @@ export default function Checkout() {
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="font-medium">Ausgewähltes Paket</h3>
-                    <p className="text-sm text-muted-foreground">{package.credits} Credits</p>
+                    <p className="text-sm text-muted-foreground">{creditPackage.credits} Credits</p>
                   </div>
                   <div className="text-right">
                     <p className="font-medium">{amount}€</p>
