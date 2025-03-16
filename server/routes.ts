@@ -65,8 +65,14 @@ export async function registerRoutes(router: Router) {
     try {
       const signature = req.headers['stripe-signature'];
 
+      if (!signature) {
+        console.error('No Stripe signature found in webhook request');
+        return res.status(400).json({ error: 'No Stripe signature present' });
+      }
+
       if (!process.env.STRIPE_WEBHOOK_SECRET) {
-        throw new Error('Missing Stripe webhook secret');
+        console.error('Missing Stripe webhook secret');
+        return res.status(500).json({ error: 'Webhook secret not configured' });
       }
 
       try {
@@ -75,68 +81,60 @@ export async function registerRoutes(router: Router) {
           signature,
           process.env.STRIPE_WEBHOOK_SECRET
         );
-      } catch (err) {
+      } catch (err: any) {
         console.error('⚠️ Webhook signature verification failed:', err.message);
         return res.status(400).json({ error: `Webhook Error: ${err.message}` });
       }
 
-      console.log('Webhook event received:', event.type);
+      console.log('✓ Webhook signature verified');
+      console.log('Webhook event type:', event.type);
+      console.log('Event data:', JSON.stringify(event.data.object));
 
       if (event.type === 'payment_intent.succeeded') {
         const paymentIntent = event.data.object;
         console.log('💰 Payment succeeded:', paymentIntent.id);
         console.log('Payment metadata:', paymentIntent.metadata);
 
-        try {
-          // Ensure credits and userId are numbers
-          const credits = parseInt(paymentIntent.metadata.credits);
-          const userId = parseInt(paymentIntent.metadata.userId);
+        const credits = parseInt(paymentIntent.metadata.credits);
+        const userId = parseInt(paymentIntent.metadata.userId);
 
-          if (isNaN(credits) || isNaN(userId)) {
-            throw new Error(`Invalid metadata - credits: ${credits}, userId: ${userId}`);
-          }
-
-          console.log(`Processing payment for user ${userId}`);
-          console.log(`Adding ${credits} credits from payment ${paymentIntent.id}`);
-
-          // Get current user and verify existence
-          const user = await storage.getUser(userId);
-          if (!user) {
-            throw new Error(`User ${userId} not found`);
-          }
-
-          console.log(`Current credits for user ${userId}: ${user.credits}`);
-
-          // Add credits
-          const updatedUser = await storage.addCredits(userId, credits);
-          console.log(`Successfully updated credits for user ${userId}. New balance: ${updatedUser.credits}`);
-
-          // Immediately verify the update
-          const verifiedUser = await storage.getUser(userId);
-          if (!verifiedUser || verifiedUser.credits !== updatedUser.credits) {
-            throw new Error('Credit update verification failed');
-          }
-
-          // Send success response with updated information
-          return res.json({ 
-            received: true,
-            userId: userId,
-            credits: updatedUser.credits,
-            message: 'Credits added successfully'
-          });
-        } catch (error: any) {
-          console.error('Failed to add credits:', error);
-          return res.status(500).json({
-            received: true,
-            error: true,
-            message: `Failed to process credits: ${error.message}`
-          });
+        if (isNaN(credits) || isNaN(userId)) {
+          throw new Error(`Invalid metadata - credits: ${credits}, userId: ${userId}`);
         }
+
+        console.log(`Processing payment for user ${userId}`);
+        console.log(`Adding ${credits} credits from payment ${paymentIntent.id}`);
+
+        // Get current user and verify existence
+        const user = await storage.getUser(userId);
+        if (!user) {
+          throw new Error(`User ${userId} not found`);
+        }
+
+        console.log(`Current credits for user ${userId}: ${user.credits}`);
+
+        // Add credits and verify the update
+        const updatedUser = await storage.addCredits(userId, credits);
+        console.log(`Credits updated. New balance: ${updatedUser.credits}`);
+
+        const verifiedUser = await storage.getUser(userId);
+        if (!verifiedUser || verifiedUser.credits !== updatedUser.credits) {
+          throw new Error('Credit update verification failed');
+        }
+
+        console.log(`✓ Credits successfully added and verified for user ${userId}`);
+        return res.json({ 
+          received: true,
+          userId: userId,
+          credits: updatedUser.credits,
+          message: 'Credits added successfully'
+        });
       }
 
       return res.json({ received: true });
     } catch (err: any) {
       console.error('❌ Webhook Error:', err.message);
+      console.error('Error stack:', err.stack);
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
   });
