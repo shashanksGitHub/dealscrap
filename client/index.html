@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>LeadScraper - B2B Lead Generation</title>
     <!-- Google Tag Manager -->
     <script>
       (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -12,6 +13,14 @@
       })(window,document,'script','dataLayer','GTM-XXXXX');
     </script>
     <!-- End Google Tag Manager -->
+    <!-- Error Tracking -->
+    <script>
+      window.onerror = function(msg, url, lineNo, columnNo, error) {
+        console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
+        return false;
+      };
+      console.log('Page loaded at:', new Date().toISOString());
+    </script>
   </head>
   <body>
     <!-- Google Tag Manager (noscript) -->
@@ -22,5 +31,11 @@
     <!-- End Google Tag Manager (noscript) -->
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Fallback content -->
+    <noscript>
+      <div style="text-align: center; padding: 20px;">
+        Bitte aktivieren Sie JavaScript, um diese Anwendung nutzen zu können.
+      </div>
+    </noscript>
   </body>
 </html>
