@@ -20,6 +20,32 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
+
+const VideoTutorialDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Video Tutorial</DialogTitle>
+        </DialogHeader>
+        <div className="aspect-video rounded-lg overflow-hidden">
+          <iframe
+            src="https://www.loom.com/embed/caafc64aed3a46d1b83262c5e843b7d4?sid=c3c6fcee-4802-4418-bfa8-2b6bde0ef4dc"
+            frameBorder="0"
+            allowFullScreen
+            className="w-full h-full"
+          ></iframe>
+        </div>
+        <p className="mt-6 text-lg text-muted-foreground text-center">
+          In diesem kurzen Video zeige ich Ihnen persönlich, wie Sie mit unserem Tool effizient Business-Leads generieren können.
+        </p>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -28,6 +54,9 @@ export default function Dashboard() {
   const [searchLocation, setSearchLocation] = useState("");
   const [leadCount, setLeadCount] = useState(1);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return localStorage.getItem("tutorialWatched") !== "true";
+  });
 
   const { data: searches = [], isLoading: isSearchesLoading } = useQuery({
     queryKey: ["/api/searches"],
@@ -172,30 +201,27 @@ export default function Dashboard() {
     }
   });
 
+  const handleTutorialClose = () => {
+    setShowTutorial(false);
+    localStorage.setItem("tutorialWatched", "true");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-12 space-y-16">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-              <PlayCircleIcon className="w-6 h-6 text-primary" />
-              Sehen Sie, wie einfach die Lead-Generierung funktioniert
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="aspect-video rounded-lg overflow-hidden">
-              <iframe
-                src="https://www.loom.com/embed/caafc64aed3a46d1b83262c5e843b7d4?sid=c3c6fcee-4802-4418-bfa8-2b6bde0ef4dc"
-                frameBorder="0"
-                allowFullScreen
-                className="w-full h-full"
-              ></iframe>
-            </div>
-            <p className="mt-6 text-lg text-muted-foreground text-center">
-              In diesem kurzen Video zeige ich Ihnen persönlich, wie Sie mit unserem Tool effizient Business-Leads generieren können.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold tracking-tight">Lead-Generierung</h1>
+          <Button
+            variant="ghost"
+            onClick={() => setShowTutorial(true)}
+            className="text-muted-foreground hover:text-primary"
+          >
+            <PlayCircleIcon className="w-4 h-4 mr-2" />
+            Anleitung
+          </Button>
+        </div>
+
+        <VideoTutorialDialog open={showTutorial} onOpenChange={setShowTutorial} />
 
         <div className="grid md:grid-cols-2 gap-8">
           <Card>
