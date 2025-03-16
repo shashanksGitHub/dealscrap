@@ -21,11 +21,15 @@ const imagesToCopy = [
 imagesToCopy.forEach(image => {
   const sourceImage = path.join(sourceDir, image);
   const targetImage = path.join(targetDir, image);
-  
-  if (fs.existsSync(sourceImage)) {
-    fs.copyFileSync(sourceImage, targetImage);
-    console.log(`Copied ${image} to public/images`);
-  } else {
-    console.warn(`Warning: Source image ${image} not found`);
+
+  try {
+    if (fs.existsSync(sourceImage)) {
+      fs.copyFileSync(sourceImage, targetImage);
+      console.log(`Copied ${image} to public/images`);
+    } else {
+      console.warn(`Warning: Source image ${image} not found at ${sourceImage}`);
+    }
+  } catch (error) {
+    console.error(`Error copying ${image}:`, error);
   }
 });
