@@ -6,6 +6,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { setupAuth } from "./auth";
 import path from "path";
 import { recoveryService } from "./services/recovery";
+import fs from 'fs';
 
 const app = express();
 
@@ -139,8 +140,24 @@ async function startServer() {
     if (isProduction) {
       log("Setting up production static file serving...");
       // Updated path to serve static files from the correct build directory
-      const publicDir = path.resolve(__dirname, 'public');
+      const publicDir = path.resolve(__dirname, '../dist/public');
       log(`Serving static files from: ${publicDir}`);
+      log(`Production environment detected:
+NODE_ENV: ${process.env.NODE_ENV}
+PORT: ${process.env.PORT}
+PWD: ${process.cwd()}
+BUILD_DIR: ${publicDir}`);
+
+      // Verify build directory exists
+      if (!fs.existsSync(publicDir)) {
+        log(`⚠️ Warning: Build directory ${publicDir} does not exist!`);
+        throw new Error(`Build directory ${publicDir} does not exist`);
+      } else {
+        log(`✓ Build directory ${publicDir} exists`);
+        // List contents of build directory
+        const files = fs.readdirSync(publicDir);
+        log(`Build directory contents: ${files.join(', ')}`);
+      }
 
       // Serve static files with proper MIME types
       app.use(express.static(publicDir, {
@@ -154,12 +171,23 @@ async function startServer() {
             // Cache static assets for 1 year
             res.setHeader('Cache-Control', 'public, max-age=31536000');
           }
+          // Log static file requests in production
+          log(`Serving static file: ${path}`);
         }
       }));
 
       // Serve index.html for all routes in production
       app.get('*', (_req, res) => {
-        res.sendFile(path.resolve(publicDir, 'index.html'));
+        const indexPath = path.resolve(publicDir, 'index.html');
+        log(`Attempting to serve index.html from: ${indexPath}`);
+
+        if (!fs.existsSync(indexPath)) {
+          log(`❌ Error: index.html not found at ${indexPath}`);
+          return res.status(500).send('Server configuration error: index.html not found');
+        }
+
+        log(`✓ Serving index.html from ${indexPath}`);
+        res.sendFile(indexPath);
       });
     } else {
       log("Setting up development Vite middleware...");
