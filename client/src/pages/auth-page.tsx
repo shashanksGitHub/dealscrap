@@ -11,7 +11,6 @@ import { Redirect } from "wouter";
 import { Footer } from "@/components/layout/footer";
 import { Lock, Mail, CheckCircle } from "lucide-react";
 import { TestimonialCarousel } from "@/components/testimonial-carousel";
-import { ActivityBubble } from "@/components/activity-bubble";
 
 export default function AuthPage() {
   const { user } = useAuth();
@@ -71,7 +70,6 @@ export default function AuthPage() {
         </div>
       </div>
       <Footer />
-      <ActivityBubble />
     </div>
   );
 }

@@ -54,6 +54,7 @@ export function NavHeader() {
                     max={1000}
                     size="md"
                     showLabel
+                    showMax={false}
                     className={currentUser.credits === 0 ? 'text-destructive' : 'text-primary'}
                   />
                   <Button variant="outline" size="sm" onClick={logout}>
