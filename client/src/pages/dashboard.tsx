@@ -79,6 +79,7 @@ export default function Dashboard() {
   ];
 
   const handlePurchase = (price: number) => {
+    // Directly navigate to checkout page with the selected price
     setLocation(`/checkout/${price}`);
   };
 

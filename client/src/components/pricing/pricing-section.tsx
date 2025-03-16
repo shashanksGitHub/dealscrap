@@ -5,6 +5,7 @@ export function PricingSection() {
   const [, setLocation] = useLocation();
 
   const handleSelect = (price: number) => {
+    // Redirect to checkout page with selected price
     setLocation(`/checkout/${price}`);
   };
 

@@ -36,7 +36,7 @@ export function PriceCard({ credits, price, isRecommended, onSelect }: PriceCard
       </CardContent>
       <CardFooter>
         <Button 
-          onClick={onSelect} 
+          onClick={onSelect}
           className="w-full" 
           variant={isRecommended ? "default" : "outline"}
         >
