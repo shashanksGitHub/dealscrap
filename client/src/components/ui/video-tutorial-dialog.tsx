@@ -31,9 +31,9 @@ export function VideoTutorialDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
-          <DialogTitle>Willkommen bei der Lead-Generierung!</DialogTitle>
-          <DialogDescription>
-            In diesem kurzen Video zeigen wir Ihnen, wie Sie effizient Business-Leads generieren können.
+          <DialogTitle className="text-2xl text-primary">In weniger als 1 Minute zu passenden B2B-Leads</DialogTitle>
+          <DialogDescription className="text-base mt-2">
+            Unser Geschäftsführer zeigt Ihnen, wie einfach Sie mit unserem AI-Scraper passende Geschäftskontakte finden.
           </DialogDescription>
         </DialogHeader>
         <div className="relative aspect-video rounded-lg overflow-hidden bg-black">
