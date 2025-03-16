@@ -22,10 +22,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
-    "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
-    "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev; " +
-    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev wss://*.replit.dev; " +
+    "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
+    "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
+    "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
+    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app wss://*.replit.dev wss://*.replit.app; " +
     "style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: https: http:; " +
     "font-src 'self' data:;"
