@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /blog
+Allow: /leads-kaufen
+Allow: /kontakt
+Allow: /impressum
+Allow: /datenschutz
+Allow: /agb
+Disallow: /dashboard
+Disallow: /auth-page
+Disallow: /reset-password
+
+Sitemap: https://[domain]/sitemap.xml

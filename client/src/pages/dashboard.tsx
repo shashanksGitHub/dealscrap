@@ -21,7 +21,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-
+import { SimpleFooter } from "@/components/layout/simple-footer";
+import { SEO } from "@/components/layout/seo";
 
 const VideoTutorialDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => {
   return (
@@ -207,235 +208,242 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-12 space-y-16">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">Lead-Generierung</h1>
-          <Button
-            variant="ghost"
-            onClick={() => setShowTutorial(true)}
-            className="text-muted-foreground hover:text-primary"
-          >
-            <PlayCircleIcon className="w-4 h-4 mr-2" />
-            Anleitung
-          </Button>
-        </div>
+    <>
+      <SEO 
+        title="Dashboard - LeadScraper"
+        noindex={true} 
+      />
+      <div className="min-h-screen bg-background">
+        <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-12 space-y-16">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold tracking-tight">Lead-Generierung</h1>
+            <Button
+              variant="ghost"
+              onClick={() => setShowTutorial(true)}
+              className="text-muted-foreground hover:text-primary"
+            >
+              <PlayCircleIcon className="w-4 h-4 mr-2" />
+              Anleitung
+            </Button>
+          </div>
 
-        <VideoTutorialDialog open={showTutorial} onOpenChange={setShowTutorial} />
+          <VideoTutorialDialog open={showTutorial} onOpenChange={setShowTutorial} />
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold tracking-tight">Neue Leads finden</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="query">Unternehmensart</Label>
-                  <Input
-                    id="query"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="z.B. Restaurant"
-                    disabled={scrapeMutation.isPending}
-                    className="text-base"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="location">Standort</Label>
-                  <Input
-                    id="location"
-                    value={searchLocation}
-                    onChange={(e) => setSearchLocation(e.target.value)}
-                    placeholder="z.B. Berlin"
-                    disabled={scrapeMutation.isPending}
-                    className="text-base"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="leadCount">Anzahl der Leads</Label>
-                  <Input
-                    id="leadCount"
-                    type="number"
-                    min={1}
-                    max={100}
-                    value={leadCount}
-                    onChange={(e) => setLeadCount(parseInt(e.target.value) || 1)}
-                    disabled={scrapeMutation.isPending}
-                    className="text-base"
-                  />
-                  <p className="text-sm text-muted-foreground">
-                    1 Lead = 1 Credit
-                  </p>
-                </div>
-                <Button
-                  onClick={() => scrapeMutation.mutate({ query, location: searchLocation, count: leadCount })}
-                  disabled={scrapeMutation.isPending || !user?.credits}
-                  className="w-full text-base py-6"
-                  size="lg"
-                >
-                  {scrapeMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Suche läuft...
-                    </>
-                  ) : (
-                    <>
-                      <SearchIcon className="mr-2 h-5 w-5" />
-                      {leadCount} Lead{leadCount !== 1 ? 's' : ''} finden
-                    </>
-                  )}
-                </Button>
-                {user?.credits === 0 ? (
-                  <p className="text-base text-destructive text-center">
-                    Bitte wählen Sie eines der Credit-Pakete
-                  </p>
-                ) : (
-                  <p className="text-base text-muted-foreground text-center">
-                    Sie haben noch {user?.credits} Credits verfügbar
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold tracking-tight">Credits kaufen</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                {creditPackages.map((pkg) => (
+          <div className="grid md:grid-cols-2 gap-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold tracking-tight">Neue Leads finden</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="query">Unternehmensart</Label>
+                    <Input
+                      id="query"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="z.B. Restaurant"
+                      disabled={scrapeMutation.isPending}
+                      className="text-base"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Standort</Label>
+                    <Input
+                      id="location"
+                      value={searchLocation}
+                      onChange={(e) => setSearchLocation(e.target.value)}
+                      placeholder="z.B. Berlin"
+                      disabled={scrapeMutation.isPending}
+                      className="text-base"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="leadCount">Anzahl der Leads</Label>
+                    <Input
+                      id="leadCount"
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={leadCount}
+                      onChange={(e) => setLeadCount(parseInt(e.target.value) || 1)}
+                      disabled={scrapeMutation.isPending}
+                      className="text-base"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      1 Lead = 1 Credit
+                    </p>
+                  </div>
                   <Button
-                    key={pkg.id}
-                    onClick={() => handlePurchase(pkg.price)}
-                    variant="outline"
-                    className={cn(
-                      "relative flex flex-col items-center justify-center gap-2 p-6 h-auto min-h-[140px]",
-                      pkg.recommended && "border-2 border-primary shadow-lg"
-                    )}
-                    disabled={isProcessingPayment}
+                    onClick={() => scrapeMutation.mutate({ query, location: searchLocation, count: leadCount })}
+                    disabled={scrapeMutation.isPending || !user?.credits}
+                    className="w-full text-base py-6"
+                    size="lg"
                   >
-                    {pkg.recommended && (
-                      <Badge
-                        variant="secondary"
-                        className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground"
-                      >
-                        Empfohlen
-                      </Badge>
-                    )}
-                    <span className="text-2xl font-bold">{pkg.credits} Credits</span>
-                    <span className="text-3xl font-bold text-primary">€{pkg.price}</span>
-                    {isProcessingPayment && (
-                      <Loader2 className="h-4 w-4 animate-spin absolute bottom-2 right-2" />
+                    {scrapeMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Suche läuft...
+                      </>
+                    ) : (
+                      <>
+                        <SearchIcon className="mr-2 h-5 w-5" />
+                        {leadCount} Lead{leadCount !== 1 ? 's' : ''} finden
+                      </>
                     )}
                   </Button>
-                ))}
-              </div>
+                  {user?.credits === 0 ? (
+                    <p className="text-base text-destructive text-center">
+                      Bitte wählen Sie eines der Credit-Pakete
+                    </p>
+                  ) : (
+                    <p className="text-base text-muted-foreground text-center">
+                      Sie haben noch {user?.credits} Credits verfügbar
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl font-bold tracking-tight">Credits kaufen</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  {creditPackages.map((pkg) => (
+                    <Button
+                      key={pkg.id}
+                      onClick={() => handlePurchase(pkg.price)}
+                      variant="outline"
+                      className={cn(
+                        "relative flex flex-col items-center justify-center gap-2 p-6 h-auto min-h-[140px]",
+                        pkg.recommended && "border-2 border-primary shadow-lg"
+                      )}
+                      disabled={isProcessingPayment}
+                    >
+                      {pkg.recommended && (
+                        <Badge
+                          variant="secondary"
+                          className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-primary-foreground"
+                        >
+                          Empfohlen
+                        </Badge>
+                      )}
+                      <span className="text-2xl font-bold">{pkg.credits} Credits</span>
+                      <span className="text-3xl font-bold text-primary">€{pkg.price}</span>
+                      {isProcessingPayment && (
+                        <Loader2 className="h-4 w-4 animate-spin absolute bottom-2 right-2" />
+                      )}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-2xl font-bold tracking-tight">Ihre Leads</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isSearchesLoading ? (
+                <div className="p-16 text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                  <p className="text-lg text-muted-foreground">Suchen werden geladen...</p>
+                </div>
+              ) : searches.length === 0 ? (
+                <div className="p-16 text-center">
+                  <p className="text-lg text-muted-foreground">Keine Suchen gefunden</p>
+                </div>
+              ) : (
+                <Accordion
+                  type="single"
+                  collapsible
+                  className="w-full"
+                  onValueChange={(value) => {
+                    if (value) {
+                      markSearchAsRead.mutate(parseInt(value));
+                    }
+                  }}
+                >
+                  {searches.map((search: any) => (
+                    <AccordionItem key={search.id} value={search.id.toString()}>
+                      <AccordionTrigger className="hover:no-underline py-3">
+                        <div className="flex items-center justify-between w-full pr-4">
+                          <div className="flex items-center gap-4">
+                            {!search.isRead && (
+                              <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                            )}
+                            <div className="flex items-baseline gap-3">
+                              <h3 className="font-semibold text-base">{search.query} in {search.location}</h3>
+                              <p className="text-xs text-muted-foreground">
+                                {format(new Date(search.createdAt), "dd. MMMM yyyy, HH:mm 'Uhr'", { locale: de })}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">{search.count} Leads</Badge>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="pt-2 pb-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleExport(search.id)}
+                            className="mb-3"
+                          >
+                            <DownloadIcon className="w-3 h-3 mr-2" />
+                            Als CSV exportieren
+                          </Button>
+                        </div>
+                        <div className="overflow-x-auto rounded-md border">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b bg-muted/50">
+                                <th className="p-2 text-left font-medium">Firmenname</th>
+                                <th className="p-2 text-left font-medium hidden md:table-cell">Adresse</th>
+                                <th className="p-2 text-left font-medium">Telefon</th>
+                                <th className="p-2 text-left font-medium hidden md:table-cell">E-Mail</th>
+                                <th className="p-2 text-left font-medium hidden lg:table-cell">Website</th>
+                              </tr>
+                            </thead>
+                            <tbody className="text-sm">
+                              {leads
+                                .filter((lead: Lead) => lead.searchId === search.id)
+                                .map((lead: Lead) => (
+                                  <tr key={lead.id} className="border-b hover:bg-muted/50">
+                                    <td className="p-2">{lead.businessName}</td>
+                                    <td className="p-2 hidden md:table-cell text-muted-foreground">{lead.address}</td>
+                                    <td className="p-2">{lead.phone}</td>
+                                    <td className="p-2 hidden md:table-cell text-muted-foreground">{lead.email}</td>
+                                    <td className="p-2 hidden lg:table-cell text-muted-foreground">
+                                      {lead.website && (
+                                        <a
+                                          href={lead.website}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-primary hover:underline"
+                                        >
+                                          {lead.website}
+                                        </a>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              )}
             </CardContent>
           </Card>
-        </div>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-2xl font-bold tracking-tight">Ihre Leads</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isSearchesLoading ? (
-              <div className="p-16 text-center">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                <p className="text-lg text-muted-foreground">Suchen werden geladen...</p>
-              </div>
-            ) : searches.length === 0 ? (
-              <div className="p-16 text-center">
-                <p className="text-lg text-muted-foreground">Keine Suchen gefunden</p>
-              </div>
-            ) : (
-              <Accordion
-                type="single"
-                collapsible
-                className="w-full"
-                onValueChange={(value) => {
-                  if (value) {
-                    markSearchAsRead.mutate(parseInt(value));
-                  }
-                }}
-              >
-                {searches.map((search: any) => (
-                  <AccordionItem key={search.id} value={search.id.toString()}>
-                    <AccordionTrigger className="hover:no-underline py-3">
-                      <div className="flex items-center justify-between w-full pr-4">
-                        <div className="flex items-center gap-4">
-                          {!search.isRead && (
-                            <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
-                          )}
-                          <div className="flex items-baseline gap-3">
-                            <h3 className="font-semibold text-base">{search.query} in {search.location}</h3>
-                            <p className="text-xs text-muted-foreground">
-                              {format(new Date(search.createdAt), "dd. MMMM yyyy, HH:mm 'Uhr'", { locale: de })}
-                            </p>
-                          </div>
-                        </div>
-                        <Badge variant="secondary" className="text-xs">{search.count} Leads</Badge>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="pt-2 pb-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleExport(search.id)}
-                          className="mb-3"
-                        >
-                          <DownloadIcon className="w-3 h-3 mr-2" />
-                          Als CSV exportieren
-                        </Button>
-                      </div>
-                      <div className="overflow-x-auto rounded-md border">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b bg-muted/50">
-                              <th className="p-2 text-left font-medium">Firmenname</th>
-                              <th className="p-2 text-left font-medium hidden md:table-cell">Adresse</th>
-                              <th className="p-2 text-left font-medium">Telefon</th>
-                              <th className="p-2 text-left font-medium hidden md:table-cell">E-Mail</th>
-                              <th className="p-2 text-left font-medium hidden lg:table-cell">Website</th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-sm">
-                            {leads
-                              .filter((lead: Lead) => lead.searchId === search.id)
-                              .map((lead: Lead) => (
-                                <tr key={lead.id} className="border-b hover:bg-muted/50">
-                                  <td className="p-2">{lead.businessName}</td>
-                                  <td className="p-2 hidden md:table-cell text-muted-foreground">{lead.address}</td>
-                                  <td className="p-2">{lead.phone}</td>
-                                  <td className="p-2 hidden md:table-cell text-muted-foreground">{lead.email}</td>
-                                  <td className="p-2 hidden lg:table-cell text-muted-foreground">
-                                    {lead.website && (
-                                      <a
-                                        href={lead.website}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-primary hover:underline"
-                                      >
-                                        {lead.website}
-                                      </a>
-                                    )}
-                                  </td>
-                                </tr>
-                              ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            )}
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+        </main>
+        <SimpleFooter />
+      </div>
+    </>
   );
 }
