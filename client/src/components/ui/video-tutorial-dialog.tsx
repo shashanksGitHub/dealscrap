@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useState } from "react";
-import { PlayCircle } from "lucide-react";
+import { PlayCircle, Lightbulb } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function VideoTutorialDialog({
@@ -31,7 +31,10 @@ export function VideoTutorialDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-primary">In weniger als 1 Minute zu passenden B2B-Leads</DialogTitle>
+          <DialogTitle className="flex items-center gap-3 text-2xl">
+            <Lightbulb className="w-6 h-6 text-primary" />
+            <span className="text-primary">In weniger als 1 Minute zu passenden B2B-Leads</span>
+          </DialogTitle>
           <DialogDescription className="text-base mt-2">
             Unser Geschäftsführer zeigt Ihnen, wie einfach Sie mit unserem AI-Scraper passende Geschäftskontakte finden.
           </DialogDescription>
