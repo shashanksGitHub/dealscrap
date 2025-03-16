@@ -51,7 +51,7 @@ export default function BlogPage() {
             Erfahren Sie mehr über Lead-Generierung, Vertriebsstrategien und wie Sie Ihr Business erfolgreich ausbauen können
           </p>
           <Link href="/auth">
-            <Button size="lg" className="rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105 animate-[pulse_3s_ease-in-out_infinite] hover:animate-none">
+            <Button size="lg" className="rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105 animate-wiggle">
               Kostenloses Konto erstellen
             </Button>
           </Link>

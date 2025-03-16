@@ -13,7 +13,7 @@ export function Footer() {
             Starten Sie noch heute mit LeadScraper und entdecken Sie, wie einfach moderne Lead-Generierung sein kann.
           </p>
           <Link href="/auth">
-            <Button size="lg" className="w-full sm:w-auto rounded-full px-6 md:px-8 py-4 md:py-6 h-auto text-base md:text-lg font-medium transition-all duration-300 hover:scale-105 animate-[pulse_3s_ease-in-out_infinite] hover:animate-none">
+            <Button size="lg" className="w-full sm:w-auto rounded-full px-6 md:px-8 py-4 md:py-6 h-auto text-base md:text-lg font-medium transition-all duration-300 hover:scale-105 animate-wiggle">
               Jetzt kostenloses Konto erstellen
             </Button>
           </Link>

@@ -47,6 +47,11 @@
   }
 }
 
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-1deg) scale(1.01); }
+  75% { transform: rotate(1deg) scale(1.01); }
+}
 
 @tailwind base;
 @tailwind components;
@@ -135,20 +140,10 @@
     animation-delay: 4s;
   }
 
-  @keyframes blob {
-    0% {
-      transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-      transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
-    }
-    100% {
-      transform: translate(0px, 0px) scale(1);
-    }
+  .animate-wiggle {
+    animation: wiggle 3s ease-in-out infinite;
   }
+
 
   /* Grid Hintergrund */
   .bg-grid-white\/10 {

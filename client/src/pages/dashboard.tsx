@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { motion } from "framer-motion";
+import { VideoTutorialDialog } from "@/components/ui/video-tutorial-dialog";
 import {
   Accordion,
   AccordionContent,
@@ -31,6 +32,7 @@ const Dashboard = () => {
   const [leadCount, setLeadCount] = useState(1);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [searchStatus, setSearchStatus] = useState("");
+  const [showTutorial, setShowTutorial] = useState(false);
   const searchStatuses = [
     "Neue Unternehmen werden gesucht...",
     "Spannendes Unternehmen gefunden! 🎯",
@@ -38,6 +40,15 @@ const Dashboard = () => {
     "Leaddaten werden extrahiert...",
     "Tiefergehende Recherche läuft..."
   ];
+
+  useEffect(() => {
+    // Show tutorial only on first login
+    const tutorialWatched = localStorage.getItem("tutorialWatched");
+    if (!tutorialWatched) {
+      setShowTutorial(true);
+      localStorage.setItem("tutorialWatched", "true");
+    }
+  }, []);
 
   const { data: searches = [], isLoading: isSearchesLoading } = useQuery({
     queryKey: ["/api/searches"],
@@ -240,6 +251,7 @@ const Dashboard = () => {
         title="Dashboard - LeadScraper"
         noindex={true} 
       />
+      <VideoTutorialDialog open={showTutorial} onOpenChange={setShowTutorial} />
       <div className="min-h-screen bg-background">
         <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-12 space-y-12">
           {user?.credits === 0 && (
