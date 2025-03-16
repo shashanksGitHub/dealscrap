@@ -10,8 +10,7 @@ const mollieClient = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY });
 export async function createPayment(
   userId: number,
   amount: number,
-  description: string,
-  embedded = false
+  description: string
 ) {
   const user = await storage.getUser(userId);
   if (!user) throw new Error("User not found");
@@ -33,31 +32,34 @@ export async function createPayment(
 
   console.log('Using URLs:', { redirectUrl, webhookUrl });
 
-  const payment = await mollieClient.payments.create({
-    amount: {
-      currency: "EUR",
-      value: amount.toFixed(2) // Mollie erwartet einen String mit 2 Dezimalstellen
-    },
-    description,
-    redirectUrl,
-    webhookUrl,
-    metadata: {
-      userId: userId.toString(),
-      creditAmount: amount.toString()
-    },
-    billingEmail: user.email,
-    locale: 'de_DE',
-    profileId: process.env.MOLLIE_PROFILE_ID,
-    method: ['ideal', 'creditcard', 'bancontact', 'sofort'],
-  });
+  try {
+    const payment = await mollieClient.payments.create({
+      amount: {
+        currency: "EUR",
+        value: amount.toFixed(2) // Mollie erwartet einen String mit 2 Dezimalstellen
+      },
+      description,
+      redirectUrl,
+      webhookUrl,
+      metadata: {
+        userId: userId.toString(),
+        creditAmount: amount.toString()
+      },
+      billingEmail: user.email,
+      locale: "de_DE"
+    });
 
-  console.log('Mollie payment created:', {
-    id: payment.id,
-    status: payment.status,
-    checkoutUrl: payment.getCheckoutUrl()
-  });
+    console.log('Mollie payment created:', {
+      id: payment.id,
+      status: payment.status,
+      checkoutUrl: payment._links?.checkout?.href
+    });
 
-  return payment;
+    return payment._links?.checkout?.href;
+  } catch (error) {
+    console.error('Error creating Mollie payment:', error);
+    throw error;
+  }
 }
 
 export async function handleWebhookEvent(paymentId: string): Promise<void> {

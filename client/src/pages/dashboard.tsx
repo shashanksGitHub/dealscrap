@@ -85,11 +85,11 @@ export default function Dashboard() {
         amount: price
       });
 
-      const { checkoutUrl } = await response.json();
-      console.log('Received checkout URL:', checkoutUrl);
+      const data = await response.json();
+      console.log('Payment response:', data);
 
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
       } else {
         throw new Error('Keine Checkout-URL erhalten');
       }
@@ -97,7 +97,7 @@ export default function Dashboard() {
       console.error('Error initiating payment:', error);
       toast({
         title: "Fehler",
-        description: "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+        description: error.message || "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
         variant: "destructive"
       });
     } finally {

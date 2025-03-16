@@ -42,13 +42,16 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ message: "Betrag ist erforderlich" });
       }
 
-      const payment = await createPayment(
+      const checkoutUrl = await createPayment(
         req.user.id,
         amount,
         `${amount} Credits`
       );
 
-      const checkoutUrl = payment.getCheckoutUrl();
+      if (!checkoutUrl) {
+        throw new Error('Keine Checkout-URL von Mollie erhalten');
+      }
+
       console.log('Payment created, redirecting to:', checkoutUrl);
 
       res.json({
@@ -57,7 +60,10 @@ export async function registerRoutes(router: Router) {
       });
     } catch (error: any) {
       console.error('Error creating payment:', error);
-      res.status(400).json({ message: error.message });
+      res.status(400).json({ 
+        message: "Fehler bei der Zahlungsvorbereitung", 
+        details: error.message 
+      });
     }
   });
 
