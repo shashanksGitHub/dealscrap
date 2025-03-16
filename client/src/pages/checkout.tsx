@@ -1,10 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRoute, Link } from "wouter";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { businessInfoSchema, type BusinessInfo } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeftIcon } from "lucide-react";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { Footer } from "@/components/layout/footer";
+import { useAuth } from "@/hooks/use-auth";
 
 const CREDIT_PACKAGES: Record<string, { credits: number; price: number }> = {
   '100': { credits: 100, price: 100 },
@@ -13,8 +20,28 @@ const CREDIT_PACKAGES: Record<string, { credits: number; price: number }> = {
   '600': { credits: 1000, price: 600 }
 };
 
+const COUNTRIES = [
+  { value: 'DE', label: 'Deutschland' },
+  { value: 'AT', label: 'Österreich' },
+  { value: 'CH', label: 'Schweiz' }
+];
+
 export default function Checkout() {
   const [match, params] = useRoute("/checkout/:amount");
+  const { user } = useAuth();
+  const [showBusinessForm, setShowBusinessForm] = useState(true); 
+
+  const form = useForm<BusinessInfo>({
+    resolver: zodResolver(businessInfoSchema),
+    defaultValues: {
+      companyName: "",
+      vatId: "",
+      street: "",
+      city: "",
+      postalCode: "",
+      country: "DE"
+    }
+  });
 
   useEffect(() => {
     if (!match || !params?.amount || !CREDIT_PACKAGES[params.amount]) {
@@ -28,6 +55,10 @@ export default function Checkout() {
   if (!creditPackage) {
     return null;
   }
+
+  const onSubmit = async (data: BusinessInfo) => {
+    console.log("Business data:", data);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -44,11 +75,11 @@ export default function Checkout() {
             <CardHeader>
               <CardTitle>Kreditpaket kaufen</CardTitle>
               <CardDescription>
-                Zahlungsabwicklung vorübergehend deaktiviert
+                Bitte geben Sie Ihre Unternehmensdaten für die Rechnung ein
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="rounded-lg border border-border p-4 bg-muted/5">
+              <div className="rounded-lg border border-border p-4 bg-muted/5 mb-6">
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="font-medium">Ausgewähltes Paket</h3>
@@ -61,9 +92,112 @@ export default function Checkout() {
                 </div>
               </div>
 
-              <p className="mt-6 text-center text-muted-foreground">
-                Die Zahlungsabwicklung wird derzeit überarbeitet. Bitte versuchen Sie es später erneut.
-              </p>
+              {showBusinessForm && (
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="companyName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Firmenname</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="vatId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>USt-IdNr. (optional)</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="street"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Straße und Hausnummer</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="postalCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>PLZ</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Stadt</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Land</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Wählen Sie ein Land" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {COUNTRIES.map(country => (
+                                <SelectItem key={country.value} value={country.value}>
+                                  {country.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <Button type="submit" className="w-full">
+                      Weiter zur Zahlung
+                    </Button>
+                  </form>
+                </Form>
+              )}
             </CardContent>
           </Card>
 

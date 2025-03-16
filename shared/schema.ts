@@ -11,6 +11,16 @@ export const users = pgTable("users", {
   resetToken: text("reset_token"),
   resetTokenExpiry: timestamp("reset_token_expiry"),
   createdAt: timestamp("created_at").defaultNow(),
+  // Business information
+  companyName: text("company_name"),
+  vatId: text("vat_id"),
+  // Billing address
+  street: text("street"),
+  city: text("city"),
+  postalCode: text("postal_code"),
+  country: text("country"),
+  // Stripe information
+  stripeCustomerId: text("stripe_customer_id"),
 });
 
 export const leads = pgTable("leads", {
@@ -55,9 +65,21 @@ export const insertUserSchema = baseUserSchema.extend({
   path: ["passwordConfirm"],
 });
 
+// Business information schema
+export const businessInfoSchema = z.object({
+  companyName: z.string().min(1, "Firmenname ist erforderlich"),
+  vatId: z.string().optional(),
+  street: z.string().min(1, "Straße ist erforderlich"),
+  city: z.string().min(1, "Stadt ist erforderlich"),
+  postalCode: z.string().min(4, "PLZ muss mindestens 4 Zeichen lang sein"),
+  country: z.string().refine(
+    (val) => ["DE", "AT", "CH"].includes(val),
+    "Land muss Deutschland, Österreich oder Schweiz sein"
+  )
+});
+
 export const insertLeadSchema = createInsertSchema(leads);
 
-// Korrigiertes Blog Post Schema
 export const insertBlogPostSchema = z.object({
   title: z.string().min(5, "Titel muss mindestens 5 Zeichen lang sein"),
   content: z.string().min(50, "Inhalt muss mindestens 50 Zeichen lang sein"),
@@ -69,3 +91,4 @@ export type User = typeof users.$inferSelect;
 export type Lead = typeof leads.$inferSelect;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BusinessInfo = z.infer<typeof businessInfoSchema>;
