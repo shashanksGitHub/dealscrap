@@ -338,7 +338,7 @@ export default function Dashboard() {
                   </datalist>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="leadCount">Anzahl der Leads</Label>
+                  <Label htmlFor="leadCount">Anzahl der Leads (1 Lead = 1 Credit)</Label>
                   <Input
                     id="leadCount"
                     type="number"
@@ -349,9 +349,6 @@ export default function Dashboard() {
                     disabled={scrapeMutation.isPending}
                     className="text-base"
                   />
-                  <p className="text-sm text-muted-foreground">
-                    1 Lead = 1 Credit
-                  </p>
                 </div>
                 <Button
                   onClick={() => scrapeMutation.mutate({ query, location: searchLocation, count: leadCount })}

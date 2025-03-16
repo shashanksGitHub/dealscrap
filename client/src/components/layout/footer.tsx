@@ -1,29 +1,34 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Lock, ShieldCheck, CreditCard, Award, Shield } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export function Footer() {
+  const { user } = useAuth();
+
   return (
     <footer className="bg-background border-t">
       <div className="max-w-[1200px] mx-auto py-16 px-6 lg:px-8">
-        {/* CTA Section */}
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">Bereit, Ihre Lead-Generierung zu revolutionieren?</h2>
-          <p className="text-base md:text-lg text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto">
-            Starten Sie noch heute mit LeadScraper und entdecken Sie, wie einfach moderne Lead-Generierung sein kann.
-          </p>
-          <Link href="/auth">
-            <Button size="lg" className="w-full sm:w-auto rounded-full px-6 md:px-8 py-4 md:py-6 h-auto text-base md:text-lg font-medium transition-all duration-300 hover:scale-105 animate-wiggle">
-              Jetzt kostenloses Konto erstellen
-            </Button>
-          </Link>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Fragen? Kontaktieren Sie unseren Support unter{" "}
-            <a href="mailto:support@leadscraper.de" className="text-primary hover:underline">
-              support@leadscraper.de
-            </a>
-          </p>
-        </div>
+        {/* CTA Section - Only show when not logged in */}
+        {!user && (
+          <div className="max-w-4xl mx-auto text-center mb-16">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6">Bereit, Ihre Lead-Generierung zu revolutionieren?</h2>
+            <p className="text-base md:text-lg text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto">
+              Starten Sie noch heute mit LeadScraper und entdecken Sie, wie einfach moderne Lead-Generierung sein kann.
+            </p>
+            <Link href="/auth">
+              <Button size="lg" className="w-full sm:w-auto rounded-full px-6 md:px-8 py-4 md:py-6 h-auto text-base md:text-lg font-medium transition-all duration-300 hover:scale-105 animate-wiggle">
+                Jetzt kostenloses Konto erstellen
+              </Button>
+            </Link>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Fragen? Kontaktieren Sie unseren Support unter{" "}
+              <a href="mailto:support@leadscraper.de" className="text-primary hover:underline">
+                support@leadscraper.de
+              </a>
+            </p>
+          </div>
+        )}
 
         {/* Trust Icons Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12">
