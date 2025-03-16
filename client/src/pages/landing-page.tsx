@@ -36,7 +36,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6 animate-fade-in-up animation-delay-300">
               <Link href="/auth">
-                <Button size="lg" className="w-full sm:w-auto rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105">
+                <Button size="lg" className="w-full sm:w-auto rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105 animate-[pulse_3s_ease-in-out_infinite] hover:animate-none">
                   Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-4 w-4" />
                 </Button>
               </Link>

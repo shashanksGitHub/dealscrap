@@ -47,9 +47,14 @@ export default function BlogPage() {
         <div className="container mx-auto text-center">
           <BookOpenIcon className="h-12 w-12 text-primary mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Ratgeber für Leadgenerierung</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Erfahren Sie mehr über Lead-Generierung, Vertriebsstrategien und wie Sie Ihr Business erfolgreich ausbauen können
           </p>
+          <Link href="/auth">
+            <Button size="lg" className="rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105 animate-[pulse_3s_ease-in-out_infinite] hover:animate-none">
+              Kostenloses Konto erstellen
+            </Button>
+          </Link>
         </div>
       </section>
 
