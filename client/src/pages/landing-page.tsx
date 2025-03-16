@@ -118,15 +118,24 @@ export default function LandingPage() {
       {/* Features Section - Desktop Optimiert */}
       <section className="bg-muted/5 py-16">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-12"
+          >
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">Einfache Lead-Generierung mit LeadScraper</h2>
             <p className="text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto">
               Unser Tool bietet alles, was Sie für eine erfolgreiche Lead-Generierung benötigen
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1"
+            >
               <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                 <SearchIcon className="h-6 w-6 text-primary" />
               </div>
@@ -134,9 +143,14 @@ export default function LandingPage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Finden Sie genau die Leads, die Sie suchen, mit unseren fortschrittlichen Filteroptionen.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1"
+            >
               <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                 <GlobeIcon className="h-6 w-6 text-primary" />
               </div>
@@ -144,9 +158,14 @@ export default function LandingPage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Zugriff auf Millionen von Unternehmen in Deutschland und weltweit, regelmäßig aktualisiert.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1"
+            >
               <div className="bg-primary/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                 <ShieldCheck className="h-6 w-6 text-primary" />
               </div>
@@ -154,7 +173,7 @@ export default function LandingPage() {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 Alle Daten werden vor dem Export validiert, um höchste Qualitätsstandards zu gewährleisten.
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -281,44 +300,67 @@ export default function LandingPage() {
       {/* Benefits Section */}
       <section id="benefits" className="bg-muted/5 py-16">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto text-center mb-12">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto text-center mb-12"
+          >
             <h2 className="text-2xl lg:text-3xl font-bold mb-4">Warum LeadScraper?</h2>
             <p className="text-base lg:text-lg text-muted-foreground">
               Unser Tool wurde entwickelt, um Ihren Vertriebsprozess zu optimieren
             </p>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, index) => (
-              <div key={index} className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300">
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="group bg-background/50 backdrop-blur-sm p-6 rounded-xl border border-primary/10 hover:border-primary/30 transition-all hover:-translate-y-1 duration-300"
+              >
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="bg-primary/10 p-2 rounded-lg">
+                  <div className="bg-primary/10 p-2 rounded-lg group-hover:scale-110 transition-transform duration-300">
                     {benefit.icon}
                   </div>
                   <h3 className="text-base font-medium">{benefit.title}</h3>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ Section - Desktop Optimiert */}
+      {/* FAQ Section */}
       <section id="faq" className="py-16">
         <div className="max-w-[1200px] mx-auto px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto"
+          >
             <h2 className="text-2xl lg:text-3xl font-bold mb-8 text-center">Häufig gestellte Fragen</h2>
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full space-y-4">
               {faqs.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index + 1}`}>
-                  <AccordionTrigger className="text-base">{faq.question}</AccordionTrigger>
-                  <AccordionContent className="text-sm text-muted-foreground">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <AccordionItem value={`item-${index + 1}`} className="border border-primary/10 rounded-lg overflow-hidden backdrop-blur-sm">
+                    <AccordionTrigger className="text-base px-4 hover:no-underline hover:bg-primary/5">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground px-4 pb-4">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                </motion.div>
               ))}
             </Accordion>
-          </div>
+          </motion.div>
         </div>
       </section>
 
