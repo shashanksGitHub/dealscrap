@@ -1,34 +1,39 @@
 import { useState } from 'react';
 import { PriceCard } from "./price-card";
+import { BusinessInfoModal } from "./business-info-modal";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
+import type { BusinessInfo } from "@shared/schema";
 
 export function PricingSection() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
+  const [showBusinessModal, setShowBusinessModal] = useState(false);
 
-  const handleSelect = async (price: number) => {
+  const handleSelect = (price: number) => {
+    setSelectedPrice(price);
+    setShowBusinessModal(true);
+  };
+
+  const handleSubmitBusinessInfo = async (businessInfo: BusinessInfo) => {
+    if (!selectedPrice) return;
+
     setIsProcessing(true);
     try {
-      console.log('Initiating payment for amount:', price);
+      console.log('Initiating payment for amount:', selectedPrice);
       const response = await apiRequest("POST", "/api/business-info", {
-        amount: price,
-        companyName: user?.companyName || "",
-        vatId: user?.vatId || "",
-        street: user?.street || "",
-        city: user?.city || "",
-        postalCode: user?.postalCode || "",
-        country: user?.country || "DE"
+        ...businessInfo,
+        amount: selectedPrice
       });
 
       const { checkoutUrl } = await response.json();
       console.log('Received checkout URL:', checkoutUrl);
 
       if (checkoutUrl) {
-        // Direkt zum Mollie Checkout weiterleiten
         window.location.href = checkoutUrl;
       } else {
         throw new Error('Keine Checkout-URL erhalten');
@@ -40,8 +45,9 @@ export function PricingSection() {
         description: "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
         variant: "destructive"
       });
-    } finally {
       setIsProcessing(false);
+    } finally {
+      setShowBusinessModal(false); //Added to close modal after processing
     }
   };
 
@@ -83,6 +89,12 @@ export function PricingSection() {
           />
         </div>
 
+        <BusinessInfoModal
+          isOpen={showBusinessModal}
+          onClose={() => setShowBusinessModal(false)}
+          onSubmit={handleSubmitBusinessInfo}
+          isProcessing={isProcessing}
+        />
         {isProcessing && (
           <div className="mt-8 text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto" />

@@ -11,6 +11,8 @@ import { useState } from "react";
 import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2, CreditCard } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { BusinessInfoModal } from "@/components/pricing/business-info-modal";
+import type { BusinessInfo } from "@shared/schema";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -18,6 +20,8 @@ export default function Dashboard() {
   const [query, setQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
+  const [showBusinessModal, setShowBusinessModal] = useState(false);
 
   const { data: leads = [], isLoading: isLeadsLoading } = useQuery<Lead[]>({
     queryKey: ["/api/leads"],
@@ -77,24 +81,29 @@ export default function Dashboard() {
     { id: "1000", credits: 1000, price: 600 },
   ];
 
-  const handlePurchase = async (price: number) => {
+  const handlePurchase = (price: number) => {
+    setSelectedPrice(price);
+    setShowBusinessModal(true);
+  };
+
+  const handleSubmitBusinessInfo = async (businessInfo: BusinessInfo) => {
+    if (!selectedPrice) return;
+
     setIsProcessingPayment(true);
     try {
-      // Direkt Business-Info senden und Mollie Payment erstellen
+      console.log('Initiating payment for amount:', selectedPrice);
       const response = await apiRequest("POST", "/api/business-info", {
-        amount: price,
-        companyName: user?.companyName || "",
-        vatId: user?.vatId || "",
-        street: user?.street || "",
-        city: user?.city || "",
-        postalCode: user?.postalCode || "",
-        country: user?.country || "DE"
+        ...businessInfo,
+        amount: selectedPrice
       });
 
       const { checkoutUrl } = await response.json();
+      console.log('Received checkout URL:', checkoutUrl);
+
       if (checkoutUrl) {
-        // Direkt zum Mollie Checkout weiterleiten
         window.location.href = checkoutUrl;
+      } else {
+        throw new Error('Keine Checkout-URL erhalten');
       }
     } catch (error: any) {
       console.error('Error initiating payment:', error);
@@ -103,7 +112,6 @@ export default function Dashboard() {
         description: "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
         variant: "destructive"
       });
-    } finally {
       setIsProcessingPayment(false);
     }
   };
@@ -282,6 +290,12 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </main>
+      <BusinessInfoModal
+        isOpen={showBusinessModal}
+        onClose={() => setShowBusinessModal(false)}
+        onSubmit={handleSubmitBusinessInfo}
+        isProcessing={isProcessingPayment}
+      />
     </div>
   );
 }
