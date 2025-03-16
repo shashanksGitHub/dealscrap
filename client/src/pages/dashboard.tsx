@@ -8,56 +8,28 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2, CheckCircle2Icon } from "lucide-react";
+import { SearchIcon, DownloadIcon, Loader2, CheckCircle2Icon } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SimpleFooter } from "@/components/layout/simple-footer";
 import { SEO } from "@/components/layout/seo";
 
-const VideoTutorialDialog = ({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) => {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Video Tutorial</DialogTitle>
-        </DialogHeader>
-        <div className="aspect-video rounded-lg overflow-hidden">
-          <iframe
-            src="https://www.loom.com/embed/caafc64aed3a46d1b83262c5e843b7d4?sid=c3c6fcee-4802-4418-bfa8-2b6bde0ef4dc"
-            frameBorder="0"
-            allowFullScreen
-            className="w-full h-full"
-          ></iframe>
-        </div>
-        <p className="mt-6 text-lg text-muted-foreground text-center">
-          In diesem kurzen Video zeige ich Ihnen persönlich, wie Sie mit unserem Tool effizient Business-Leads generieren können.
-        </p>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-
-export default function Dashboard() {
+const Dashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [leadCount, setLeadCount] = useState(1);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [showTutorial, setShowTutorial] = useState(() => {
-    return localStorage.getItem("tutorialWatched") !== "true";
-  });
 
   const { data: searches = [], isLoading: isSearchesLoading } = useQuery({
     queryKey: ["/api/searches"],
@@ -202,10 +174,6 @@ export default function Dashboard() {
     }
   });
 
-  const handleTutorialClose = () => {
-    setShowTutorial(false);
-    localStorage.setItem("tutorialWatched", "true");
-  };
 
   return (
     <>
@@ -214,110 +182,23 @@ export default function Dashboard() {
         noindex={true} 
       />
       <div className="min-h-screen bg-background">
-        <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-12 space-y-16">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold tracking-tight">Lead-Generierung</h1>
-            <Button
-              variant="ghost"
-              onClick={() => setShowTutorial(true)}
-              className="text-muted-foreground hover:text-primary"
-            >
-              <PlayCircleIcon className="w-4 h-4 mr-2" />
-              Anleitung
-            </Button>
-          </div>
-
-          <VideoTutorialDialog open={showTutorial} onOpenChange={setShowTutorial} />
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card>
+        <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-12 space-y-12">
+          {user?.credits === 0 && (
+            <Card className="bg-muted/50">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold tracking-tight">Neue Leads finden</CardTitle>
+                <CardTitle className="text-2xl font-bold tracking-tight text-center">
+                  Wählen Sie Ihr Credit-Paket
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="query">Unternehmensart</Label>
-                    <Input
-                      id="query"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="z.B. Restaurant"
-                      disabled={scrapeMutation.isPending}
-                      className="text-base"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="location">Standort</Label>
-                    <Input
-                      id="location"
-                      value={searchLocation}
-                      onChange={(e) => setSearchLocation(e.target.value)}
-                      placeholder="z.B. Berlin"
-                      disabled={scrapeMutation.isPending}
-                      className="text-base"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="leadCount">Anzahl der Leads</Label>
-                    <Input
-                      id="leadCount"
-                      type="number"
-                      min={1}
-                      max={100}
-                      value={leadCount}
-                      onChange={(e) => setLeadCount(parseInt(e.target.value) || 1)}
-                      disabled={scrapeMutation.isPending}
-                      className="text-base"
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      1 Lead = 1 Credit
-                    </p>
-                  </div>
-                  <Button
-                    onClick={() => scrapeMutation.mutate({ query, location: searchLocation, count: leadCount })}
-                    disabled={scrapeMutation.isPending || !user?.credits}
-                    className="w-full text-base py-6"
-                    size="lg"
-                  >
-                    {scrapeMutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Suche läuft...
-                      </>
-                    ) : (
-                      <>
-                        <SearchIcon className="mr-2 h-5 w-5" />
-                        {leadCount} Lead{leadCount !== 1 ? 's' : ''} finden
-                      </>
-                    )}
-                  </Button>
-                  {user?.credits === 0 ? (
-                    <p className="text-base text-destructive text-center">
-                      Bitte wählen Sie eines der Credit-Pakete
-                    </p>
-                  ) : (
-                    <p className="text-base text-muted-foreground text-center">
-                      Sie haben noch {user?.credits} Credits verfügbar
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold tracking-tight">Credits kaufen</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   {creditPackages.map((pkg) => (
                     <Button
                       key={pkg.id}
                       onClick={() => handlePurchase(pkg.price)}
                       variant="outline"
                       className={cn(
-                        "relative flex flex-col items-center justify-center gap-2 p-6 h-auto min-h-[140px]",
+                        "relative flex flex-col items-center justify-center gap-2 p-6 h-auto min-h-[140px] bg-background",
                         pkg.recommended && "border-2 border-primary shadow-lg"
                       )}
                       disabled={isProcessingPayment}
@@ -340,7 +221,78 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          )}
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl font-bold tracking-tight">Neue Leads finden</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="query">Unternehmensart</Label>
+                  <Input
+                    id="query"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="z.B. Restaurant"
+                    disabled={scrapeMutation.isPending}
+                    className="text-base"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="location">Standort</Label>
+                  <Input
+                    id="location"
+                    value={searchLocation}
+                    onChange={(e) => setSearchLocation(e.target.value)}
+                    placeholder="z.B. Berlin"
+                    disabled={scrapeMutation.isPending}
+                    className="text-base"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="leadCount">Anzahl der Leads</Label>
+                  <Input
+                    id="leadCount"
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={leadCount}
+                    onChange={(e) => setLeadCount(parseInt(e.target.value) || 1)}
+                    disabled={scrapeMutation.isPending}
+                    className="text-base"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    1 Lead = 1 Credit
+                  </p>
+                </div>
+                <Button
+                  onClick={() => scrapeMutation.mutate({ query, location: searchLocation, count: leadCount })}
+                  disabled={scrapeMutation.isPending || !user?.credits}
+                  className="w-full text-base py-6"
+                  size="lg"
+                >
+                  {scrapeMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Suche läuft...
+                    </>
+                  ) : (
+                    <>
+                      <SearchIcon className="mr-2 h-5 w-5" />
+                      {leadCount} Lead{leadCount !== 1 ? 's' : ''} finden
+                    </>
+                  )}
+                </Button>
+                {user?.credits > 0 && (
+                  <p className="text-base text-muted-foreground text-center">
+                    Sie haben noch {user?.credits} Credits verfügbar
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
@@ -446,4 +398,6 @@ export default function Dashboard() {
       </div>
     </>
   );
-}
+};
+
+export default Dashboard;

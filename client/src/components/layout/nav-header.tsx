@@ -1,13 +1,18 @@
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, PlayCircleIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { CircleProgress } from "@/components/ui/circle-progress";
+import { useState } from "react";
+import { VideoTutorialDialog } from "@/components/ui/video-tutorial-dialog";
 
 export function NavHeader() {
   const { user, logout } = useAuth();
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return localStorage.getItem("tutorialWatched") !== "true";
+  });
 
   // Fetch fresh user data every 5 seconds
   const { data: freshUserData } = useQuery({
@@ -24,9 +29,6 @@ export function NavHeader() {
 
   // Use the latest user data from the query
   const currentUser = freshUserData || user;
-
-  // Log credit updates
-  console.log('Current user credits:', currentUser?.credits);
 
   return (
     <header className="bg-background border-b">
@@ -49,14 +51,21 @@ export function NavHeader() {
               )}
               {currentUser ? (
                 <div className="flex items-center gap-4">
-                  <CircleProgress 
-                    value={currentUser.credits}
-                    max={1000}
-                    size="md"
-                    showLabel
-                    showMax={false}
-                    className={currentUser.credits === 0 ? 'text-destructive' : 'text-primary'}
-                  />
+                  <div className="flex items-center px-3 py-1.5 bg-muted rounded-full">
+                    <span className="text-sm font-medium mr-2">Credits:</span>
+                    <span className={`text-lg font-bold ${currentUser.credits === 0 ? 'text-destructive' : 'text-primary'}`}>
+                      {currentUser.credits}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowTutorial(true)}
+                    className="text-muted-foreground hover:text-primary"
+                  >
+                    <PlayCircleIcon className="w-4 h-4 mr-2" />
+                    Anleitung
+                  </Button>
                   <Button variant="outline" size="sm" onClick={logout}>
                     <LogOutIcon className="h-4 w-4 mr-2" />
                     Logout
@@ -73,6 +82,7 @@ export function NavHeader() {
           </nav>
         </div>
       </div>
+      <VideoTutorialDialog open={showTutorial} onOpenChange={setShowTutorial} />
     </header>
   );
 }
