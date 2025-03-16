@@ -11,22 +11,33 @@ import { useState } from "react";
 import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2 } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { de } from "date-fns/locale";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
-  const [leadCount, setLeadCount] = useState(1); 
+  const [leadCount, setLeadCount] = useState(1);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-  const { data: leads = [], isLoading: isLeadsLoading } = useQuery<Lead[]>({
+  // Lade alle Suchen des Users
+  const { data: searches = [], isLoading: isSearchesLoading } = useQuery({
+    queryKey: ["/api/searches"],
+    initialData: [],
+  });
+
+  // Lade Leads für die ausgewählte Suche
+  const { data: leads = [], isLoading: isLeadsLoading } = useQuery({
     queryKey: ["/api/leads"],
     initialData: [],
-    refetchOnWindowFocus: false,
-    // Stellen Sie sicher, dass die Leads nach der Scraping-Operation neu geladen werden
-    refetchInterval: 5000,
-    staleTime: 0 // Consider data immediately stale
   });
 
   const scrapeMutation = useMutation({
@@ -48,6 +59,7 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/searches"] }); //Invalidate searches after scrape
       toast({
         title: "Erfolgreich",
         description: "Leads erfolgreich gefunden",
@@ -62,10 +74,11 @@ export default function Dashboard() {
     },
   });
 
-  const handleExport = () => {
-    if (!leads.length) return;
+  const handleExport = (searchId: number) => {
+    const searchLeads = leads.filter(lead => lead.searchId === searchId);
+    if (!searchLeads.length) return;
 
-    const csv = leads.map((lead: Lead) =>
+    const csv = searchLeads.map((lead: Lead) =>
       Object.values(lead).join(",")
     ).join("\n");
 
@@ -73,7 +86,7 @@ export default function Dashboard() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "leads.csv";
+    a.download = `leads-${searchId}.csv`;
     a.click();
   };
 
@@ -253,52 +266,76 @@ export default function Dashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-2xl font-bold tracking-tight">Ihre Leads</CardTitle>
-            <Button
-              variant="outline"
-              onClick={handleExport}
-              disabled={isLeadsLoading || leads.length === 0}
-              size="lg"
-            >
-              <DownloadIcon className="w-5 h-5 mr-2" />
-              Als CSV exportieren
-            </Button>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto rounded-md border">
-              {isLeadsLoading ? (
-                <div className="p-16 text-center">
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-                  <p className="text-lg text-muted-foreground">Leads werden geladen...</p>
-                </div>
-              ) : leads.length === 0 ? (
-                <div className="p-16 text-center">
-                  <p className="text-lg text-muted-foreground">Keine Leads gefunden</p>
-                </div>
-              ) : (
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="p-4 text-left text-base font-medium">Firmenname</th>
-                      <th className="p-4 text-left text-base font-medium hidden md:table-cell">Adresse</th>
-                      <th className="p-4 text-left text-base font-medium">Telefon</th>
-                      <th className="p-4 text-left text-base font-medium hidden md:table-cell">E-Mail</th>
-                      <th className="p-4 text-left text-base font-medium hidden lg:table-cell">Website</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leads.map((lead: Lead) => (
-                      <tr key={lead.id} className="border-b">
-                        <td className="p-4 text-base">{lead.businessName}</td>
-                        <td className="p-4 text-base hidden md:table-cell">{lead.address}</td>
-                        <td className="p-4 text-base">{lead.phone}</td>
-                        <td className="p-4 text-base hidden md:table-cell">{lead.email}</td>
-                        <td className="p-4 text-base hidden lg:table-cell">{lead.website}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
+            {isSearchesLoading ? (
+              <div className="p-16 text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                <p className="text-lg text-muted-foreground">Suchen werden geladen...</p>
+              </div>
+            ) : searches.length === 0 ? (
+              <div className="p-16 text-center">
+                <p className="text-lg text-muted-foreground">Keine Suchen gefunden</p>
+              </div>
+            ) : (
+              <Accordion type="single" collapsible className="w-full">
+                {searches.map((search: any) => (
+                  <AccordionItem key={search.id} value={search.id.toString()}>
+                    <AccordionTrigger className="hover:no-underline">
+                      <div className="flex items-center justify-between w-full pr-4">
+                        <div className="flex items-center gap-4">
+                          <div>
+                            <h3 className="font-semibold">{search.query} in {search.location}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(search.createdAt), "dd. MMMM yyyy, HH:mm 'Uhr'", { locale: de })}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant="secondary">{search.count} Leads</Badge>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="pt-4 pb-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => handleExport(search.id)}
+                          className="mb-4"
+                        >
+                          <DownloadIcon className="w-4 h-4 mr-2" />
+                          Als CSV exportieren
+                        </Button>
+                      </div>
+                      <div className="overflow-x-auto rounded-md border">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b bg-muted/50">
+                              <th className="p-4 text-left text-base font-medium">Firmenname</th>
+                              <th className="p-4 text-left text-base font-medium hidden md:table-cell">Adresse</th>
+                              <th className="p-4 text-left text-base font-medium">Telefon</th>
+                              <th className="p-4 text-left text-base font-medium hidden md:table-cell">E-Mail</th>
+                              <th className="p-4 text-left text-base font-medium hidden lg:table-cell">Website</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {leads
+                              .filter((lead: Lead) => lead.searchId === search.id)
+                              .map((lead: Lead) => (
+                                <tr key={lead.id} className="border-b">
+                                  <td className="p-4 text-base">{lead.businessName}</td>
+                                  <td className="p-4 text-base hidden md:table-cell">{lead.address}</td>
+                                  <td className="p-4 text-base">{lead.phone}</td>
+                                  <td className="p-4 text-base hidden md:table-cell">{lead.email}</td>
+                                  <td className="p-4 text-base hidden lg:table-cell">{lead.website}</td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            )}
           </CardContent>
         </Card>
       </main>

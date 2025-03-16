@@ -23,9 +23,20 @@ export const users = pgTable("users", {
   stripeCustomerId: text("stripe_customer_id"),
 });
 
+// Neue Tabelle für die Suchen
+export const searches = pgTable("searches", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  query: text("query").notNull(),
+  location: text("location").notNull(),
+  count: integer("count").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const leads = pgTable("leads", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
+  searchId: integer("search_id"), // Machen wir nullable
   businessName: text("business_name").notNull(),
   address: text("address").notNull(),
   phone: text("phone"),
@@ -92,3 +103,8 @@ export type Lead = typeof leads.$inferSelect;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BusinessInfo = z.infer<typeof businessInfoSchema>;
+// Neue Types für die Suchen
+export type Search = typeof searches.$inferSelect;
+export type InsertSearch = typeof searches.$inferInsert;
+
+export type InsertLead = typeof leads.$inferInsert;

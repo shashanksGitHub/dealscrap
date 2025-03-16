@@ -3,6 +3,9 @@ import { insertLeadSchema, insertBlogPostSchema } from "../shared/schema";
 import { storage } from "./storage";
 import { createPayment, handleWebhookEvent } from "./services/mollie";
 import { apifyClient } from "./services/apify";
+import { db } from "./db";
+import { eq, desc, and } from "drizzle-orm";
+import { searches, leads } from "@shared/schema";
 
 export async function registerRoutes(router: Router) {
   // Get user info with additional verification
@@ -145,6 +148,36 @@ export async function registerRoutes(router: Router) {
     }
   });
 
+  router.get("/searches", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
+
+    try {
+      const searches = await db.select().from(searches)
+        .where(eq(searches.userId, req.user.id))
+        .orderBy(desc(searches.createdAt));
+      res.json(searches);
+    } catch (error) {
+      console.error('Error fetching searches:', error);
+      res.status(500).json({ message: "Fehler beim Abrufen der Suchen" });
+    }
+  });
+
+  router.get("/searches/:id/leads", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
+
+    try {
+      const searchLeads = await db.select().from(leads)
+        .where(and(
+          eq(leads.userId, req.user.id),
+          eq(leads.searchId, parseInt(req.params.id))
+        ));
+      res.json(searchLeads);
+    } catch (error) {
+      console.error('Error fetching leads for search:', error);
+      res.status(500).json({ message: "Fehler beim Abrufen der Leads" });
+    }
+  });
+
   router.post("/scrape", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
     const { query, location, count } = req.body;
@@ -153,7 +186,6 @@ export async function registerRoutes(router: Router) {
       return res.status(400).json({ message: "Query, location, and count are required" });
     }
 
-    // Validiere die Anzahl der Leads
     if (count < 1 || count > 100) {
       return res.status(400).json({ message: "Lead count must be between 1 and 100" });
     }
@@ -164,9 +196,17 @@ export async function registerRoutes(router: Router) {
     }
 
     try {
+      const [search] = await db.insert(searches)
+        .values({
+          userId: req.user.id,
+          query,
+          location,
+          count
+        })
+        .returning();
+
       console.log(`Starting scrape for ${count} leads with query: ${query}, location: ${location}`);
 
-      // Konfiguriere den Google Places Scraper
       const run = await apifyClient.actor("nwua9Gu5YrADL7ZDj").call({
         searchStringsArray: [query],
         locationQuery: `${location}, Deutschland`,
@@ -182,21 +222,18 @@ export async function registerRoutes(router: Router) {
         skipClosedPlaces: false
       });
 
-      // Warte auf die Ergebnisse und hole die Items aus dem Dataset
       const { items } = await apifyClient.dataset(run.defaultDatasetId).listItems();
       console.log(`Received ${items.length} leads from Apify`);
 
-      // Reduziere die Credits
       await storage.addCredits(req.user.id, -count);
 
-      // Debug-Ausgabe für die Apify-Daten
       console.log('Raw Apify data:', JSON.stringify(items, null, 2));
 
-      // Speichere die Leads in der Datenbank
       const savedLeads = await Promise.all(items.map(async (data: any) => {
         try {
           const leadData = {
             userId: req.user.id,
+            searchId: search.id, 
             businessName: data.title || data.name || "",
             address: data.address || "",
             phone: data.phone || data.phoneNumber || "",
@@ -220,14 +257,13 @@ export async function registerRoutes(router: Router) {
       }));
 
       console.log(`Successfully saved ${savedLeads.length} leads to database`);
-      res.json(savedLeads);
+      res.json({ search, leads: savedLeads });
     } catch (error: any) {
       console.error('Error during scraping:', error);
       res.status(500).json({ 
         message: "Failed to scrape data", 
-        error: (error as Error).message 
+        error: error.message 
       });
     }
   });
-
 }
