@@ -21,10 +21,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { SimpleFooter } from "@/components/layout/simple-footer";
 import { SEO } from "@/components/layout/seo";
+import { Footer } from "@/components/layout/footer";
 
-const Dashboard = () => {
+export default function Dashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
@@ -112,7 +112,7 @@ const Dashboard = () => {
             >
               <CheckCircle2Icon className="w-5 h-5 text-green-500" />
             </motion.div>
-            <span>Leads erfolgreich gefunden! 🎉</span>
+            Leads erfolgreich gefunden! 🎉
           </div>
         ),
         description: (
@@ -194,7 +194,7 @@ const Dashboard = () => {
               >
                 <Sparkles className="w-5 h-5 text-primary" />
               </motion.div>
-              <span>Credits erfolgreich aufgeladen! ⭐</span>
+              Credits erfolgreich aufgeladen! ⭐
             </div>
           ),
           description: (
@@ -490,10 +490,8 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </main>
-        <SimpleFooter />
+        <Footer />
       </div>
     </>
   );
-};
-
-export default Dashboard;
+}
