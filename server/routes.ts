@@ -166,19 +166,17 @@ export async function registerRoutes(router: Router) {
     try {
       console.log(`Starting scrape for ${count} leads with query: ${query}, location: ${location}`);
 
-      // Aktualisierter Actor-Name und Parameter
-      const run = await apifyClient.actor("tugkan/google-places-scraper").call({
-        startUrls: [],
+      // Konfiguriere den Compass Google Places Crawler
+      const run = await apifyClient.actor("compass/crawler-google-places").call({
         searchStrings: [`${query} in ${location}`],
-        maxCrawledPlaces: count,
+        maxPlaces: count,
         language: "de",
-        maxImages: 0,
+        extractContacts: true,
+        extractOpeningHours: false,
+        extractPeopleAlsoSearch: false,
+        extractPhotos: false,
+        extractReviews: false,
         maxReviews: 0,
-        maxCrawledReviews: 0,
-        exportPlaceUrls: false,
-        includeHistogram: false,
-        includeOpeningHours: false,
-        includePeopleAlsoSearch: false,
         onlyDataFromSearchPages: true,
         allPlacesNoSearchAction: false
       });
@@ -194,9 +192,9 @@ export async function registerRoutes(router: Router) {
       const savedLeads = await Promise.all(items.map(async (data: any) => {
         return await storage.createLead({
           userId: req.user.id,
-          businessName: data.title || "",
+          businessName: data.name || "",
           address: data.address || "",
-          phone: data.phone || "",
+          phone: data.phoneNumber || "",
           email: data.email || "",
           website: data.website || "",
           category: query,
@@ -217,4 +215,5 @@ export async function registerRoutes(router: Router) {
       });
     }
   });
+
 }
