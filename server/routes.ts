@@ -167,7 +167,7 @@ export async function registerRoutes(router: Router) {
       console.log(`Starting scrape for ${count} leads with query: ${query}, location: ${location}`);
 
       // Konfiguriere den Compass Google Places Crawler
-      const run = await apifyClient.actor("compass/crawler-google-places").call({
+      const actorCall = await apifyClient.actor("compass/crawler-google-places").call({
         searchStringsArray: [query],
         locationQuery: `${location}, Deutschland`,
         language: "de",
@@ -183,16 +183,20 @@ export async function registerRoutes(router: Router) {
       });
 
       // Warte auf die Ergebnisse
-      const { items } = await run.dataset().listItems();
+      const dataset = await apifyClient.dataset(actorCall.defaultDatasetId);
+      const { items } = await dataset.listItems();
       console.log(`Received ${items.length} leads from Apify`);
 
       // Reduziere die Credits
       await storage.addCredits(req.user.id, -count);
 
+      // Debug-Ausgabe für die Apify-Daten
+      console.log('Raw Apify data:', JSON.stringify(items, null, 2));
+
       // Speichere die Leads in der Datenbank
       const savedLeads = await Promise.all(items.map(async (data: any) => {
         try {
-          const lead = await storage.createLead({
+          const leadData = {
             userId: req.user.id,
             businessName: data.title || data.name || "",
             address: data.address || "",
@@ -205,7 +209,9 @@ export async function registerRoutes(router: Router) {
               totalScore: data.reviewsCount,
               placeId: data.placeId
             }
-          });
+          };
+          console.log('Trying to save lead with data:', leadData);
+          const lead = await storage.createLead(leadData);
           console.log('Successfully saved lead:', lead);
           return lead;
         } catch (error) {

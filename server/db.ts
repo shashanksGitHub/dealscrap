@@ -28,9 +28,16 @@ pool.on('error', (err) => {
 
 export const db = drizzle({ client: pool, schema });
 
-// Test the connection
+// Test the connection and log the result
 pool.connect()
-  .then(() => console.log('Database connected successfully'))
+  .then(() => {
+    console.log('Database connected successfully');
+    // Test query to verify connection
+    return pool.query('SELECT NOW()');
+  })
+  .then(result => {
+    console.log('Database query successful:', result.rows[0]);
+  })
   .catch(err => {
     console.error('Database connection error:', err);
     process.exit(-1);
