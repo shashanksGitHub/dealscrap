@@ -3,15 +3,26 @@ import { PriceCard } from "./price-card";
 import { MollieCheckoutModal } from "./mollie-checkout-modal";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 export function PricingSection() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
   const handleSelect = async (price: number) => {
+    if (!user) {
+      toast({
+        title: "Login erforderlich",
+        description: "Bitte melden Sie sich an, um Credits zu kaufen.",
+      });
+      navigate("/auth");
+      return;
+    }
+
     try {
       setIsProcessing(true);
       const response = await fetch('/api/create-payment', {
@@ -33,8 +44,12 @@ export function PricingSection() {
         throw new Error(data.message);
       }
 
-      setSelectedPrice(price);
-      setShowCheckoutModal(true);
+      const data = await response.json();
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        throw new Error('Keine Checkout-URL erhalten');
+      }
     } catch (error: any) {
       toast({
         title: "Fehler",

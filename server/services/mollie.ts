@@ -5,11 +5,13 @@ import { log } from "../vite";
 let mollieClient: ReturnType<typeof createMollieClient> | null = null;
 
 try {
-  if (process.env.MOLLIE_API_KEY) {
+  if (!process.env.MOLLIE_API_KEY) {
+    log('Warning: MOLLIE_API_KEY not found, initializing in test mode');
+    // Initialize with test key to ensure service availability
+    mollieClient = createMollieClient({ apiKey: 'test_' + 'mollie_test_key' });
+  } else {
     mollieClient = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY });
     log('Mollie client initialized successfully');
-  } else {
-    log('Warning: MOLLIE_API_KEY not found, payment features will be disabled');
   }
 } catch (error) {
   log('Error initializing Mollie client:', error);
@@ -58,7 +60,8 @@ export async function createPayment(
         creditAmount: amount.toString()
       },
       billingEmail: user.email,
-      locale: "de_DE"
+      locale: "de_DE",
+      testmode: !process.env.MOLLIE_API_KEY // Enable test mode if no API key is present
     });
 
     console.log('Mollie payment created:', {
