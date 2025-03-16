@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
-import { SearchIcon, DownloadIcon, Loader2, CheckCircle2Icon, Star, Sparkles } from "lucide-react";
+import { SearchIcon, DownloadIcon, Loader2, CheckCircle2Icon, Sparkles } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -60,7 +60,7 @@ const Dashboard = () => {
     },
   });
 
-  const { data: leads = [], isLoading: isLeadsLoading } = useQuery({
+  const { data: leads = [] } = useQuery({
     queryKey: ["/api/leads"],
     initialData: [],
   });
@@ -145,7 +145,7 @@ const Dashboard = () => {
   });
 
   const handleExport = (searchId: number) => {
-    const searchLeads = leads.filter(lead => lead.searchId === searchId);
+    const searchLeads = leads.filter((lead: Lead) => lead.searchId === searchId);
     if (!searchLeads.length) return;
 
     const csv = searchLeads.map((lead: Lead) =>
@@ -243,7 +243,6 @@ const Dashboard = () => {
       queryClient.invalidateQueries({ queryKey: ["/api/searches"] });
     }
   });
-
 
   return (
     <>
