@@ -171,7 +171,7 @@ export async function registerRoutes(router: Router) {
         searchStringsArray: [query],
         locationQuery: `${location}, Deutschland`,
         language: "de",
-        maxPlaces: count,
+        maxCrawledPlacesPerSearch: count,
         includeWebResults: false,
         maxQuestions: 0,
         onlyDataFromSearchPage: false,
