@@ -166,8 +166,8 @@ export async function registerRoutes(router: Router) {
     try {
       console.log(`Starting scrape for ${count} leads with query: ${query}, location: ${location}`);
 
-      // Konfiguriere den Compass Google Places Crawler
-      const actorCall = await apifyClient.actor("compass/crawler-google-places").call({
+      // Konfiguriere den Google Places Scraper
+      const run = await apifyClient.actor("nwua9Gu5YrADL7ZDj").call({
         searchStringsArray: [query],
         locationQuery: `${location}, Deutschland`,
         language: "de",
@@ -182,9 +182,8 @@ export async function registerRoutes(router: Router) {
         skipClosedPlaces: false
       });
 
-      // Warte auf die Ergebnisse
-      const dataset = await apifyClient.dataset(actorCall.defaultDatasetId);
-      const { items } = await dataset.listItems();
+      // Warte auf die Ergebnisse und hole die Items aus dem Dataset
+      const { items } = await apifyClient.dataset(run.defaultDatasetId).listItems();
       console.log(`Received ${items.length} leads from Apify`);
 
       // Reduziere die Credits
