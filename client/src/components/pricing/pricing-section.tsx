@@ -43,7 +43,7 @@ export function PricingSection() {
 
       if (!response.ok) {
         const data = await response.json();
-        if (data.message.includes('Payment service is not available')) {
+        if (data.message?.includes('Payment service is not available')) {
           toast({
             title: "Service nicht verfügbar",
             description: "Das Zahlungssystem ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.",
@@ -51,7 +51,7 @@ export function PricingSection() {
           });
           return;
         }
-        throw new Error(data.message);
+        throw new Error(data.message || 'Ein Fehler ist aufgetreten');
       }
 
       const data = await response.json();
