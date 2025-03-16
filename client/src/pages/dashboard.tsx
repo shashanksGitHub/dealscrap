@@ -23,7 +23,9 @@ export default function Dashboard() {
   const { data: leads = [], isLoading: isLeadsLoading } = useQuery<Lead[]>({
     queryKey: ["/api/leads"],
     initialData: [],
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    // Stellen Sie sicher, dass die Leads nach der Scraping-Operation neu geladen werden
+    refetchInterval: 5000
   });
 
   const scrapeMutation = useMutation({

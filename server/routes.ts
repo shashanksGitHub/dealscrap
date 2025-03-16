@@ -169,7 +169,7 @@ export async function registerRoutes(router: Router) {
       // Konfiguriere den Compass Google Places Crawler
       const run = await apifyClient.actor("compass/crawler-google-places").call({
         searchStringsArray: [query],
-        locationQuery: location,
+        locationQuery: `${location}, Deutschland`,
         language: "de",
         maxPlaces: count,
         includeWebResults: false,
@@ -191,7 +191,7 @@ export async function registerRoutes(router: Router) {
 
       // Speichere die Leads in der Datenbank
       const savedLeads = await Promise.all(items.map(async (data: any) => {
-        return await storage.createLead({
+        const lead = await storage.createLead({
           userId: req.user.id,
           businessName: data.name || "",
           address: data.address || "",
@@ -205,8 +205,11 @@ export async function registerRoutes(router: Router) {
             placeId: data.placeId
           }
         });
+        console.log('Saved lead:', lead);
+        return lead;
       }));
 
+      console.log('All leads saved, sending response');
       res.json(savedLeads);
     } catch (error) {
       console.error('Error during scraping:', error);
