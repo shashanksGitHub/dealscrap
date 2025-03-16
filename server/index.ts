@@ -139,7 +139,7 @@ async function startServer() {
     if (isProduction) {
       log("Setting up production static file serving...");
       // Updated path to serve static files from the correct build directory
-      const publicDir = path.resolve(__dirname, '../dist/public');
+      const publicDir = path.resolve(__dirname, 'public');
       log(`Serving static files from: ${publicDir}`);
 
       // Serve static files with proper MIME types
