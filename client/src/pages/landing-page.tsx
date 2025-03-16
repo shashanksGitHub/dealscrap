@@ -1,7 +1,6 @@
 import { ArrowRightIcon } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
 import CookieBanner from "@/components/cookie-banner";
 import { Footer } from "@/components/layout/footer";
 import { ActivityBubble } from "@/components/activity-bubble";
