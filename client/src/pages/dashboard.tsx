@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
-import { SearchIcon, DownloadIcon, Loader2, CheckCircle2Icon } from "lucide-react";
+import { SearchIcon, DownloadIcon, Loader2, CheckCircle2Icon, Star, Sparkles } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -168,7 +168,46 @@ const Dashboard = () => {
       console.log('Payment response:', data);
 
       if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
+        // Show success animation before redirect
+        toast({
+          title: (
+            <div className="flex items-center gap-2">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20
+                }}
+              >
+                <Sparkles className="w-5 h-5 text-primary" />
+              </motion.div>
+              <span>Credits erfolgreich aufgeladen! ⭐</span>
+            </div>
+          ),
+          description: (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-2"
+            >
+              <p>
+                <span className="font-medium">Vielen Dank für Ihren Einkauf!</span>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Sie werden jetzt zur sicheren Zahlungsabwicklung weitergeleitet.
+              </p>
+            </motion.div>
+          ),
+          duration: 4000,
+        });
+
+        // Short delay before redirect to show the animation
+        setTimeout(() => {
+          window.location.href = data.checkoutUrl;
+        }, 1500);
       } else {
         throw new Error('Keine Checkout-URL erhalten');
       }
