@@ -13,7 +13,6 @@ export interface IStorage {
   clearResetToken(userId: number): Promise<void>;
   updatePassword(userId: number, hashedPassword: string): Promise<void>;
   addCredits(userId: number, amount: number): Promise<User>;
-  setStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User>;
   createLead(lead: Omit<Lead, "id" | "createdAt">): Promise<Lead>;
   getLeadsByUserId(userId: number): Promise<Lead[]>;
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
@@ -73,8 +72,7 @@ export class MemStorage implements IStorage {
       isActive: true,
       createdAt: new Date(),
       resetToken: null,
-      resetTokenExpiry: null,
-      stripeCustomerId: ''
+      resetTokenExpiry: null
     };
     console.log(`Creating new user with ID ${id}:`, user);
     this.users.set(id, user);
@@ -125,21 +123,17 @@ export class MemStorage implements IStorage {
       throw new Error("User not found");
     }
 
-    // Ensure credits is initialized
     const currentCredits = typeof user.credits === 'number' ? user.credits : 0;
     console.log(`Current credits for user ${userId}: ${currentCredits}`);
 
-    // Create a new user object with updated credits
     const updatedUser: User = {
       ...user,
       credits: currentCredits + amount
     };
 
-    // Store the updated user
     this.users.set(userId, updatedUser);
     console.log(`Updated credits for user ${userId} to ${updatedUser.credits}`);
 
-    // Verify the update was successful
     const verifiedUser = await this.getUser(userId);
     if (!verifiedUser || verifiedUser.credits !== updatedUser.credits) {
       console.error(`Failed to verify credit update for user ${userId}`);
@@ -147,18 +141,6 @@ export class MemStorage implements IStorage {
     }
 
     console.log(`Successfully verified credit update for user ${userId}`);
-    return updatedUser;
-  }
-
-  async setStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User> {
-    const user = await this.getUser(userId);
-    if (!user) throw new Error("User not found");
-
-    const updatedUser = {
-      ...user,
-      stripeCustomerId
-    };
-    this.users.set(userId, updatedUser);
     return updatedUser;
   }
 

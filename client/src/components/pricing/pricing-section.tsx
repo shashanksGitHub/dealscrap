@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 export function PricingSection() {
   const [, setLocation] = useLocation();
 
-  const handleSelect = (credits: number, price: number) => {
+  const handleSelect = (price: number) => {
     setLocation(`/checkout/${price}`);
   };
 
@@ -22,23 +22,23 @@ export function PricingSection() {
           <PriceCard
             credits={100}
             price={100}
-            onSelect={() => handleSelect(100, 100)}
+            onSelect={() => handleSelect(100)}
           />
           <PriceCard
             credits={250}
             price={200}
-            onSelect={() => handleSelect(250, 200)}
+            onSelect={() => handleSelect(200)}
           />
           <PriceCard
             credits={500}
             price={350}
             isRecommended
-            onSelect={() => handleSelect(500, 350)}
+            onSelect={() => handleSelect(350)}
           />
           <PriceCard
             credits={1000}
             price={600}
-            onSelect={() => handleSelect(1000, 600)}
+            onSelect={() => handleSelect(600)}
           />
         </div>
       </div>

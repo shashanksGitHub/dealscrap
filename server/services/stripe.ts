@@ -1,10 +1,2 @@
-// Placeholder for future Stripe integration
-export async function createPayment(userId: number, packageId: string) {
-  console.log("Payment creation disabled");
-  return { url: "/dashboard" };
-}
-
-export async function handleWebhook(event: any) {
-  console.log("Webhook handling disabled");
-  return null;
-}
+// This file is intentionally left empty as we remove Stripe integration
+// It will be reimplemented later with a fresh approach

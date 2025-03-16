@@ -11,7 +11,6 @@ export const users = pgTable("users", {
   resetToken: text("reset_token"),
   resetTokenExpiry: timestamp("reset_token_expiry"),
   createdAt: timestamp("created_at").defaultNow(),
-  stripeCustomerId: text("stripe_customer_id"),
 });
 
 export const leads = pgTable("leads", {

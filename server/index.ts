@@ -11,22 +11,17 @@ import fs from 'fs';
 const app = express();
 
 // Basic middleware
-app.use(express.json({
-  verify: (req, res, buf) => {
-    // Raw body needed for Stripe webhook verification
-    (req as any).rawBody = buf;
-  }
-}));
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Enhanced Security headers including CSP for Stripe and static assets
+// Enhanced Security headers
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
-    "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
-    "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
-    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app wss://*.replit.dev wss://*.replit.app; " +
+    "default-src 'self' *.replit.dev *.replit.app; " +
+    "frame-src 'self' *.replit.dev *.replit.app; " +
+    "script-src 'self' 'unsafe-inline' *.replit.dev *.replit.app; " +
+    "connect-src 'self' *.replit.dev *.replit.app wss://*.replit.dev wss://*.replit.app; " +
     "style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: https: http:; " +
     "font-src 'self' data:;"
@@ -62,7 +57,7 @@ app.use((req, res, next) => {
   }
 
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, stripe-signature");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   res.header("Access-Control-Allow-Credentials", "true");
 
   if (req.method === "OPTIONS") {
@@ -126,12 +121,6 @@ async function startServer() {
 
     // Mount API router with explicit content type
     app.use('/api', (req, res, next) => {
-      // Special handling for Stripe webhooks
-      if (req.path === '/stripe-webhook') {
-        res.setHeader('Content-Type', 'application/json');
-        return next();
-      }
-      // Force JSON content type for other API routes
       res.setHeader('Content-Type', 'application/json');
       log(`Processing API request: ${req.method} ${req.path}`);
       next();
@@ -139,7 +128,6 @@ async function startServer() {
 
     if (isProduction) {
       log("Setting up production static file serving...");
-      // Updated path to serve static files from the correct build directory
       const publicDir = path.resolve(__dirname, '../dist/public');
       log(`Serving static files from: ${publicDir}`);
       log(`Production environment detected:
@@ -161,17 +149,14 @@ BUILD_DIR: ${publicDir}`);
 
       // Serve static files with proper MIME types
       app.use(express.static(publicDir, {
-        index: false, // Disable directory indexing
-        extensions: ['html', 'htm'], // Try these extensions for extensionless URLs
+        index: false,
+        extensions: ['html', 'htm'],
         setHeaders: (res, path) => {
-          // Set proper caching headers
           if (path.endsWith('.html')) {
             res.setHeader('Cache-Control', 'no-cache');
           } else {
-            // Cache static assets for 1 year
             res.setHeader('Cache-Control', 'public, max-age=31536000');
           }
-          // Log static file requests in production
           log(`Serving static file: ${path}`);
         }
       }));
@@ -208,7 +193,6 @@ BUILD_DIR: ${publicDir}`);
         log(`Error: Port ${port} is already in use`);
       } else {
         log(`Server error: ${error.message}`);
-        // Attempt recovery for server errors
         await recoveryService.handleDeploymentError(error);
       }
       process.exit(1);
