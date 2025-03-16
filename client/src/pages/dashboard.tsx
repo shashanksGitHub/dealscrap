@@ -17,6 +17,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
+  const [leadCount, setLeadCount] = useState(1); 
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const { data: leads = [], isLoading: isLeadsLoading } = useQuery<Lead[]>({
@@ -26,14 +27,22 @@ export default function Dashboard() {
   });
 
   const scrapeMutation = useMutation({
-    mutationFn: async (data: { query: string; location: string }) => {
+    mutationFn: async (data: { query: string; location: string; count: number }) => {
       if (!data.query.trim() || !data.location.trim()) {
         throw new Error("Suchbegriff und Standort dürfen nicht leer sein");
+      }
+
+      if (data.count < 1 || data.count > 100) {
+        throw new Error("Bitte wählen Sie zwischen 1 und 100 Leads");
       }
 
       const locationRegex = /^[a-zA-Z\s-]+$/;
       if (!locationRegex.test(data.location)) {
         throw new Error("Ungültiges Standortformat");
+      }
+
+      if (user && user.credits < data.count) {
+        throw new Error(`Sie benötigen ${data.count} Credits für diese Suche. Bitte kaufen Sie weitere Credits.`);
       }
 
       const res = await apiRequest("POST", "/api/scrape", data);
@@ -43,7 +52,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
       toast({
         title: "Erfolgreich",
-        description: "Lead erfolgreich gefunden",
+        description: "Leads erfolgreich gefunden",
       });
     },
     onError: (error: Error) => {
@@ -108,7 +117,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-12 space-y-16">
-        {/* Tutorial Video */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl font-bold tracking-tight">
@@ -132,7 +140,6 @@ export default function Dashboard() {
         </Card>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Lead Search */}
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl font-bold tracking-tight">Neue Leads finden</CardTitle>
@@ -161,9 +168,25 @@ export default function Dashboard() {
                     className="text-base"
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="leadCount">Anzahl der Leads</Label>
+                  <Input
+                    id="leadCount"
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={leadCount}
+                    onChange={(e) => setLeadCount(parseInt(e.target.value) || 1)}
+                    disabled={scrapeMutation.isPending}
+                    className="text-base"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    1 Lead = 1 Credit
+                  </p>
+                </div>
                 <Button
-                  onClick={() => scrapeMutation.mutate({ query, location: searchLocation })}
-                  disabled={scrapeMutation.isPending || user?.credits === 0}
+                  onClick={() => scrapeMutation.mutate({ query, location: searchLocation, count: leadCount })}
+                  disabled={scrapeMutation.isPending || !user?.credits}
                   className="w-full text-base py-6"
                   size="lg"
                 >
@@ -175,7 +198,7 @@ export default function Dashboard() {
                   ) : (
                     <>
                       <SearchIcon className="mr-2 h-5 w-5" />
-                      Suche starten
+                      {leadCount} Lead{leadCount !== 1 ? 's' : ''} finden
                     </>
                   )}
                 </Button>
@@ -192,7 +215,6 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Credit Packages */}
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl font-bold tracking-tight">Credits kaufen</CardTitle>
@@ -230,7 +252,6 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Leads Table */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-2xl font-bold tracking-tight">Ihre Leads</CardTitle>

@@ -2,6 +2,8 @@ import { Router } from "express";
 import { insertLeadSchema, insertBlogPostSchema } from "../shared/schema";
 import { storage } from "./storage";
 import { createPayment, handleWebhookEvent } from "./services/mollie";
+import { apifyClient } from "./services/apify"; // Added import for apifyClient
+
 
 export async function registerRoutes(router: Router) {
   // Get user info with additional verification
@@ -146,34 +148,65 @@ export async function registerRoutes(router: Router) {
 
   router.post("/scrape", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
-    const { query, location } = req.body;
+    const { query, location, count } = req.body;
 
-    if (!query || !location) {
-      return res.status(400).json({ message: "Query and location are required" });
+    if (!query || !location || !count) {
+      return res.status(400).json({ message: "Query, location, and count are required" });
+    }
+
+    // Validiere die Anzahl der Leads
+    if (count < 1 || count > 100) {
+      return res.status(400).json({ message: "Lead count must be between 1 and 100" });
     }
 
     const user = await storage.getUser(req.user.id);
-    if (!user || user.credits <= 0) {
+    if (!user || user.credits < count) {
       return res.status(403).json({ message: "Insufficient credits" });
     }
 
     try {
-      // Mock scraping for now
-      await storage.addCredits(req.user.id, -1);
-      const lead = await storage.createLead({
-        userId: req.user.id,
-        businessName: "Example Business",
-        address: "123 Example St",
-        phone: "+1234567890",
-        email: "example@business.com",
-        website: "www.example.com",
-        category: "Business",
-        metadata: {}
+      console.log(`Starting scrape for ${count} leads with query: ${query}, location: ${location}`);
+
+      // Verbinde mit Apify und starte den Scraper
+      const leads = await apifyClient.actor("apify/google-places-scraper").call({
+        searchStrings: [`${query} in ${location}`],
+        maxCrawledPlaces: count,
+        language: "de",
+        maxReviews: 0 // Wir brauchen keine Reviews
       });
 
-      res.json(lead);
+      // Verarbeite die Ergebnisse
+      const scrapedData = await leads.getData();
+      console.log(`Received ${scrapedData.length} leads from Apify`);
+
+      // Reduziere die Credits
+      await storage.addCredits(req.user.id, -count);
+
+      // Speichere die Leads in der Datenbank
+      const savedLeads = await Promise.all(scrapedData.map(async (data: any) => {
+        return await storage.createLead({
+          userId: req.user.id,
+          businessName: data.name,
+          address: data.address,
+          phone: data.phone,
+          email: data.email || "",
+          website: data.website || "",
+          category: query,
+          metadata: {
+            rating: data.rating,
+            totalScore: data.reviewsCount,
+            placeId: data.placeId
+          }
+        });
+      }));
+
+      res.json(savedLeads);
     } catch (error) {
-      res.status(500).json({ message: "Failed to scrape data", error: (error as Error).message });
+      console.error('Error during scraping:', error);
+      res.status(500).json({ 
+        message: "Failed to scrape data", 
+        error: (error as Error).message 
+      });
     }
   });
 }
