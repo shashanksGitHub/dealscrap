@@ -7,10 +7,11 @@ interface PriceCardProps {
   credits: number;
   price: number;
   isRecommended?: boolean;
+  disabled?: boolean;
   onSelect: () => void;
 }
 
-export function PriceCard({ credits, price, isRecommended, onSelect }: PriceCardProps) {
+export function PriceCard({ credits, price, isRecommended, disabled, onSelect }: PriceCardProps) {
   return (
     <Card className={cn(
       "relative transition-all duration-200 hover:shadow-lg",
@@ -39,6 +40,7 @@ export function PriceCard({ credits, price, isRecommended, onSelect }: PriceCard
           onClick={onSelect}
           className="w-full" 
           variant={isRecommended ? "default" : "outline"}
+          disabled={disabled}
         >
           Credits kaufen
         </Button>

@@ -1,12 +1,44 @@
+import { useState } from 'react';
 import { PriceCard } from "./price-card";
-import { useLocation } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Loader2 } from "lucide-react";
 
 export function PricingSection() {
-  const [, setLocation] = useLocation();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleSelect = (price: number) => {
-    // Redirect to checkout page with selected price
-    setLocation(`/checkout/${price}`);
+  const handleSelect = async (price: number) => {
+    setIsProcessing(true);
+    try {
+      // Direkt Business-Info senden und Mollie Payment erstellen
+      const response = await apiRequest("POST", "/api/business-info", {
+        amount: price,
+        companyName: user?.companyName || "",
+        vatId: user?.vatId || "",
+        street: user?.street || "",
+        city: user?.city || "",
+        postalCode: user?.postalCode || "",
+        country: user?.country || "DE"
+      });
+
+      const { checkoutUrl } = await response.json();
+      if (checkoutUrl) {
+        // Direkt zum Mollie Checkout weiterleiten
+        window.location.href = checkoutUrl;
+      }
+    } catch (error: any) {
+      console.error('Error initiating payment:', error);
+      toast({
+        title: "Fehler",
+        description: "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -24,24 +56,35 @@ export function PricingSection() {
             credits={100}
             price={100}
             onSelect={() => handleSelect(100)}
+            disabled={isProcessing}
           />
           <PriceCard
             credits={250}
             price={200}
             onSelect={() => handleSelect(200)}
+            disabled={isProcessing}
           />
           <PriceCard
             credits={500}
             price={350}
             isRecommended
             onSelect={() => handleSelect(350)}
+            disabled={isProcessing}
           />
           <PriceCard
             credits={1000}
             price={600}
             onSelect={() => handleSelect(600)}
+            disabled={isProcessing}
           />
         </div>
+
+        {isProcessing && (
+          <div className="mt-8 text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+            <p className="mt-2 text-muted-foreground">Zahlungsvorgang wird vorbereitet...</p>
+          </div>
+        )}
       </div>
     </div>
   );
