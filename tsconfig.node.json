@@ -8,7 +8,9 @@
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["./shared/*"]
-    }
+    },
+    "strict": true,
+    "types": ["node"]
   },
   "include": ["vite.config.ts", "server/**/*"],
   "references": [{ "path": "./shared" }]
