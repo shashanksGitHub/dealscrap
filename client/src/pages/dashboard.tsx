@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { motion } from "framer-motion";
-import { VideoTutorialDialog } from "@/components/ui/video-tutorial-dialog";
 import {
   Accordion,
   AccordionContent,
@@ -23,6 +22,7 @@ import {
 } from "@/components/ui/accordion";
 import { SEO } from "@/components/layout/seo";
 import { Footer } from "@/components/layout/footer";
+import { VideoTutorialDialog } from "@/components/ui/video-tutorial-dialog";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -33,13 +33,6 @@ export default function Dashboard() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [searchStatus, setSearchStatus] = useState("");
   const [showTutorial, setShowTutorial] = useState(false);
-  const searchStatuses = [
-    "Neue Unternehmen werden gesucht...",
-    "Spannendes Unternehmen gefunden! 🎯",
-    "Daten werden angereichert...",
-    "Leaddaten werden extrahiert...",
-    "Tiefergehende Recherche läuft..."
-  ];
 
   useEffect(() => {
     // Show tutorial only on first login
@@ -50,18 +43,20 @@ export default function Dashboard() {
     }
   }, []);
 
+  const searchStatuses = [
+    "Neue Unternehmen werden gesucht...",
+    "Spannendes Unternehmen gefunden! 🎯",
+    "Daten werden angereichert...",
+    "Leaddaten werden extrahiert...",
+    "Tiefergehende Recherche läuft..."
+  ];
+
   const { data: searches = [], isLoading: isSearchesLoading } = useQuery({
-    queryKey: ["/api/searches"],
-    queryFn: async () => {
-      const response = await apiRequest("GET", "/api/searches");
-      const data = await response.json();
-      console.log('Fetched searches:', data);
-      return data;
-    },
+    queryKey: ['/api/searches'],
   });
 
   const { data: leads = [] } = useQuery({
-    queryKey: ["/api/leads"],
+    queryKey: ['/api/leads'],
     initialData: [],
   });
 
@@ -114,7 +109,7 @@ export default function Dashboard() {
             </motion.div>
             Leads erfolgreich gefunden! 🎉
           </div>
-        ) as any,
+        ),
         description: (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -131,7 +126,7 @@ export default function Dashboard() {
               Sie können die Leads jetzt in der untenstehenden Liste einsehen oder als CSV-Datei exportieren.
             </p>
           </motion.div>
-        ) as any,
+        ),
         duration: 6000,
       });
     },
@@ -170,16 +165,13 @@ export default function Dashboard() {
   const handlePurchase = async (price: number) => {
     setIsProcessingPayment(true);
     try {
-      console.log('Initiating payment for amount:', price);
       const response = await apiRequest("POST", "/api/create-payment", {
         amount: price
       });
 
       const data = await response.json();
-      console.log('Payment response:', data);
 
       if (data.checkoutUrl) {
-        // Show success animation before redirect
         toast({
           title: (
             <div className="flex items-center gap-2">
@@ -196,7 +188,7 @@ export default function Dashboard() {
               </motion.div>
               Credits erfolgreich aufgeladen! ⭐
             </div>
-          ) as any,
+          ),
           description: (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -211,11 +203,10 @@ export default function Dashboard() {
                 Sie werden jetzt zur sicheren Zahlungsabwicklung weitergeleitet.
               </p>
             </motion.div>
-          ) as any,
+          ),
           duration: 4000,
         });
 
-        // Short delay before redirect to show the animation
         setTimeout(() => {
           window.location.href = data.checkoutUrl;
         }, 1500);
@@ -223,7 +214,6 @@ export default function Dashboard() {
         throw new Error('Keine Checkout-URL erhalten');
       }
     } catch (error: any) {
-      console.error('Error initiating payment:', error);
       toast({
         title: "Fehler",
         description: error.message || "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
