@@ -19,6 +19,8 @@ export function MollieCheckoutModal({ isOpen, onClose, checkoutUrl }: MollieChec
             src={checkoutUrl}
             className="w-full h-full border-none rounded-lg"
             title="Mollie Checkout"
+            allow="payment"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-modals"
           />
         ) : (
           <div className="flex items-center justify-center h-full">

@@ -45,7 +45,17 @@ export async function createPayment(
       userId: userId.toString(),
       creditAmount: amount.toString()
     },
-    ...(embedded ? { locale: 'de_DE', profileId: process.env.MOLLIE_PROFILE_ID } : {})
+    ...(embedded ? { 
+      locale: 'de_DE', 
+      profileId: process.env.MOLLIE_PROFILE_ID,
+      method: ['ideal', 'creditcard', 'bancontact', 'sofort'],
+      component: {
+        checkout: {
+          locale: 'de_DE',
+          embed: true
+        }
+      }
+    } : {})
   });
 
   console.log('Mollie payment created:', {
