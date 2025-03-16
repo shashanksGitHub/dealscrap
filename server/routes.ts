@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { insertLeadSchema, insertBlogPostSchema } from "../shared/schema";
+import { insertLeadSchema, insertBlogPostSchema, businessInfoSchema } from "../shared/schema";
 import { storage } from "./storage";
+import { createOrUpdateCustomer, createPaymentIntent, handleWebhookEvent, isStripeInitialized } from "./services/stripe";
 
 export async function registerRoutes(router: Router) {
   // Get user info with additional verification
@@ -20,6 +21,73 @@ export async function registerRoutes(router: Router) {
     } catch (error: any) {
       console.error('Error fetching user info:', error);
       res.status(500).json({ message: "Fehler beim Abrufen der Benutzerinformationen" });
+    }
+  });
+
+  // Business information and payment routes
+  router.post("/business-info", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Nicht authentifiziert" });
+    }
+
+    try {
+      if (!isStripeInitialized()) {
+        return res.status(503).json({ 
+          message: "Zahlungssystem temporär nicht verfügbar. Bitte versuchen Sie es später erneut." 
+        });
+      }
+
+      const businessInfo = businessInfoSchema.parse(req.body);
+      await storage.updateBusinessInfo(req.user.id, businessInfo);
+      const customer = await createOrUpdateCustomer(req.user.id, businessInfo);
+
+      res.json({ success: true, customerId: customer.id });
+    } catch (error: any) {
+      console.error('Error updating business info:', error);
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  router.post("/create-payment-intent", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Nicht authentifiziert" });
+    }
+
+    try {
+      if (!isStripeInitialized()) {
+        return res.status(503).json({ 
+          message: "Zahlungssystem temporär nicht verfügbar. Bitte versuchen Sie es später erneut." 
+        });
+      }
+
+      const { amount, customerId } = req.body;
+
+      if (!amount || !customerId) {
+        return res.status(400).json({ message: "Betrag und Customer ID sind erforderlich" });
+      }
+
+      const paymentIntent = await createPaymentIntent(req.user.id, amount, customerId);
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      console.error('Error creating payment intent:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  router.post("/stripe-webhook", async (req, res) => {
+    try {
+      if (!isStripeInitialized()) {
+        return res.status(503).json({ message: "Stripe service not available" });
+      }
+
+      await handleWebhookEvent(
+        req.headers['stripe-signature'] as string,
+        req.body
+      );
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error('Webhook error:', error);
+      res.status(400).json({ message: error.message });
     }
   });
 

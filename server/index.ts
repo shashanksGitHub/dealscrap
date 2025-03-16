@@ -10,18 +10,23 @@ import fs from 'fs';
 
 const app = express();
 
-// Basic middleware
-app.use(express.json());
+// Basic middleware with raw body parsing for Stripe webhooks
+app.use(express.json({
+  verify: (req, res, buf) => {
+    // Raw body needed for Stripe webhook verification
+    (req as any).rawBody = buf;
+  }
+}));
 app.use(express.urlencoded({ extended: false }));
 
-// Enhanced Security headers
+// Enhanced Security headers including CSP for Stripe and static assets
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self' *.replit.dev *.replit.app; " +
-    "frame-src 'self' *.replit.dev *.replit.app; " +
-    "script-src 'self' 'unsafe-inline' *.replit.dev *.replit.app; " +
-    "connect-src 'self' *.replit.dev *.replit.app wss://*.replit.dev wss://*.replit.app; " +
+    "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
+    "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
+    "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
+    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app wss://*.replit.dev wss://*.replit.app; " +
     "style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: https: http:; " +
     "font-src 'self' data:;"
@@ -57,7 +62,7 @@ app.use((req, res, next) => {
   }
 
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, stripe-signature");
   res.header("Access-Control-Allow-Credentials", "true");
 
   if (req.method === "OPTIONS") {
@@ -75,6 +80,29 @@ app.use((req, res, next) => {
   });
   next();
 });
+
+// First set up auth as it's needed for protected routes
+log("Setting up authentication...");
+setupAuth(app);
+
+// Then register API routes before any static middleware
+log("Registering API routes...");
+const apiRouter = express.Router();
+await registerRoutes(apiRouter);
+
+// Mount API router with explicit content type
+app.use('/api', (req, res, next) => {
+  // Special handling for Stripe webhooks
+  if (req.path === '/stripe-webhook') {
+    res.setHeader('Content-Type', 'application/json');
+    return next();
+  }
+  // Force JSON content type for other API routes
+  res.setHeader('Content-Type', 'application/json');
+  log(`Processing API request: ${req.method} ${req.path}`);
+  next();
+}, apiRouter);
+
 
 // Enhanced error handler middleware with recovery mechanism
 const errorHandler = async (err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -110,21 +138,6 @@ async function startServer() {
       throw new Error("Critical services are not available");
     }
 
-    // First set up auth as it's needed for protected routes
-    log("Setting up authentication...");
-    setupAuth(app);
-
-    // Then register API routes before any static middleware
-    log("Registering API routes...");
-    const apiRouter = express.Router();
-    await registerRoutes(apiRouter);
-
-    // Mount API router with explicit content type
-    app.use('/api', (req, res, next) => {
-      res.setHeader('Content-Type', 'application/json');
-      log(`Processing API request: ${req.method} ${req.path}`);
-      next();
-    }, apiRouter);
 
     if (isProduction) {
       log("Setting up production static file serving...");

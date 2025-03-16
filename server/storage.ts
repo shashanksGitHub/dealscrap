@@ -4,6 +4,10 @@ import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
 
+interface BusinessInfo {
+  [key: string]: any; //  A flexible type, allowing various business information fields.  Consider a more specific type if known.
+}
+
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
@@ -20,6 +24,8 @@ export interface IStorage {
   getBlogPosts(authorId?: number): Promise<BlogPost[]>;
   updateBlogPost(id: number, post: Partial<BlogPost>): Promise<BlogPost>;
   sessionStore: session.Store;
+  updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User>;
+  updateBusinessInfo(userId: number, businessInfo: BusinessInfo): Promise<User>;
 }
 
 export class MemStorage implements IStorage {
@@ -198,6 +204,30 @@ export class MemStorage implements IStorage {
     };
     this.blogPosts.set(id, updatedPost);
     return updatedPost;
+  }
+
+  async updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User> {
+    const user = await this.getUser(userId);
+    if (!user) throw new Error("User not found");
+
+    const updatedUser = {
+      ...user,
+      stripeCustomerId
+    };
+    this.users.set(userId, updatedUser);
+    return updatedUser;
+  }
+
+  async updateBusinessInfo(userId: number, businessInfo: BusinessInfo): Promise<User> {
+    const user = await this.getUser(userId);
+    if (!user) throw new Error("User not found");
+
+    const updatedUser = {
+      ...user,
+      ...businessInfo
+    };
+    this.users.set(userId, updatedUser);
+    return updatedUser;
   }
 }
 

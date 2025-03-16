@@ -3,15 +3,24 @@ import { useRoute, Link } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { businessInfoSchema, type BusinessInfo } from "@shared/schema";
+import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, CreditCard, Loader2 } from "lucide-react";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { Footer } from "@/components/layout/footer";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+
+// Only initialize Stripe if public key is available
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLIC_KEY 
+  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
+  : null;
 
 const CREDIT_PACKAGES: Record<string, { credits: number; price: number }> = {
   '100': { credits: 100, price: 100 },
@@ -26,10 +35,102 @@ const COUNTRIES = [
   { value: 'CH', label: 'Schweiz' }
 ];
 
+const CheckoutForm = ({ customerId, amount }: { customerId: string; amount: number }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { refreshUserData } = useAuth();
+
+  const handlePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      console.error('Stripe or elements not initialized');
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/dashboard`,
+        },
+        redirect: 'if_required',
+      });
+
+      if (error) {
+        console.error('Payment confirmation error:', error);
+        toast({
+          title: "Zahlung fehlgeschlagen",
+          description: error.message || "Ein Fehler ist aufgetreten",
+          variant: "destructive",
+        });
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        console.log('Payment successful:', paymentIntent);
+
+        await refreshUserData();
+
+        toast({
+          title: "Zahlung erfolgreich",
+          description: "Ihre Credits wurden gutgeschrieben",
+        });
+
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 2000);
+      }
+    } catch (error: any) {
+      console.error('Payment processing error:', error);
+      toast({
+        title: "Fehler",
+        description: "Bei der Verarbeitung der Zahlung ist ein Fehler aufgetreten.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handlePayment} className="space-y-6">
+      <PaymentElement />
+
+      <Button 
+        type="submit" 
+        className="w-full" 
+        size="lg"
+        disabled={!stripe || isProcessing}
+      >
+        {isProcessing ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Zahlung wird verarbeitet...
+          </>
+        ) : (
+          <>
+            <CreditCard className="mr-2 h-4 w-4" />
+            Jetzt {amount}€ bezahlen
+          </>
+        )}
+      </Button>
+
+      <p className="text-xs text-center text-muted-foreground">
+        Mit der Zahlung akzeptieren Sie unsere AGB und Datenschutzbestimmungen
+      </p>
+    </form>
+  );
+};
+
 export default function Checkout() {
   const [match, params] = useRoute("/checkout/:amount");
   const { user } = useAuth();
-  const [showBusinessForm, setShowBusinessForm] = useState(true); 
+  const { toast } = useToast();
+  const [showBusinessForm, setShowBusinessForm] = useState(true);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [customerId, setCustomerId] = useState<string | null>(null);
 
   const form = useForm<BusinessInfo>({
     resolver: zodResolver(businessInfoSchema),
@@ -57,7 +158,38 @@ export default function Checkout() {
   }
 
   const onSubmit = async (data: BusinessInfo) => {
-    console.log("Business data:", data);
+    try {
+      if (!stripePromise) {
+        toast({
+          title: "Zahlungssystem nicht verfügbar",
+          description: "Das Zahlungssystem ist temporär nicht verfügbar. Bitte versuchen Sie es später erneut.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // First, save business information and get Stripe customer
+      const response = await apiRequest("POST", "/api/business-info", data);
+      const { customerId } = await response.json();
+      setCustomerId(customerId);
+
+      // Then create payment intent
+      const paymentResponse = await apiRequest("POST", "/api/create-payment-intent", {
+        amount,
+        customerId
+      });
+      const { clientSecret } = await paymentResponse.json();
+
+      setClientSecret(clientSecret);
+      setShowBusinessForm(false);
+    } catch (error: any) {
+      console.error('Error setting up payment:', error);
+      toast({
+        title: "Fehler",
+        description: error.response?.data?.message || "Die Zahlungsvorbereitung ist fehlgeschlagen. Bitte versuchen Sie es später erneut.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -73,9 +205,12 @@ export default function Checkout() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Kreditpaket kaufen</CardTitle>
+              <CardTitle>{showBusinessForm ? "Kreditpaket kaufen" : "Bezahlung"}</CardTitle>
               <CardDescription>
-                Bitte geben Sie Ihre Unternehmensdaten für die Rechnung ein
+                {showBusinessForm 
+                  ? "Bitte geben Sie Ihre Unternehmensdaten für die Rechnung ein"
+                  : "Bitte schließen Sie die Zahlung ab"
+                }
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -92,7 +227,7 @@ export default function Checkout() {
                 </div>
               </div>
 
-              {showBusinessForm && (
+              {showBusinessForm ? (
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <FormField
@@ -197,6 +332,24 @@ export default function Checkout() {
                     </Button>
                   </form>
                 </Form>
+              ) : clientSecret && customerId && stripePromise ? (
+                <Elements stripe={stripePromise} options={{ 
+                  clientSecret,
+                  appearance: { 
+                    theme: 'stripe',
+                    variables: {
+                      colorPrimary: '#7c3aed',
+                      colorBackground: '#ffffff',
+                      colorText: '#1a1a1a',
+                    }
+                  }
+                }}>
+                  <CheckoutForm amount={amount} customerId={customerId} />
+                </Elements>
+              ) : (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
               )}
             </CardContent>
           </Card>
