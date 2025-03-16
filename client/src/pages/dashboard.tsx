@@ -8,11 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2 } from "lucide-react";
+import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2, CheckCircle2Icon } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
@@ -28,7 +29,6 @@ export default function Dashboard() {
   const [leadCount, setLeadCount] = useState(1);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-  // Lade alle Suchen des Users
   const { data: searches = [], isLoading: isSearchesLoading } = useQuery({
     queryKey: ["/api/searches"],
     queryFn: async () => {
@@ -39,7 +39,6 @@ export default function Dashboard() {
     },
   });
 
-  // Lade Leads für die ausgewählte Suche
   const { data: leads = [], isLoading: isLeadsLoading } = useQuery({
     queryKey: ["/api/leads"],
     initialData: [],
@@ -62,12 +61,45 @@ export default function Dashboard() {
       const res = await apiRequest("POST", "/api/scrape", data);
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/searches"] }); //Invalidate searches after scrape
+      queryClient.invalidateQueries({ queryKey: ["/api/searches"] });
+
       toast({
-        title: "Erfolgreich",
-        description: "Leads erfolgreich gefunden",
+        title: (
+          <div className="flex items-center gap-2">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20
+              }}
+            >
+              <CheckCircle2Icon className="w-5 h-5 text-green-500" />
+            </motion.div>
+            <span>Leads erfolgreich gefunden! 🎉</span>
+          </div>
+        ),
+        description: (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-2"
+          >
+            <p>
+              Es wurden <span className="font-medium">{data.leads.length} neue Leads</span> für
+              <span className="font-medium"> {data.search.query}</span> in
+              <span className="font-medium"> {data.search.location}</span> gefunden.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Sie können die Leads jetzt in der untenstehenden Liste einsehen oder als CSV-Datei exportieren.
+            </p>
+          </motion.div>
+        ),
+        duration: 6000,
       });
     },
     onError: (error: Error) => {
