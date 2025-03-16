@@ -3,35 +3,74 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import CookieBanner from "@/components/cookie-banner";
-import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
-import { HamburgBadge } from "@/components/ui/hamburg-badge";
 import { Footer } from "@/components/layout/footer";
 import { ActivityBubble } from "@/components/activity-bubble";
 import { Star } from "lucide-react";
 import { Zap, Users, BarChart, Code, Megaphone, ShoppingCart, Wallet, Factory, Database, Target, Download, Coins, GlobeIcon, SearchIcon, ShieldCheck } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { motion } from "framer-motion";
+import { Helmet } from "react-helmet";
 
 export default function LandingPage() {
   const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>LeadScraper.de - Intelligente B2B Lead-Generierung für den DACH-Raum</title>
+        <meta name="description" content="Automatisierte Lead-Generierung für den deutschen B2B-Markt. DSGVO-konform, KI-gestützt und effizient." />
+        <meta name="keywords" content="Lead-Generierung, B2B, DACH, DSGVO-konform, Vertrieb, Marketing" />
+        <script type="application/ld+json">
+          {`
+            {
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "LeadScraper.de",
+              "applicationCategory": "BusinessApplication",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "EUR"
+              }
+            }
+          `}
+        </script>
+      </Helmet>
+
       {/* Hero Section */}
       <section className="pt-32 pb-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(black,transparent_70%)] -z-10" />
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl opacity-70 animate-blob" />
-        <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.7 }}
+          className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl animate-blob" 
+        />
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.7 }}
+          className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl animate-blob animation-delay-2000" 
+        />
 
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center max-w-xl mx-auto text-center">
-            <Link href="/auth">
-              <Button size="lg" className="rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300">
-                Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link href="/auth">
+                <Button size="lg" className="rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300">
+                  Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </motion.div>
 
             {/* Rating Section */}
-            <div className="mt-6 text-center">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mt-6 text-center"
+            >
               <div className="flex justify-center gap-1">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
@@ -39,22 +78,38 @@ export default function LandingPage() {
               </div>
               <p className="text-lg mt-2">5/5 Bewertungen</p>
               <p className="text-muted-foreground">Über 1000 zufriedene Kunden</p>
-            </div>
+            </motion.div>
 
             {/* Trust Badges */}
             <div className="mt-8 grid grid-cols-2 gap-8">
-              <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl text-center">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                className="bg-white/5 backdrop-blur-sm p-6 rounded-xl text-center"
+              >
                 <div className="flex flex-col items-center">
-                  <img src="dsgvo-logo.png" alt="DSGVO" className="h-8 mb-2" />
+                  <img 
+                    src="/public/dsgvo-logo.svg" 
+                    alt="DSGVO" 
+                    className="h-8 mb-2"
+                    loading="lazy"
+                  />
                   <h3 className="text-lg font-medium">DSGVO-konform</h3>
                   <p className="text-sm text-muted-foreground">Höchste Sicherheitsstandards</p>
                 </div>
-              </div>
-              <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl text-center">
-                <img src="/attached_assets/DEU_Hamburg_COA.svg.png" alt="Hamburg" className="h-8 mb-2" />
+              </motion.div>
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                className="bg-white/5 backdrop-blur-sm p-6 rounded-xl text-center"
+              >
+                <img 
+                  src="/public/hamburg-coa.svg" 
+                  alt="Hamburg" 
+                  className="h-8 mb-2"
+                  loading="lazy"
+                />
                 <h3 className="text-lg font-medium">Hamburg</h3>
                 <p className="text-sm text-muted-foreground">Entwickelt für den DACH-Raum</p>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
