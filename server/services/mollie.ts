@@ -1,17 +1,29 @@
 import { createMollieClient } from "@mollie/api-client";
 import { storage } from "../storage";
+import { log } from "../vite";
 
-if (!process.env.MOLLIE_API_KEY) {
-  throw new Error('Missing required Mollie secret: MOLLIE_API_KEY');
+let mollieClient: ReturnType<typeof createMollieClient> | null = null;
+
+try {
+  if (process.env.MOLLIE_API_KEY) {
+    mollieClient = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY });
+    log('Mollie client initialized successfully');
+  } else {
+    log('Warning: MOLLIE_API_KEY not found, payment features will be disabled');
+  }
+} catch (error) {
+  log('Error initializing Mollie client:', error);
 }
-
-const mollieClient = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY });
 
 export async function createPayment(
   userId: number,
   amount: number,
   description: string
 ) {
+  if (!mollieClient) {
+    throw new Error('Payment service is not available');
+  }
+
   const user = await storage.getUser(userId);
   if (!user) throw new Error("User not found");
 
@@ -63,6 +75,10 @@ export async function createPayment(
 }
 
 export async function handleWebhookEvent(paymentId: string): Promise<void> {
+  if (!mollieClient) {
+    throw new Error('Payment service is not available');
+  }
+
   try {
     console.log('Processing Mollie webhook for payment:', paymentId);
     const payment = await mollieClient.payments.get(paymentId);

@@ -3,8 +3,6 @@ import { PriceCard } from "./price-card";
 import { MollieCheckoutModal } from "./mollie-checkout-modal";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { Loader2 } from "lucide-react";
 
 export function PricingSection() {
   const { user } = useAuth();
@@ -13,9 +11,39 @@ export function PricingSection() {
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
-  const handleSelect = (price: number) => {
-    setSelectedPrice(price);
-    setShowCheckoutModal(true);
+  const handleSelect = async (price: number) => {
+    try {
+      setIsProcessing(true);
+      const response = await fetch('/api/create-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: price })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        if (data.message.includes('Payment service is not available')) {
+          toast({
+            title: "Service nicht verfügbar",
+            description: "Das Zahlungssystem ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.",
+            variant: "destructive"
+          });
+          return;
+        }
+        throw new Error(data.message);
+      }
+
+      setSelectedPrice(price);
+      setShowCheckoutModal(true);
+    } catch (error: any) {
+      toast({
+        title: "Fehler",
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleCloseCheckout = () => {
@@ -61,15 +89,17 @@ export function PricingSection() {
           />
         </div>
 
-        <MollieCheckoutModal
-          isOpen={showCheckoutModal}
-          onClose={handleCloseCheckout}
-          amount={selectedPrice || 0}
-        />
+        {showCheckoutModal && (
+          <MollieCheckoutModal
+            isOpen={showCheckoutModal}
+            onClose={handleCloseCheckout}
+            amount={selectedPrice || 0}
+          />
+        )}
 
         {isProcessing && (
           <div className="mt-8 text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
             <p className="mt-2 text-muted-foreground">Zahlungsvorgang wird vorbereitet...</p>
           </div>
         )}
