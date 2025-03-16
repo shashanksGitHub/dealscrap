@@ -1,19 +1,29 @@
 import { useState } from 'react';
-import { PriceCard } from "./price-card";
-import { MollieCheckoutModal } from "./mollie-checkout-modal";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { Card } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
 
 export function PricingSection() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
-  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [credits, setCredits] = useState<number>(50);
 
-  const handleSelect = async (price: number) => {
+  // Berechne den Preis basierend auf der Credit-Anzahl
+  const calculatePrice = (credits: number) => {
+    // Staffelung: Je mehr Credits, desto günstiger pro Credit
+    if (credits <= 100) return credits * 1; // 1€ pro Credit
+    if (credits <= 250) return credits * 0.8; // 0.80€ pro Credit
+    if (credits <= 500) return credits * 0.7; // 0.70€ pro Credit
+    return credits * 0.6; // 0.60€ pro Credit ab 500
+  };
+
+  const price = Math.round(calculatePrice(credits));
+
+  const handleSelect = async () => {
     if (!user) {
       toast({
         title: "Login erforderlich",
@@ -61,63 +71,61 @@ export function PricingSection() {
     }
   };
 
-  const handleCloseCheckout = () => {
-    setShowCheckoutModal(false);
-    setSelectedPrice(null);
-  };
-
   return (
     <div className="py-16 px-4">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Credits kaufen</h2>
           <p className="text-lg text-muted-foreground">
-            Wählen Sie das passende Paket für Ihre Bedürfnisse
+            Wählen Sie die gewünschte Anzahl an Credits
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <PriceCard
-            credits={100}
-            price={100}
-            onSelect={() => handleSelect(100)}
-            disabled={isProcessing}
-          />
-          <PriceCard
-            credits={250}
-            price={200}
-            onSelect={() => handleSelect(200)}
-            disabled={isProcessing}
-          />
-          <PriceCard
-            credits={500}
-            price={350}
-            isRecommended
-            onSelect={() => handleSelect(350)}
-            disabled={isProcessing}
-          />
-          <PriceCard
-            credits={1000}
-            price={600}
-            onSelect={() => handleSelect(600)}
-            disabled={isProcessing}
-          />
-        </div>
+        <Card className="p-8">
+          <div className="space-y-8">
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Anzahl Credits: {credits}
+              </label>
+              <Slider
+                value={[credits]}
+                onValueChange={(values) => setCredits(values[0])}
+                min={50}
+                max={1000}
+                step={50}
+                className="w-full"
+              />
+              <div className="flex justify-between mt-2 text-sm text-muted-foreground">
+                <span>50</span>
+                <span>1000</span>
+              </div>
+            </div>
 
-        {showCheckoutModal && (
-          <MollieCheckoutModal
-            isOpen={showCheckoutModal}
-            onClose={handleCloseCheckout}
-            amount={selectedPrice || 0}
-          />
-        )}
+            <div className="text-center">
+              <div className="text-3xl font-bold mb-2">
+                {price} €
+              </div>
+              <p className="text-sm text-muted-foreground mb-6">
+                {(price / credits).toFixed(2)}€ pro Credit
+              </p>
 
-        {isProcessing && (
-          <div className="mt-8 text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
-            <p className="mt-2 text-muted-foreground">Zahlungsvorgang wird vorbereitet...</p>
+              <button
+                onClick={handleSelect}
+                disabled={isProcessing}
+                className="w-full bg-primary text-primary-foreground rounded-lg px-6 py-3 font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full inline-block mr-2" />
+                    Verarbeitung...
+                  </>
+                ) : (
+                  `${credits} Credits für ${price}€ kaufen`
+                )}
+              </button>
+            </div>
           </div>
-        )}
+        </Card>
       </div>
     </div>
   );

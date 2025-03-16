@@ -46,6 +46,15 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ message: "Betrag ist erforderlich" });
       }
 
+      // Bestimme die Domain für die URLs
+      const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 
+                    process.env.CUSTOM_DOMAIN || 
+                    req.get('host');
+
+      if (!domain) {
+        throw new Error('Keine gültige Domain gefunden');
+      }
+
       const checkoutUrl = await createPayment(
         req.user.id,
         amount,

@@ -6,15 +6,15 @@ let mollieClient: ReturnType<typeof createMollieClient> | null = null;
 
 try {
   if (!process.env.MOLLIE_API_KEY) {
-    log('Warning: MOLLIE_API_KEY not found, initializing in test mode');
-    // Initialize with test key to ensure service availability
-    mollieClient = createMollieClient({ apiKey: 'test_' + 'mollie_test_key' });
+    log('Warning: MOLLIE_API_KEY not found');
+    throw new Error('Missing required Mollie API key');
   } else {
     mollieClient = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY });
     log('Mollie client initialized successfully');
   }
 } catch (error) {
   log('Error initializing Mollie client:', error);
+  throw error;
 }
 
 export async function createPayment(
@@ -60,8 +60,7 @@ export async function createPayment(
         creditAmount: amount.toString()
       },
       billingEmail: user.email,
-      locale: "de_DE",
-      testmode: !process.env.MOLLIE_API_KEY // Enable test mode if no API key is present
+      locale: "de_DE"
     });
 
     console.log('Mollie payment created:', {
