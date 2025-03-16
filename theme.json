@@ -1,6 +1,6 @@
 {
   "variant": "professional",
-  "primary": "hsl(214, 84%, 56%)",
+  "primary": "#000000",
   "appearance": "light",
   "radius": 0.5,
   "baseUrl": "https://leadscraper.de"
