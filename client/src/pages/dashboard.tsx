@@ -286,51 +286,63 @@ export default function Dashboard() {
               <Accordion type="single" collapsible className="w-full">
                 {searches.map((search: any) => (
                   <AccordionItem key={search.id} value={search.id.toString()}>
-                    <AccordionTrigger className="hover:no-underline">
+                    <AccordionTrigger className="hover:no-underline py-3">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-4">
                           <div>
-                            <h3 className="font-semibold">{search.query} in {search.location}</h3>
-                            <p className="text-sm text-muted-foreground">
+                            <h3 className="font-semibold text-base">{search.query} in {search.location}</h3>
+                            <p className="text-xs text-muted-foreground">
                               {format(new Date(search.createdAt), "dd. MMMM yyyy, HH:mm 'Uhr'", { locale: de })}
                             </p>
                           </div>
                         </div>
-                        <Badge variant="secondary">{search.count} Leads</Badge>
+                        <Badge variant="secondary" className="text-xs">{search.count} Leads</Badge>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="pt-4 pb-2">
+                      <div className="pt-2 pb-1">
                         <Button
                           variant="outline"
+                          size="sm"
                           onClick={() => handleExport(search.id)}
-                          className="mb-4"
+                          className="mb-3"
                         >
-                          <DownloadIcon className="w-4 h-4 mr-2" />
+                          <DownloadIcon className="w-3 h-3 mr-2" />
                           Als CSV exportieren
                         </Button>
                       </div>
                       <div className="overflow-x-auto rounded-md border">
-                        <table className="w-full">
+                        <table className="w-full text-sm">
                           <thead>
                             <tr className="border-b bg-muted/50">
-                              <th className="p-4 text-left text-base font-medium">Firmenname</th>
-                              <th className="p-4 text-left text-base font-medium hidden md:table-cell">Adresse</th>
-                              <th className="p-4 text-left text-base font-medium">Telefon</th>
-                              <th className="p-4 text-left text-base font-medium hidden md:table-cell">E-Mail</th>
-                              <th className="p-4 text-left text-base font-medium hidden lg:table-cell">Website</th>
+                              <th className="p-2 text-left font-medium">Firmenname</th>
+                              <th className="p-2 text-left font-medium hidden md:table-cell">Adresse</th>
+                              <th className="p-2 text-left font-medium">Telefon</th>
+                              <th className="p-2 text-left font-medium hidden md:table-cell">E-Mail</th>
+                              <th className="p-2 text-left font-medium hidden lg:table-cell">Website</th>
                             </tr>
                           </thead>
-                          <tbody>
+                          <tbody className="text-sm">
                             {leads
                               .filter((lead: Lead) => lead.searchId === search.id)
                               .map((lead: Lead) => (
-                                <tr key={lead.id} className="border-b">
-                                  <td className="p-4 text-base">{lead.businessName}</td>
-                                  <td className="p-4 text-base hidden md:table-cell">{lead.address}</td>
-                                  <td className="p-4 text-base">{lead.phone}</td>
-                                  <td className="p-4 text-base hidden md:table-cell">{lead.email}</td>
-                                  <td className="p-4 text-base hidden lg:table-cell">{lead.website}</td>
+                                <tr key={lead.id} className="border-b hover:bg-muted/50">
+                                  <td className="p-2">{lead.businessName}</td>
+                                  <td className="p-2 hidden md:table-cell text-muted-foreground">{lead.address}</td>
+                                  <td className="p-2">{lead.phone}</td>
+                                  <td className="p-2 hidden md:table-cell text-muted-foreground">{lead.email}</td>
+                                  <td className="p-2 hidden lg:table-cell text-muted-foreground">
+                                    {lead.website && (
+                                      <a
+                                        href={lead.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary hover:underline"
+                                      >
+                                        {lead.website}
+                                      </a>
+                                    )}
+                                  </td>
                                 </tr>
                               ))}
                           </tbody>
