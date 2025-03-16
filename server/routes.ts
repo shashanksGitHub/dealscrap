@@ -152,10 +152,12 @@ export async function registerRoutes(router: Router) {
     if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
 
     try {
-      const searches = await db.select().from(searches)
+      console.log('Fetching searches for user:', req.user.id);
+      const userSearches = await db.select().from(searches)
         .where(eq(searches.userId, req.user.id))
         .orderBy(desc(searches.createdAt));
-      res.json(searches);
+      console.log('Found searches:', userSearches);
+      res.json(userSearches);
     } catch (error) {
       console.error('Error fetching searches:', error);
       res.status(500).json({ message: "Fehler beim Abrufen der Suchen" });
@@ -196,6 +198,7 @@ export async function registerRoutes(router: Router) {
     }
 
     try {
+      console.log('Creating new search record');
       const [search] = await db.insert(searches)
         .values({
           userId: req.user.id,
@@ -204,6 +207,7 @@ export async function registerRoutes(router: Router) {
           count
         })
         .returning();
+      console.log('Created search:', search);
 
       console.log(`Starting scrape for ${count} leads with query: ${query}, location: ${location}`);
 
@@ -233,7 +237,7 @@ export async function registerRoutes(router: Router) {
         try {
           const leadData = {
             userId: req.user.id,
-            searchId: search.id, 
+            searchId: search.id,
             businessName: data.title || data.name || "",
             address: data.address || "",
             phone: data.phone || data.phoneNumber || "",

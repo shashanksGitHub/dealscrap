@@ -31,7 +31,12 @@ export default function Dashboard() {
   // Lade alle Suchen des Users
   const { data: searches = [], isLoading: isSearchesLoading } = useQuery({
     queryKey: ["/api/searches"],
-    initialData: [],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/searches");
+      const data = await response.json();
+      console.log('Fetched searches:', data);
+      return data;
+    },
   });
 
   // Lade Leads für die ausgewählte Suche
