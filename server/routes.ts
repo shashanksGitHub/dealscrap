@@ -2,8 +2,7 @@ import { Router } from "express";
 import { insertLeadSchema, insertBlogPostSchema } from "../shared/schema";
 import { storage } from "./storage";
 import { createPayment, handleWebhookEvent } from "./services/mollie";
-import { apifyClient } from "./services/apify"; // Added import for apifyClient
-
+import { apifyClient } from "./services/apify";
 
 export async function registerRoutes(router: Router) {
   // Get user info with additional verification
@@ -167,28 +166,34 @@ export async function registerRoutes(router: Router) {
     try {
       console.log(`Starting scrape for ${count} leads with query: ${query}, location: ${location}`);
 
-      // Verbinde mit Apify und starte den Scraper
-      const leads = await apifyClient.actor("apify/google-places-scraper").call({
+      // Verwende den korrekten Actor-Namen für Google Places Scraping
+      const run = await apifyClient.actor("compass/google-places-scraper").call({
         searchStrings: [`${query} in ${location}`],
         maxCrawledPlaces: count,
         language: "de",
-        maxReviews: 0 // Wir brauchen keine Reviews
+        maxReviews: 0,
+        personalDataOptions: {
+          validatePhoneNumbers: true,
+          extractPhoneNumbers: true,
+          extractEmails: true,
+          extractWebsites: true
+        }
       });
 
-      // Verarbeite die Ergebnisse
-      const scrapedData = await leads.getData();
-      console.log(`Received ${scrapedData.length} leads from Apify`);
+      // Warte auf die Ergebnisse
+      const { items } = await run.dataset().listItems();
+      console.log(`Received ${items.length} leads from Apify`);
 
       // Reduziere die Credits
       await storage.addCredits(req.user.id, -count);
 
       // Speichere die Leads in der Datenbank
-      const savedLeads = await Promise.all(scrapedData.map(async (data: any) => {
+      const savedLeads = await Promise.all(items.map(async (data: any) => {
         return await storage.createLead({
           userId: req.user.id,
-          businessName: data.name,
-          address: data.address,
-          phone: data.phone,
+          businessName: data.name || "",
+          address: data.address || "",
+          phone: data.phone || "",
           email: data.email || "",
           website: data.website || "",
           category: query,
