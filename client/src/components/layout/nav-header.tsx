@@ -1,10 +1,10 @@
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { LogOutIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { CircleProgress } from "@/components/ui/circle-progress";
 
 export function NavHeader() {
   const { user, logout } = useAuth();
@@ -24,10 +24,6 @@ export function NavHeader() {
 
   // Use the latest user data from the query
   const currentUser = freshUserData || user;
-
-  // Calculate the percentage of used credits
-  const maxCredits = 100;
-  const creditsPercentage = ((maxCredits - (currentUser?.credits || 0)) / maxCredits) * 100;
 
   // Log credit updates
   console.log('Current user credits:', currentUser?.credits);
@@ -53,17 +49,13 @@ export function NavHeader() {
               )}
               {currentUser ? (
                 <div className="flex items-center gap-4">
-                  <div className="relative w-12 h-12">
-                    <Progress 
-                      value={creditsPercentage} 
-                      className={`absolute inset-0 h-full w-full rounded-full ${currentUser.credits === 0 ? '[&>div]:bg-destructive/40' : '[&>div]:bg-primary/20'}`}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className={`text-lg font-semibold ${currentUser.credits === 0 ? 'text-background' : 'text-primary'}`}>
-                        {currentUser.credits}
-                      </span>
-                    </div>
-                  </div>
+                  <CircleProgress 
+                    value={currentUser.credits}
+                    max={1000}
+                    size="md"
+                    showLabel
+                    className={currentUser.credits === 0 ? 'text-destructive' : 'text-primary'}
+                  />
                   <Button variant="outline" size="sm" onClick={logout}>
                     <LogOutIcon className="h-4 w-4 mr-2" />
                     Logout
