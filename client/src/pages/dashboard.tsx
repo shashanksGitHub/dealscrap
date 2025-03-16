@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SearchIcon, DownloadIcon, Loader2, CheckCircle2Icon } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,14 @@ const Dashboard = () => {
   const [searchLocation, setSearchLocation] = useState("");
   const [leadCount, setLeadCount] = useState(1);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [searchStatus, setSearchStatus] = useState("");
+  const searchStatuses = [
+    "Neue Unternehmen werden gesucht...",
+    "Spannendes Unternehmen gefunden! 🎯",
+    "Daten werden angereichert...",
+    "Leaddaten werden extrahiert...",
+    "Tiefergehende Recherche läuft..."
+  ];
 
   const { data: searches = [], isLoading: isSearchesLoading } = useQuery({
     queryKey: ["/api/searches"],
@@ -60,8 +68,20 @@ const Dashboard = () => {
         throw new Error(`Sie benötigen ${data.count} Credits für diese Suche. Bitte kaufen Sie weitere Credits.`);
       }
 
-      const res = await apiRequest("POST", "/api/scrape", data);
-      return res.json();
+      let currentStatus = 0;
+      const statusInterval = setInterval(() => {
+        setSearchStatus(searchStatuses[currentStatus]);
+        currentStatus = (currentStatus + 1) % searchStatuses.length;
+      }, 2000);
+
+      try {
+        const res = await apiRequest("POST", "/api/scrape", data);
+        clearInterval(statusInterval);
+        return res.json();
+      } catch (error) {
+        clearInterval(statusInterval);
+        throw error;
+      }
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
@@ -235,10 +255,23 @@ const Dashboard = () => {
                     id="query"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="z.B. Restaurant"
+                    placeholder="z.B. Restaurant, Rechtsanwalt, Steuerberater"
                     disabled={scrapeMutation.isPending}
                     className="text-base"
+                    list="query-suggestions"
                   />
+                  <datalist id="query-suggestions">
+                    <option value="Restaurant">Restaurants & Gaststätten</option>
+                    <option value="Rechtsanwalt">Rechtsanwaltskanzlei</option>
+                    <option value="Steuerberater">Steuerberatung</option>
+                    <option value="Zahnarzt">Zahnarztpraxis</option>
+                    <option value="Architekt">Architekturbüro</option>
+                    <option value="Versicherungsmakler">Versicherungsmakler</option>
+                    <option value="Immobilienmakler">Immobilienmakler</option>
+                    <option value="Fitnessstudio">Fitnessstudio</option>
+                    <option value="Autowerkstatt">KFZ-Werkstatt</option>
+                    <option value="Physiotherapie">Physiotherapiepraxis</option>
+                  </datalist>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="location">Standort</Label>
@@ -246,10 +279,23 @@ const Dashboard = () => {
                     id="location"
                     value={searchLocation}
                     onChange={(e) => setSearchLocation(e.target.value)}
-                    placeholder="z.B. Berlin"
+                    placeholder="z.B. Berlin, Hamburg, München"
                     disabled={scrapeMutation.isPending}
                     className="text-base"
+                    list="location-suggestions"
                   />
+                  <datalist id="location-suggestions">
+                    <option value="Berlin">Berlin</option>
+                    <option value="Hamburg">Hamburg</option>
+                    <option value="München">München</option>
+                    <option value="Köln">Köln</option>
+                    <option value="Frankfurt">Frankfurt am Main</option>
+                    <option value="Stuttgart">Stuttgart</option>
+                    <option value="Düsseldorf">Düsseldorf</option>
+                    <option value="Leipzig">Leipzig</option>
+                    <option value="Dortmund">Dortmund</option>
+                    <option value="Essen">Essen</option>
+                  </datalist>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="leadCount">Anzahl der Leads</Label>
@@ -274,10 +320,10 @@ const Dashboard = () => {
                   size="lg"
                 >
                   {scrapeMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Suche läuft...
-                    </>
+                    <div className="flex items-center justify-center gap-3">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>{searchStatus}</span>
+                    </div>
                   ) : (
                     <>
                       <SearchIcon className="mr-2 h-5 w-5" />
