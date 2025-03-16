@@ -46,21 +46,16 @@ export default function LandingPage() {
               </Link>
             </div>
             {/* Ratings Section */}
-            <div className="mt-8 flex items-center justify-center gap-8 text-center animate-fade-in-up animation-delay-600">
-              <div className="flex flex-col">
-                <div className="flex items-center justify-center gap-1 text-primary">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-current" />
-                  ))}
-                </div>
-                <p className="text-sm font-medium mt-1">5/5 Bewertungen</p>
+            <div className="mt-8 text-center animate-fade-in-up animation-delay-600">
+              <div className="flex justify-center gap-1 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                ))}
               </div>
-              <div className="w-px h-8 bg-border/50" />
-              <div>
-                <p className="text-sm font-medium">Über 1000 zufriedene Kunden</p>
-              </div>
+              <p className="text-sm font-medium mt-1">5/5 Bewertungen</p>
+              <p className="text-sm font-medium">Über 1000 zufriedene Kunden</p>
             </div>
-            <div className="flex justify-center gap-8 animate-fade-in-up animation-delay-500">
+            <div className="flex justify-center gap-8 animate-fade-in-up animation-delay-500 mt-8">
               <div className="transform transition-all duration-300">
                 <DSGVOBadge size="sm" />
               </div>
