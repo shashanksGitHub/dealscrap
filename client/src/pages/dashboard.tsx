@@ -179,9 +179,13 @@ export default function Dashboard() {
                     </>
                   )}
                 </Button>
-                {user?.credits === 0 && (
+                {user?.credits === 0 ? (
                   <p className="text-base text-destructive text-center">
                     Bitte wählen Sie eines der Credit-Pakete
+                  </p>
+                ) : (
+                  <p className="text-base text-muted-foreground text-center">
+                    Sie haben noch {user?.credits} Credits verfügbar
                   </p>
                 )}
               </div>
