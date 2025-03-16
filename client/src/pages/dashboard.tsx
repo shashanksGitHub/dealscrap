@@ -25,7 +25,8 @@ export default function Dashboard() {
     initialData: [],
     refetchOnWindowFocus: false,
     // Stellen Sie sicher, dass die Leads nach der Scraping-Operation neu geladen werden
-    refetchInterval: 5000
+    refetchInterval: 5000,
+    staleTime: 0 // Consider data immediately stale
   });
 
   const scrapeMutation = useMutation({
@@ -36,11 +37,6 @@ export default function Dashboard() {
 
       if (data.count < 1 || data.count > 100) {
         throw new Error("Bitte wählen Sie zwischen 1 und 100 Leads");
-      }
-
-      const locationRegex = /^[a-zA-Z\s-]+$/;
-      if (!locationRegex.test(data.location)) {
-        throw new Error("Ungültiges Standortformat");
       }
 
       if (user && user.credits < data.count) {
