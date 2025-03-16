@@ -40,9 +40,6 @@ export function NavHeader() {
             <div className="flex items-center gap-4">
               {!currentUser && (
                 <>
-                  <Link href="/leads-kaufen" className="text-muted-foreground hover:text-primary">
-                    Leads kaufen
-                  </Link>
                   <Link href="/blog" className="text-muted-foreground hover:text-primary">
                     Ratgeber
                   </Link>

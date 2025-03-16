@@ -1,9 +1,8 @@
-import { ArrowRightIcon, CheckIcon, GlobeIcon, SearchIcon, Check, ShieldCheck, Zap, Users, BarChart, Code, Megaphone, ShoppingCart, Wallet, Factory, Database, Target, Download, Coins, Star } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import CookieBanner from "@/components/cookie-banner";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { HamburgBadge } from "@/components/ui/hamburg-badge";
 import { Footer } from "@/components/layout/footer";
@@ -40,9 +39,9 @@ export default function LandingPage() {
                   Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/leads-kaufen">
+              <Link href="/auth">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full px-6 py-5 h-auto text-base font-medium bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105">
-                  Mehr erfahren
+                  Login
                 </Button>
               </Link>
             </div>
@@ -375,3 +374,6 @@ const faqs = [
     answer: "Nein, Sie können genau die Menge an Credits kaufen, die Sie benötigen. Wir bieten jedoch Mengenrabatte an, sodass der Preis pro Lead sinkt, je mehr Credits Sie auf einmal erwerben."
   }
 ];
+
+import { Zap, Users, BarChart, Code, Megaphone, ShoppingCart, Wallet, Factory, Database, Target, Download, Coins, Star, GlobeIcon, SearchIcon, ShieldCheck } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
