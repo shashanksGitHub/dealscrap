@@ -191,27 +191,32 @@ export async function registerRoutes(router: Router) {
 
       // Speichere die Leads in der Datenbank
       const savedLeads = await Promise.all(items.map(async (data: any) => {
-        const lead = await storage.createLead({
-          userId: req.user.id,
-          businessName: data.name || "",
-          address: data.address || "",
-          phone: data.phoneNumber || "",
-          email: data.email || "",
-          website: data.website || "",
-          category: query,
-          metadata: {
-            rating: data.rating,
-            totalScore: data.reviewsCount,
-            placeId: data.placeId
-          }
-        });
-        console.log('Saved lead:', lead);
-        return lead;
+        try {
+          const lead = await storage.createLead({
+            userId: req.user.id,
+            businessName: data.title || data.name || "",
+            address: data.address || "",
+            phone: data.phone || data.phoneNumber || "",
+            email: data.email || "",
+            website: data.website || "",
+            category: query,
+            metadata: {
+              rating: data.rating,
+              totalScore: data.reviewsCount,
+              placeId: data.placeId
+            }
+          });
+          console.log('Successfully saved lead:', lead);
+          return lead;
+        } catch (error) {
+          console.error('Error saving lead:', error);
+          throw error;
+        }
       }));
 
-      console.log('All leads saved, sending response');
+      console.log(`Successfully saved ${savedLeads.length} leads to database`);
       res.json(savedLeads);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error during scraping:', error);
       res.status(500).json({ 
         message: "Failed to scrape data", 
