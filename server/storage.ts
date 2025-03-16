@@ -1,11 +1,13 @@
 import { users, leads, blogPosts, type User, type Lead, type BlogPost, type InsertUser, type InsertBlogPost } from "@shared/schema";
+import { db } from "./db";
+import { eq, sql } from "drizzle-orm";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
 
 interface BusinessInfo {
-  [key: string]: any; //  A flexible type, allowing various business information fields.  Consider a more specific type if known.
+  [key: string]: any;
 }
 
 export interface IStorage {
@@ -28,22 +30,10 @@ export interface IStorage {
   updateBusinessInfo(userId: number, businessInfo: BusinessInfo): Promise<User>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private leads: Map<number, Lead>;
-  private blogPosts: Map<number, BlogPost>;
-  private currentUserId: number;
-  private currentLeadId: number;
-  private currentBlogPostId: number;
+export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {
-    this.users = new Map();
-    this.leads = new Map();
-    this.blogPosts = new Map();
-    this.currentUserId = 1;
-    this.currentLeadId = 1;
-    this.currentBlogPostId = 1;
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000,
     });
@@ -51,184 +41,126 @@ export class MemStorage implements IStorage {
 
   async getUser(id: number): Promise<User | undefined> {
     console.log(`Getting user with ID: ${id}`);
-    const user = this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
     console.log(`Found user:`, user);
     return user;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email === email,
-    );
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
   }
 
   async getUserByResetToken(token: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.resetToken === token,
-    );
+    const [user] = await db.select().from(users).where(eq(users.resetToken, token));
+    return user;
   }
 
   async createUser(insertUser: Omit<InsertUser, "passwordConfirm">): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = {
-      id,
-      email: insertUser.email,
-      password: insertUser.password,
-      credits: 0,
-      isActive: true,
-      createdAt: new Date(),
-      resetToken: null,
-      resetTokenExpiry: null
-    };
-    console.log(`Creating new user with ID ${id}:`, user);
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async setResetToken(userId: number, token: string, expiry: Date): Promise<void> {
-    const user = await this.getUser(userId);
-    if (!user) throw new Error("User not found");
-
-    const updatedUser = {
-      ...user,
-      resetToken: token,
-      resetTokenExpiry: expiry
-    };
-    this.users.set(userId, updatedUser);
+    await db
+      .update(users)
+      .set({ resetToken: token, resetTokenExpiry: expiry })
+      .where(eq(users.id, userId));
   }
 
   async clearResetToken(userId: number): Promise<void> {
-    const user = await this.getUser(userId);
-    if (!user) throw new Error("User not found");
-
-    const updatedUser = {
-      ...user,
-      resetToken: null,
-      resetTokenExpiry: null
-    };
-    this.users.set(userId, updatedUser);
+    await db
+      .update(users)
+      .set({ resetToken: null, resetTokenExpiry: null })
+      .where(eq(users.id, userId));
   }
 
   async updatePassword(userId: number, hashedPassword: string): Promise<void> {
-    const user = await this.getUser(userId);
-    if (!user) throw new Error("User not found");
-
-    const updatedUser = {
-      ...user,
-      password: hashedPassword
-    };
-    this.users.set(userId, updatedUser);
+    await db
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, userId));
   }
 
   async addCredits(userId: number, amount: number): Promise<User> {
     console.log(`Adding credits - User ID: ${userId}, Amount: ${amount}`);
-    const user = await this.getUser(userId);
+    const [user] = await db
+      .update(users)
+      .set({
+        credits: sql`${users.credits} + ${amount}`,
+      })
+      .where(eq(users.id, userId))
+      .returning();
 
     if (!user) {
       console.error(`User not found: ${userId}`);
       throw new Error("User not found");
     }
 
-    const currentCredits = typeof user.credits === 'number' ? user.credits : 0;
-    console.log(`Current credits for user ${userId}: ${currentCredits}`);
-
-    const updatedUser: User = {
-      ...user,
-      credits: currentCredits + amount
-    };
-
-    this.users.set(userId, updatedUser);
-    console.log(`Updated credits for user ${userId} to ${updatedUser.credits}`);
-
-    const verifiedUser = await this.getUser(userId);
-    if (!verifiedUser || verifiedUser.credits !== updatedUser.credits) {
-      console.error(`Failed to verify credit update for user ${userId}`);
-      throw new Error("Failed to verify credit update");
-    }
-
-    console.log(`Successfully verified credit update for user ${userId}`);
-    return updatedUser;
+    console.log(`Updated credits for user ${userId} to ${user.credits}`);
+    return user;
   }
 
   async createLead(lead: Omit<Lead, "id" | "createdAt">): Promise<Lead> {
-    const id = this.currentLeadId++;
-    const newLead: Lead = {
-      ...lead,
-      id,
-      createdAt: new Date()
-    };
-    this.leads.set(id, newLead);
+    console.log('Creating lead:', lead);
+    const [newLead] = await db.insert(leads).values(lead).returning();
+    console.log('Created lead:', newLead);
     return newLead;
   }
 
   async getLeadsByUserId(userId: number): Promise<Lead[]> {
-    return Array.from(this.leads.values()).filter(
-      (lead) => lead.userId === userId
-    );
+    console.log('Fetching leads for user:', userId);
+    const userLeads = await db.select().from(leads).where(eq(leads.userId, userId));
+    console.log('Found leads:', userLeads);
+    return userLeads;
   }
 
   async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
-    const id = this.currentBlogPostId++;
-    const newPost: BlogPost = {
-      id,
-      authorId: post.authorId,
-      title: post.title,
-      content: post.content,
-      isPublished: false,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    this.blogPosts.set(id, newPost);
+    const [newPost] = await db.insert(blogPosts).values(post).returning();
     return newPost;
   }
 
   async getBlogPost(id: number): Promise<BlogPost | undefined> {
-    return this.blogPosts.get(id);
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.id, id));
+    return post;
   }
 
   async getBlogPosts(authorId?: number): Promise<BlogPost[]> {
-    const posts = Array.from(this.blogPosts.values());
-    return authorId
-      ? posts.filter(post => post.authorId === authorId)
-      : posts;
+    if (authorId) {
+      return db.select().from(blogPosts).where(eq(blogPosts.authorId, authorId));
+    }
+    return db.select().from(blogPosts);
   }
 
   async updateBlogPost(id: number, updates: Partial<BlogPost>): Promise<BlogPost> {
-    const post = await this.getBlogPost(id);
+    const [post] = await db
+      .update(blogPosts)
+      .set(updates)
+      .where(eq(blogPosts.id, id))
+      .returning();
     if (!post) throw new Error("Blog post not found");
-
-    const updatedPost: BlogPost = {
-      ...post,
-      ...updates,
-      updatedAt: new Date()
-    };
-    this.blogPosts.set(id, updatedPost);
-    return updatedPost;
+    return post;
   }
 
   async updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User> {
-    const user = await this.getUser(userId);
+    const [user] = await db
+      .update(users)
+      .set({ stripeCustomerId })
+      .where(eq(users.id, userId))
+      .returning();
     if (!user) throw new Error("User not found");
-
-    const updatedUser = {
-      ...user,
-      stripeCustomerId
-    };
-    this.users.set(userId, updatedUser);
-    return updatedUser;
+    return user;
   }
 
   async updateBusinessInfo(userId: number, businessInfo: BusinessInfo): Promise<User> {
-    const user = await this.getUser(userId);
+    const [user] = await db
+      .update(users)
+      .set(businessInfo)
+      .where(eq(users.id, userId))
+      .returning();
     if (!user) throw new Error("User not found");
-
-    const updatedUser = {
-      ...user,
-      ...businessInfo
-    };
-    this.users.set(userId, updatedUser);
-    return updatedUser;
+    return user;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
