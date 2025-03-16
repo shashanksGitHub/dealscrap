@@ -1,21 +1,13 @@
 import Stripe from "stripe";
 import { storage } from "../storage";
 
-let stripe: Stripe | null = null;
-
-// Initialize Stripe only if secret key is available
-try {
-  if (process.env.STRIPE_SECRET_KEY) {
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2023-10-16",
-    });
-    console.log("Stripe initialized successfully");
-  } else {
-    console.warn("Stripe secret key missing - payment features will be disabled");
-  }
-} catch (error) {
-  console.error("Failed to initialize Stripe:", error);
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
 }
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 
 export async function createOrUpdateCustomer(userId: number, businessInfo: {
   companyName: string;
@@ -25,10 +17,6 @@ export async function createOrUpdateCustomer(userId: number, businessInfo: {
   country: string;
   vatId?: string;
 }) {
-  if (!stripe) {
-    throw new Error("Stripe is not initialized");
-  }
-
   const user = await storage.getUser(userId);
   if (!user) throw new Error("User not found");
 
@@ -68,10 +56,6 @@ export async function createPaymentIntent(
   amount: number,
   customerId: string
 ) {
-  if (!stripe) {
-    throw new Error("Stripe is not initialized");
-  }
-
   const paymentIntent = await stripe.paymentIntents.create({
     amount: Math.round(amount * 100),
     currency: 'eur',
@@ -92,10 +76,6 @@ export async function handleWebhookEvent(
   signature: string,
   rawBody: Buffer
 ): Promise<void> {
-  if (!stripe) {
-    throw new Error("Stripe is not initialized");
-  }
-
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
     throw new Error('Missing Stripe webhook secret');
   }
@@ -118,8 +98,4 @@ export async function handleWebhookEvent(
     console.error('Error processing webhook:', err.message);
     throw err;
   }
-}
-
-export function isStripeInitialized(): boolean {
-  return stripe !== null;
 }

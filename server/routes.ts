@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { insertLeadSchema, insertBlogPostSchema, businessInfoSchema } from "../shared/schema";
 import { storage } from "./storage";
-import { createOrUpdateCustomer, createPaymentIntent, handleWebhookEvent, isStripeInitialized } from "./services/stripe";
+import { createOrUpdateCustomer, createPaymentIntent, handleWebhookEvent } from "./services/stripe";
 
 export async function registerRoutes(router: Router) {
   // Get user info with additional verification
@@ -31,12 +31,6 @@ export async function registerRoutes(router: Router) {
     }
 
     try {
-      if (!isStripeInitialized()) {
-        return res.status(503).json({ 
-          message: "Zahlungssystem temporär nicht verfügbar. Bitte versuchen Sie es später erneut." 
-        });
-      }
-
       const businessInfo = businessInfoSchema.parse(req.body);
       await storage.updateBusinessInfo(req.user.id, businessInfo);
       const customer = await createOrUpdateCustomer(req.user.id, businessInfo);
@@ -54,12 +48,6 @@ export async function registerRoutes(router: Router) {
     }
 
     try {
-      if (!isStripeInitialized()) {
-        return res.status(503).json({ 
-          message: "Zahlungssystem temporär nicht verfügbar. Bitte versuchen Sie es später erneut." 
-        });
-      }
-
       const { amount, customerId } = req.body;
 
       if (!amount || !customerId) {
@@ -76,13 +64,9 @@ export async function registerRoutes(router: Router) {
 
   router.post("/stripe-webhook", async (req, res) => {
     try {
-      if (!isStripeInitialized()) {
-        return res.status(503).json({ message: "Stripe service not available" });
-      }
-
       await handleWebhookEvent(
         req.headers['stripe-signature'] as string,
-        req.body
+        (req as any).rawBody
       );
       res.json({ received: true });
     } catch (error: any) {
