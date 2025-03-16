@@ -12,8 +12,6 @@ import { motion } from "framer-motion";
 import { Helmet } from "react-helmet";
 
 export default function LandingPage() {
-  const { user } = useAuth();
-
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
