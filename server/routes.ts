@@ -168,17 +168,18 @@ export async function registerRoutes(router: Router) {
 
       // Konfiguriere den Compass Google Places Crawler
       const run = await apifyClient.actor("compass/crawler-google-places").call({
-        searchStrings: [`${query} in ${location}`],
-        maxPlaces: count,
+        searchStringsArray: [query],
+        locationQuery: location,
         language: "de",
-        extractContacts: true,
-        extractOpeningHours: false,
-        extractPeopleAlsoSearch: false,
-        extractPhotos: false,
-        extractReviews: false,
-        maxReviews: 0,
-        onlyDataFromSearchPages: true,
-        allPlacesNoSearchAction: false
+        maxPlaces: count,
+        includeWebResults: false,
+        maxQuestions: 0,
+        onlyDataFromSearchPage: false,
+        scrapeDirectories: false,
+        scrapeImageAuthors: false,
+        scrapeReviewsPersonalData: true,
+        scrapeTableReservationProvider: false,
+        skipClosedPlaces: false
       });
 
       // Warte auf die Ergebnisse
