@@ -17,14 +17,29 @@ export async function createPayment(
 
   console.log('Creating Mollie payment for user:', userId, 'amount:', amount);
 
+  // Get the domain from REPLIT_DOMAINS, fallback to a default if not available
+  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || '';
+
+  // Ensure we have a valid domain
+  if (!domain) {
+    throw new Error('No valid domain found for redirect URL');
+  }
+
+  // Create proper URLs using the domain
+  const baseUrl = `https://${domain}`;
+  const redirectUrl = `${baseUrl}/dashboard`;
+  const webhookUrl = `${baseUrl}/api/mollie-webhook`;
+
+  console.log('Using URLs:', { redirectUrl, webhookUrl });
+
   const payment = await mollieClient.payments.create({
     amount: {
       currency: "EUR",
       value: amount.toFixed(2) // Mollie erwartet einen String mit 2 Dezimalstellen
     },
     description,
-    redirectUrl: `${process.env.REPLIT_DOMAINS?.replace('0.0.0.0', 'replit.dev')}/dashboard`,
-    webhookUrl: `${process.env.REPLIT_DOMAINS?.replace('0.0.0.0', 'replit.dev')}/api/mollie-webhook`,
+    redirectUrl,
+    webhookUrl,
     metadata: {
       userId: userId.toString(),
       creditAmount: amount.toString()
