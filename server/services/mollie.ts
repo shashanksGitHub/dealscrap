@@ -10,7 +10,8 @@ const mollieClient = createMollieClient({ apiKey: process.env.MOLLIE_API_KEY });
 export async function createPayment(
   userId: number,
   amount: number,
-  description: string
+  description: string,
+  embedded = false
 ) {
   const user = await storage.getUser(userId);
   if (!user) throw new Error("User not found");
@@ -43,7 +44,8 @@ export async function createPayment(
     metadata: {
       userId: userId.toString(),
       creditAmount: amount.toString()
-    }
+    },
+    ...(embedded ? { locale: 'de_DE', profileId: process.env.MOLLIE_PROFILE_ID } : {})
   });
 
   console.log('Mollie payment created:', {

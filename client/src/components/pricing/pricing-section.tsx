@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PriceCard } from "./price-card";
 import { BusinessInfoModal } from "./business-info-modal";
+import { MollieCheckoutModal } from "./mollie-checkout-modal";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -13,6 +14,8 @@ export function PricingSection() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [showBusinessModal, setShowBusinessModal] = useState(false);
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [checkoutUrl, setCheckoutUrl] = useState<string>();
 
   const handleSelect = (price: number) => {
     setSelectedPrice(price);
@@ -27,14 +30,17 @@ export function PricingSection() {
       console.log('Initiating payment for amount:', selectedPrice);
       const response = await apiRequest("POST", "/api/business-info", {
         ...businessInfo,
-        amount: selectedPrice
+        amount: selectedPrice,
+        embedded: true // Signal that we want embedded checkout
       });
 
       const { checkoutUrl } = await response.json();
       console.log('Received checkout URL:', checkoutUrl);
 
       if (checkoutUrl) {
-        window.location.href = checkoutUrl;
+        setCheckoutUrl(checkoutUrl);
+        setShowBusinessModal(false);
+        setShowCheckoutModal(true);
       } else {
         throw new Error('Keine Checkout-URL erhalten');
       }
@@ -45,10 +51,14 @@ export function PricingSection() {
         description: "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
         variant: "destructive"
       });
-      setIsProcessing(false);
     } finally {
-      setShowBusinessModal(false); //Added to close modal after processing
+      setIsProcessing(false);
     }
+  };
+
+  const handleCloseCheckout = () => {
+    setShowCheckoutModal(false);
+    setCheckoutUrl(undefined);
   };
 
   return (
@@ -95,6 +105,13 @@ export function PricingSection() {
           onSubmit={handleSubmitBusinessInfo}
           isProcessing={isProcessing}
         />
+
+        <MollieCheckoutModal
+          isOpen={showCheckoutModal}
+          onClose={handleCloseCheckout}
+          checkoutUrl={checkoutUrl}
+        />
+
         {isProcessing && (
           <div className="mt-8 text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto" />

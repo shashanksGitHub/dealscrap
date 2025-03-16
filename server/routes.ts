@@ -33,7 +33,8 @@ export async function registerRoutes(router: Router) {
     try {
       console.log('Processing business info request:', {
         userId: req.user.id,
-        amount: req.body.amount
+        amount: req.body.amount,
+        embedded: req.body.embedded
       });
 
       const businessInfo = businessInfoSchema.parse(req.body);
@@ -47,7 +48,8 @@ export async function registerRoutes(router: Router) {
       const payment = await createPayment(
         req.user.id,
         amount,
-        `${amount} Credits für ${businessInfo.companyName}`
+        `${amount} Credits für ${businessInfo.companyName}`,
+        req.body.embedded
       );
 
       const checkoutUrl = payment.getCheckoutUrl();
