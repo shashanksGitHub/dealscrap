@@ -30,6 +30,7 @@ export const searches = pgTable("searches", {
   query: text("query").notNull(),
   location: text("location").notNull(),
   count: integer("count").notNull(),
+  isRead: boolean("is_read").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

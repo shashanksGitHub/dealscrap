@@ -180,6 +180,30 @@ export async function registerRoutes(router: Router) {
     }
   });
 
+  router.patch("/searches/:id/mark-read", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
+
+    try {
+      const [search] = await db
+        .update(searches)
+        .set({ isRead: true })
+        .where(and(
+          eq(searches.id, parseInt(req.params.id)),
+          eq(searches.userId, req.user.id)
+        ))
+        .returning();
+
+      if (!search) {
+        return res.status(404).json({ message: "Suche nicht gefunden" });
+      }
+
+      res.json(search);
+    } catch (error) {
+      console.error('Error marking search as read:', error);
+      res.status(500).json({ message: "Fehler beim Markieren der Suche als gelesen" });
+    }
+  });
+
   router.post("/scrape", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
     const { query, location, count } = req.body;

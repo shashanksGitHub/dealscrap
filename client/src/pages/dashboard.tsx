@@ -162,6 +162,16 @@ export default function Dashboard() {
     }
   };
 
+  const markSearchAsRead = useMutation({
+    mutationFn: async (searchId: number) => {
+      const response = await apiRequest("PATCH", `/api/searches/${searchId}/mark-read`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/searches"] });
+    }
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto max-w-[1200px] px-6 lg:px-8 py-12 space-y-16">
@@ -315,13 +325,25 @@ export default function Dashboard() {
                 <p className="text-lg text-muted-foreground">Keine Suchen gefunden</p>
               </div>
             ) : (
-              <Accordion type="single" collapsible className="w-full">
+              <Accordion
+                type="single"
+                collapsible
+                className="w-full"
+                onValueChange={(value) => {
+                  if (value) {
+                    markSearchAsRead.mutate(parseInt(value));
+                  }
+                }}
+              >
                 {searches.map((search: any) => (
                   <AccordionItem key={search.id} value={search.id.toString()}>
                     <AccordionTrigger className="hover:no-underline py-3">
                       <div className="flex items-center justify-between w-full pr-4">
                         <div className="flex items-center gap-4">
-                          <div>
+                          {!search.isRead && (
+                            <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                          )}
+                          <div className="flex items-baseline gap-3">
                             <h3 className="font-semibold text-base">{search.query} in {search.location}</h3>
                             <p className="text-xs text-muted-foreground">
                               {format(new Date(search.createdAt), "dd. MMMM yyyy, HH:mm 'Uhr'", { locale: de })}
