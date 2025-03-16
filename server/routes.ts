@@ -166,18 +166,21 @@ export async function registerRoutes(router: Router) {
     try {
       console.log(`Starting scrape for ${count} leads with query: ${query}, location: ${location}`);
 
-      // Verwende den korrekten Actor-Namen für Google Places Scraping
-      const run = await apifyClient.actor("compass/google-places-scraper").call({
+      // Aktualisierter Actor-Name und Parameter
+      const run = await apifyClient.actor("tugkan/google-places-scraper").call({
+        startUrls: [],
         searchStrings: [`${query} in ${location}`],
         maxCrawledPlaces: count,
         language: "de",
+        maxImages: 0,
         maxReviews: 0,
-        personalDataOptions: {
-          validatePhoneNumbers: true,
-          extractPhoneNumbers: true,
-          extractEmails: true,
-          extractWebsites: true
-        }
+        maxCrawledReviews: 0,
+        exportPlaceUrls: false,
+        includeHistogram: false,
+        includeOpeningHours: false,
+        includePeopleAlsoSearch: false,
+        onlyDataFromSearchPages: true,
+        allPlacesNoSearchAction: false
       });
 
       // Warte auf die Ergebnisse
@@ -191,7 +194,7 @@ export async function registerRoutes(router: Router) {
       const savedLeads = await Promise.all(items.map(async (data: any) => {
         return await storage.createLead({
           userId: req.user.id,
-          businessName: data.name || "",
+          businessName: data.title || "",
           address: data.address || "",
           phone: data.phone || "",
           email: data.email || "",
