@@ -88,7 +88,7 @@ setupAuth(app);
 // Then register API routes before any static middleware
 log("Registering API routes...");
 const apiRouter = express.Router();
-await registerRoutes(apiRouter);
+registerRoutes(apiRouter);
 
 // Mount API router with explicit content type
 app.use('/api', (req, res, next) => {
@@ -102,7 +102,6 @@ app.use('/api', (req, res, next) => {
   log(`Processing API request: ${req.method} ${req.path}`);
   next();
 }, apiRouter);
-
 
 // Enhanced error handler middleware with recovery mechanism
 const errorHandler = async (err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -138,54 +137,27 @@ async function startServer() {
       throw new Error("Critical services are not available");
     }
 
-
     if (isProduction) {
       log("Setting up production static file serving...");
-      const publicDir = path.resolve(__dirname, '../dist/public');
-      log(`Serving static files from: ${publicDir}`);
-      log(`Production environment detected:
-NODE_ENV: ${process.env.NODE_ENV}
-PORT: ${process.env.PORT}
-PWD: ${process.cwd()}
-BUILD_DIR: ${publicDir}`);
 
-      // Verify build directory exists
+      // In production, serve the built client files from dist/public
+      const publicDir = path.join(process.cwd(), 'dist/public');
+      log(`Serving static files from: ${publicDir}`);
+
       if (!fs.existsSync(publicDir)) {
-        log(`⚠️ Warning: Build directory ${publicDir} does not exist!`);
-        throw new Error(`Build directory ${publicDir} does not exist`);
-      } else {
-        log(`✓ Build directory ${publicDir} exists`);
-        // List contents of build directory
-        const files = fs.readdirSync(publicDir);
-        log(`Build directory contents: ${files.join(', ')}`);
+        throw new Error(`Production build directory not found: ${publicDir}`);
       }
 
-      // Serve static files with proper MIME types
+      // Serve static files with cache control
       app.use(express.static(publicDir, {
-        index: false,
-        extensions: ['html', 'htm'],
-        setHeaders: (res, path) => {
-          if (path.endsWith('.html')) {
-            res.setHeader('Cache-Control', 'no-cache');
-          } else {
-            res.setHeader('Cache-Control', 'public, max-age=31536000');
-          }
-          log(`Serving static file: ${path}`);
-        }
+        maxAge: '1y',
+        etag: true,
+        lastModified: true,
       }));
 
-      // Serve index.html for all routes in production
-      app.get('*', (_req, res) => {
-        const indexPath = path.resolve(publicDir, 'index.html');
-        log(`Attempting to serve index.html from: ${indexPath}`);
-
-        if (!fs.existsSync(indexPath)) {
-          log(`❌ Error: index.html not found at ${indexPath}`);
-          return res.status(500).send('Server configuration error: index.html not found');
-        }
-
-        log(`✓ Serving index.html from ${indexPath}`);
-        res.sendFile(indexPath);
+      // Always return index.html for any unknown routes (SPA support)
+      app.get('*', (req, res) => {
+        res.sendFile(path.join(publicDir, 'index.html'));
       });
     } else {
       log("Setting up development Vite middleware...");
@@ -196,19 +168,8 @@ BUILD_DIR: ${publicDir}`);
     app.use(errorHandler);
 
     const port = Number(process.env.PORT || 5000);
-
     server.listen(port, "0.0.0.0", () => {
-      log(`Server running at http://0.0.0.0:${port} in ${process.env.NODE_ENV} mode`);
-    });
-
-    server.on('error', async (error: any) => {
-      if (error.code === 'EADDRINUSE') {
-        log(`Error: Port ${port} is already in use`);
-      } else {
-        log(`Server error: ${error.message}`);
-        await recoveryService.handleDeploymentError(error);
-      }
-      process.exit(1);
+      log(`Server running at http://0.0.0.0:${port} in ${isProduction ? 'production' : 'development'} mode`);
     });
 
   } catch (error: any) {
