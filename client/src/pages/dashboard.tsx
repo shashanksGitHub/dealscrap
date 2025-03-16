@@ -8,11 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2, CreditCard } from "lucide-react";
+import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2 } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
-import { BusinessInfoModal } from "@/components/pricing/business-info-modal";
-import type { BusinessInfo } from "@shared/schema";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -20,8 +18,6 @@ export default function Dashboard() {
   const [query, setQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
-  const [showBusinessModal, setShowBusinessModal] = useState(false);
 
   const { data: leads = [], isLoading: isLeadsLoading } = useQuery<Lead[]>({
     queryKey: ["/api/leads"],
@@ -81,20 +77,12 @@ export default function Dashboard() {
     { id: "1000", credits: 1000, price: 600 },
   ];
 
-  const handlePurchase = (price: number) => {
-    setSelectedPrice(price);
-    setShowBusinessModal(true);
-  };
-
-  const handleSubmitBusinessInfo = async (businessInfo: BusinessInfo) => {
-    if (!selectedPrice) return;
-
+  const handlePurchase = async (price: number) => {
     setIsProcessingPayment(true);
     try {
-      console.log('Initiating payment for amount:', selectedPrice);
-      const response = await apiRequest("POST", "/api/business-info", {
-        ...businessInfo,
-        amount: selectedPrice
+      console.log('Initiating payment for amount:', price);
+      const response = await apiRequest("POST", "/api/create-payment", {
+        amount: price
       });
 
       const { checkoutUrl } = await response.json();
@@ -112,6 +100,7 @@ export default function Dashboard() {
         description: "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
         variant: "destructive"
       });
+    } finally {
       setIsProcessingPayment(false);
     }
   };
@@ -290,12 +279,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </main>
-      <BusinessInfoModal
-        isOpen={showBusinessModal}
-        onClose={() => setShowBusinessModal(false)}
-        onSubmit={handleSubmitBusinessInfo}
-        isProcessing={isProcessingPayment}
-      />
     </div>
   );
 }
