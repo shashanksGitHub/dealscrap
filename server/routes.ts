@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { insertLeadSchema, insertBlogPostSchema, businessInfoSchema } from "../shared/schema";
 import { storage } from "./storage";
-import { createOrUpdateCustomer, createPaymentIntent, handleWebhookEvent } from "./services/stripe";
+import { createPayment, handleWebhookEvent } from "./services/mollie";
 
 export async function registerRoutes(router: Router) {
   // Get user info with additional verification
@@ -33,41 +33,36 @@ export async function registerRoutes(router: Router) {
     try {
       const businessInfo = businessInfoSchema.parse(req.body);
       await storage.updateBusinessInfo(req.user.id, businessInfo);
-      const customer = await createOrUpdateCustomer(req.user.id, businessInfo);
 
-      res.json({ success: true, customerId: customer.id });
+      const amount = parseInt(req.body.amount);
+      if (!amount) {
+        return res.status(400).json({ message: "Betrag ist erforderlich" });
+      }
+
+      const payment = await createPayment(
+        req.user.id,
+        amount,
+        `${amount} Credits für ${businessInfo.companyName}`
+      );
+
+      res.json({ 
+        success: true, 
+        checkoutUrl: payment.getCheckoutUrl() 
+      });
     } catch (error: any) {
-      console.error('Error updating business info:', error);
+      console.error('Error creating payment:', error);
       res.status(400).json({ message: error.message });
     }
   });
 
-  router.post("/create-payment-intent", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Nicht authentifiziert" });
-    }
-
+  router.post("/mollie-webhook", async (req, res) => {
     try {
-      const { amount, customerId } = req.body;
-
-      if (!amount || !customerId) {
-        return res.status(400).json({ message: "Betrag und Customer ID sind erforderlich" });
+      const paymentId = req.body.id;
+      if (!paymentId) {
+        return res.status(400).json({ message: "Payment ID fehlt" });
       }
 
-      const paymentIntent = await createPaymentIntent(req.user.id, amount, customerId);
-      res.json({ clientSecret: paymentIntent.client_secret });
-    } catch (error: any) {
-      console.error('Error creating payment intent:', error);
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  router.post("/stripe-webhook", async (req, res) => {
-    try {
-      await handleWebhookEvent(
-        req.headers['stripe-signature'] as string,
-        (req as any).rawBody
-      );
+      await handleWebhookEvent(paymentId);
       res.json({ received: true });
     } catch (error: any) {
       console.error('Webhook error:', error);
