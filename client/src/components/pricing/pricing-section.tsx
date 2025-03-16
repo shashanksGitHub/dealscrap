@@ -13,7 +13,7 @@ export function PricingSection() {
   const handleSelect = async (price: number) => {
     setIsProcessing(true);
     try {
-      // Direkt Business-Info senden und Mollie Payment erstellen
+      console.log('Initiating payment for amount:', price);
       const response = await apiRequest("POST", "/api/business-info", {
         amount: price,
         companyName: user?.companyName || "",
@@ -25,9 +25,13 @@ export function PricingSection() {
       });
 
       const { checkoutUrl } = await response.json();
+      console.log('Received checkout URL:', checkoutUrl);
+
       if (checkoutUrl) {
         // Direkt zum Mollie Checkout weiterleiten
         window.location.href = checkoutUrl;
+      } else {
+        throw new Error('Keine Checkout-URL erhalten');
       }
     } catch (error: any) {
       console.error('Error initiating payment:', error);

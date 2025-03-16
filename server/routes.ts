@@ -31,6 +31,11 @@ export async function registerRoutes(router: Router) {
     }
 
     try {
+      console.log('Processing business info request:', {
+        userId: req.user.id,
+        amount: req.body.amount
+      });
+
       const businessInfo = businessInfoSchema.parse(req.body);
       await storage.updateBusinessInfo(req.user.id, businessInfo);
 
@@ -45,9 +50,12 @@ export async function registerRoutes(router: Router) {
         `${amount} Credits für ${businessInfo.companyName}`
       );
 
+      const checkoutUrl = payment.getCheckoutUrl();
+      console.log('Payment created, redirecting to:', checkoutUrl);
+
       res.json({ 
         success: true, 
-        checkoutUrl: payment.getCheckoutUrl() 
+        checkoutUrl
       });
     } catch (error: any) {
       console.error('Error creating payment:', error);
@@ -62,6 +70,7 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ message: "Payment ID fehlt" });
       }
 
+      console.log('Received webhook for payment:', paymentId);
       await handleWebhookEvent(paymentId);
       res.json({ received: true });
     } catch (error: any) {

@@ -13,7 +13,6 @@ import ResetPassword from "@/pages/reset-password";
 import Impressum from "@/pages/impressum";
 import Datenschutz from "@/pages/datenschutz";
 import AGB from "@/pages/agb";
-import Checkout from "@/pages/checkout";
 import LeadsKaufen from "@/pages/leads-kaufen";
 import Dashboard from "@/pages/dashboard";
 import { ProtectedRoute } from "./lib/protected-route";
@@ -38,7 +37,6 @@ function Router() {
         <Route path="/agb" component={AGB} />
         <ProtectedRoute path="/blog/new" component={NewBlogPost} />
         <ProtectedRoute path="/dashboard" component={Dashboard} />
-        <ProtectedRoute path="/checkout/:amount" component={Checkout} />
         <Route component={NotFound} />
       </Switch>
     </>

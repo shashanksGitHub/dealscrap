@@ -8,17 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2 } from "lucide-react";
+import { SearchIcon, DownloadIcon, PlayCircleIcon, Loader2, CreditCard } from "lucide-react";
 import type { Lead } from "@shared/schema";
 import { cn } from "@/lib/utils";
-import { useLocation } from "wouter";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
-  const [, setLocation] = useLocation();
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   const { data: leads = [], isLoading: isLeadsLoading } = useQuery<Lead[]>({
     queryKey: ["/api/leads"],
@@ -78,9 +77,35 @@ export default function Dashboard() {
     { id: "1000", credits: 1000, price: 600 },
   ];
 
-  const handlePurchase = (price: number) => {
-    // Direkt zum Checkout mit dem ausgewählten Preis weiterleiten
-    setLocation(`/checkout/${price}`);
+  const handlePurchase = async (price: number) => {
+    setIsProcessingPayment(true);
+    try {
+      // Direkt Business-Info senden und Mollie Payment erstellen
+      const response = await apiRequest("POST", "/api/business-info", {
+        amount: price,
+        companyName: user?.companyName || "",
+        vatId: user?.vatId || "",
+        street: user?.street || "",
+        city: user?.city || "",
+        postalCode: user?.postalCode || "",
+        country: user?.country || "DE"
+      });
+
+      const { checkoutUrl } = await response.json();
+      if (checkoutUrl) {
+        // Direkt zum Mollie Checkout weiterleiten
+        window.location.href = checkoutUrl;
+      }
+    } catch (error: any) {
+      console.error('Error initiating payment:', error);
+      toast({
+        title: "Fehler",
+        description: "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
 
   return (
@@ -182,6 +207,7 @@ export default function Dashboard() {
                       "relative flex flex-col items-center justify-center gap-2 p-6 h-auto min-h-[140px]",
                       pkg.recommended && "border-2 border-primary shadow-lg"
                     )}
+                    disabled={isProcessingPayment}
                   >
                     {pkg.recommended && (
                       <Badge
@@ -193,6 +219,9 @@ export default function Dashboard() {
                     )}
                     <span className="text-2xl font-bold">{pkg.credits} Credits</span>
                     <span className="text-3xl font-bold text-primary">€{pkg.price}</span>
+                    {isProcessingPayment && (
+                      <Loader2 className="h-4 w-4 animate-spin absolute bottom-2 right-2" />
+                    )}
                   </Button>
                 ))}
               </div>
