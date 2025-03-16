@@ -7,61 +7,53 @@ import { DSGVOBadge } from "@/components/ui/dsgvo-badge";
 import { HamburgBadge } from "@/components/ui/hamburg-badge";
 import { Footer } from "@/components/layout/footer";
 import { ActivityBubble } from "@/components/activity-bubble";
+import { Star } from "lucide-react";
+import { Zap, Users, BarChart, Code, Megaphone, ShoppingCart, Wallet, Factory, Database, Target, Download, Coins, GlobeIcon, SearchIcon, ShieldCheck } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function LandingPage() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Animierter Hintergrund */}
+      <section className="pt-32 pb-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(black,transparent_70%)] -z-10" />
         <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl opacity-70 animate-blob" />
         <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
-        <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-blue-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-4000" />
 
-        <div className="max-w-[1200px] mx-auto px-6 lg:px-8 py-12 lg:py-20">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full text-primary text-sm font-medium mb-4 animate-fade-in">
-              <Zap className="h-3.5 w-3.5" />
-              <span>Höchsteffiziente Leadgenerierung durch KI-Technologie</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-primary via-violet-500 to-blue-500 bg-clip-text text-transparent leading-[1.2] animate-gradient">
-              Einfach & kostengünstig B2B-Leads scrapen
-            </h1>
-            <p className="text-base lg:text-lg text-muted-foreground mb-6 max-w-xl mx-auto animate-fade-in-up">
-              Finden Sie qualifizierte Geschäftskontakte mit unserem leistungsstarken Tool und steigern Sie Ihren Vertriebserfolg.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6 animate-fade-in-up animation-delay-300">
-              <Link href="/auth">
-                <Button size="lg" className="w-full sm:w-auto rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105 animate-wiggle">
-                  Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/auth">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto rounded-full px-6 py-5 h-auto text-base font-medium bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 hover:scale-105">
-                  Login
-                </Button>
-              </Link>
-            </div>
-            {/* Ratings Section */}
-            <div className="text-center animate-fade-in-up animation-delay-600">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center max-w-xl mx-auto text-center">
+            <Link href="/auth">
+              <Button size="lg" className="rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300">
+                Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+
+            {/* Rating Section */}
+            <div className="mt-6 text-center">
               <div className="flex justify-center gap-1">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <p className="text-sm font-medium mt-2">5/5 Bewertungen</p>
-              <p className="text-sm text-muted-foreground">Über 1000 zufriedene Kunden</p>
+              <p className="text-lg mt-2">5/5 Bewertungen</p>
+              <p className="text-muted-foreground">Über 1000 zufriedene Kunden</p>
             </div>
+
             {/* Trust Badges */}
-            <div className="flex justify-center gap-8 animate-fade-in-up animation-delay-500 mt-8">
-              <div className="transform transition-all duration-300">
-                <DSGVOBadge size="sm" />
+            <div className="mt-8 grid grid-cols-2 gap-8">
+              <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl text-center">
+                <div className="flex flex-col items-center">
+                  <img src="dsgvo-logo.png" alt="DSGVO" className="h-8 mb-2" />
+                  <h3 className="text-lg font-medium">DSGVO-konform</h3>
+                  <p className="text-sm text-muted-foreground">Höchste Sicherheitsstandards</p>
+                </div>
               </div>
-              <div className="transform transition-all duration-300">
-                <HamburgBadge size="sm" />
+              <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl text-center">
+                <img src="/attached_assets/DEU_Hamburg_COA.svg.png" alt="Hamburg" className="h-8 mb-2" />
+                <h3 className="text-lg font-medium">Hamburg</h3>
+                <p className="text-sm text-muted-foreground">Entwickelt für den DACH-Raum</p>
               </div>
             </div>
           </div>
@@ -370,6 +362,3 @@ const faqs = [
     answer: "Nein, Sie können genau die Menge an Credits kaufen, die Sie benötigen. Wir bieten jedoch Mengenrabatte an, sodass der Preis pro Lead sinkt, je mehr Credits Sie auf einmal erwerben."
   }
 ];
-
-import { Zap, Users, BarChart, Code, Megaphone, ShoppingCart, Wallet, Factory, Database, Target, Download, Coins, Star, GlobeIcon, SearchIcon, ShieldCheck } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
