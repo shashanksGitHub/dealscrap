@@ -35,7 +35,6 @@ export default function AuthPage() {
           onOpenChange={(open) => {
             setShowTutorial(open);
             if (!open) {
-              // Redirect to dashboard after closing tutorial
               window.location.href = "/dashboard";
             }
           }} 
