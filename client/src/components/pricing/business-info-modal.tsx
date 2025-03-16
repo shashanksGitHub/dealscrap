@@ -1,16 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { businessInfoSchema, type BusinessInfo } from "@shared/schema";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -27,6 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import {Label} from "@/components/ui/label"; // Added missing import
 
 const COUNTRIES = [
   { value: 'DE', label: 'Deutschland' },
@@ -42,6 +39,16 @@ interface BusinessInfoModalProps {
 }
 
 export function BusinessInfoModal({ isOpen, onClose, onSubmit, isProcessing }: BusinessInfoModalProps) {
+  // Lade gespeicherte Business-Informationen
+  const { data: savedBusinessInfo, isLoading } = useQuery({ //Renamed isLoading for clarity
+    queryKey: ['/api/user/business-info'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/user/business-info');
+      return response.json();
+    },
+    enabled: isOpen // Nur laden, wenn Modal geöffnet ist
+  });
+
   const form = useForm<BusinessInfo>({
     resolver: zodResolver(businessInfoSchema),
     defaultValues: {
@@ -54,13 +61,24 @@ export function BusinessInfoModal({ isOpen, onClose, onSubmit, isProcessing }: B
     }
   });
 
+  // Automatisch Formular mit gespeicherten Daten füllen
+  useEffect(() => {
+    if (savedBusinessInfo) {
+      Object.entries(savedBusinessInfo).forEach(([key, value]) => {
+        form.setValue(key as keyof BusinessInfo, value);
+      });
+    }
+  }, [savedBusinessInfo, form]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Unternehmensdaten für die Rechnung</DialogTitle>
+          <DialogTitle>
+            {savedBusinessInfo ? "Gespeicherte Unternehmensdaten" : "Unternehmensdaten für die Rechnung"}
+          </DialogTitle>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -160,12 +178,14 @@ export function BusinessInfoModal({ isOpen, onClose, onSubmit, isProcessing }: B
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isProcessing}>
+            <Button type="submit" className="w-full" disabled={isProcessing || isLoading}> {/* Added isLoading to disable button during loading */}
               {isProcessing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Verarbeitung...
                 </>
+              ) : savedBusinessInfo ? (
+                "Mit gespeicherten Daten fortfahren"
               ) : (
                 "Weiter zur Zahlung"
               )}

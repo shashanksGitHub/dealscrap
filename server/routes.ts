@@ -24,6 +24,21 @@ export async function registerRoutes(router: Router) {
     }
   });
 
+  // Get saved business info
+  router.get("/user/business-info", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Nicht authentifiziert" });
+    }
+
+    try {
+      const businessInfo = await storage.getBusinessInfo(req.user.id);
+      res.json(businessInfo || {});
+    } catch (error: any) {
+      console.error('Error fetching business info:', error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Business information and payment routes
   router.post("/business-info", async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -55,8 +70,8 @@ export async function registerRoutes(router: Router) {
       const checkoutUrl = payment.getCheckoutUrl();
       console.log('Payment created, redirecting to:', checkoutUrl);
 
-      res.json({ 
-        success: true, 
+      res.json({
+        success: true,
         checkoutUrl
       });
     } catch (error: any) {
