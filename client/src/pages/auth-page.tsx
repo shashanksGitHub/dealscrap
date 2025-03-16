@@ -11,12 +11,38 @@ import { Redirect } from "wouter";
 import { Footer } from "@/components/layout/footer";
 import { Lock, Mail, CheckCircle } from "lucide-react";
 import { TestimonialCarousel } from "@/components/testimonial-carousel";
+import { VideoTutorialDialog } from "@/components/ui/video-tutorial-dialog";
+import { useState, useEffect } from "react";
 
 export default function AuthPage() {
   const { user } = useAuth();
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    // Check if user just logged in and hasn't seen the tutorial
+    if (user && localStorage.getItem("tutorialWatched") !== "true") {
+      setShowTutorial(true);
+      // Mark tutorial as watched
+      localStorage.setItem("tutorialWatched", "true");
+    }
+  }, [user]);
 
   if (user) {
-    return <Redirect to="/dashboard" />;
+    return (
+      <>
+        <VideoTutorialDialog 
+          open={showTutorial} 
+          onOpenChange={(open) => {
+            setShowTutorial(open);
+            if (!open) {
+              // Redirect to dashboard after closing tutorial
+              window.location.href = "/dashboard";
+            }
+          }} 
+        />
+        <Redirect to="/dashboard" />
+      </>
+    );
   }
 
   return (

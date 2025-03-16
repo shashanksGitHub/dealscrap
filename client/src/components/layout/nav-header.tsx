@@ -4,15 +4,9 @@ import { Button } from "@/components/ui/button";
 import { LogOutIcon, PlayCircleIcon } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { CircleProgress } from "@/components/ui/circle-progress";
-import { useState } from "react";
-import { VideoTutorialDialog } from "@/components/ui/video-tutorial-dialog";
 
 export function NavHeader() {
   const { user, logout } = useAuth();
-  const [showTutorial, setShowTutorial] = useState(() => {
-    return localStorage.getItem("tutorialWatched") !== "true";
-  });
 
   // Fetch fresh user data every 5 seconds
   const { data: freshUserData } = useQuery({
@@ -57,15 +51,6 @@ export function NavHeader() {
                       {currentUser.credits}
                     </span>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowTutorial(true)}
-                    className="text-muted-foreground hover:text-primary"
-                  >
-                    <PlayCircleIcon className="w-4 h-4 mr-2" />
-                    Anleitung
-                  </Button>
                   <Button variant="outline" size="sm" onClick={logout}>
                     <LogOutIcon className="h-4 w-4 mr-2" />
                     Logout
@@ -82,7 +67,6 @@ export function NavHeader() {
           </nav>
         </div>
       </div>
-      <VideoTutorialDialog open={showTutorial} onOpenChange={setShowTutorial} />
     </header>
   );
 }
