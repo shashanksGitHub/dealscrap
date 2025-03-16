@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { insertLeadSchema, insertBlogPostSchema, businessInfoSchema } from "../shared/schema";
+import { insertLeadSchema, insertBlogPostSchema } from "../shared/schema";
 import { storage } from "./storage";
 import { createPayment, handleWebhookEvent } from "./services/mollie";
 
@@ -24,36 +24,18 @@ export async function registerRoutes(router: Router) {
     }
   });
 
-  // Get saved business info
-  router.get("/user/business-info", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Nicht authentifiziert" });
-    }
-
-    try {
-      const businessInfo = await storage.getBusinessInfo(req.user.id);
-      res.json(businessInfo || {});
-    } catch (error: any) {
-      console.error('Error fetching business info:', error);
-      res.status(500).json({ message: error.message });
-    }
-  });
 
   // Business information and payment routes
-  router.post("/business-info", async (req, res) => {
+  router.post("/create-payment", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Nicht authentifiziert" });
     }
 
     try {
-      console.log('Processing business info request:', {
+      console.log('Processing payment request:', {
         userId: req.user.id,
-        amount: req.body.amount,
-        embedded: req.body.embedded
+        amount: req.body.amount
       });
-
-      const businessInfo = businessInfoSchema.parse(req.body);
-      await storage.updateBusinessInfo(req.user.id, businessInfo);
 
       const amount = parseInt(req.body.amount);
       if (!amount) {
@@ -63,8 +45,7 @@ export async function registerRoutes(router: Router) {
       const payment = await createPayment(
         req.user.id,
         amount,
-        `${amount} Credits für ${businessInfo.companyName}`,
-        req.body.embedded
+        `${amount} Credits`
       );
 
       const checkoutUrl = payment.getCheckoutUrl();

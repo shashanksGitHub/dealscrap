@@ -1,64 +1,26 @@
 import { useState } from 'react';
 import { PriceCard } from "./price-card";
-import { BusinessInfoModal } from "./business-info-modal";
 import { MollieCheckoutModal } from "./mollie-checkout-modal";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
-import type { BusinessInfo } from "@shared/schema";
 
 export function PricingSection() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
-  const [showBusinessModal, setShowBusinessModal] = useState(false);
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
-  const [checkoutUrl, setCheckoutUrl] = useState<string>();
 
   const handleSelect = (price: number) => {
     setSelectedPrice(price);
-    setShowBusinessModal(true);
-  };
-
-  const handleSubmitBusinessInfo = async (businessInfo: BusinessInfo) => {
-    if (!selectedPrice) return;
-
-    setIsProcessing(true);
-    try {
-      console.log('Initiating payment for amount:', selectedPrice);
-      const response = await apiRequest("POST", "/api/business-info", {
-        ...businessInfo,
-        amount: selectedPrice,
-        embedded: true // Signal that we want embedded checkout
-      });
-
-      const { checkoutUrl } = await response.json();
-      console.log('Received checkout URL:', checkoutUrl);
-
-      if (checkoutUrl) {
-        setCheckoutUrl(checkoutUrl);
-        setShowBusinessModal(false);
-        setShowCheckoutModal(true);
-      } else {
-        throw new Error('Keine Checkout-URL erhalten');
-      }
-    } catch (error: any) {
-      console.error('Error initiating payment:', error);
-      toast({
-        title: "Fehler",
-        description: "Bei der Zahlungsvorbereitung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsProcessing(false);
-    }
+    setShowCheckoutModal(true);
   };
 
   const handleCloseCheckout = () => {
     setShowCheckoutModal(false);
-    setCheckoutUrl(undefined);
+    setSelectedPrice(null);
   };
 
   return (
@@ -99,17 +61,10 @@ export function PricingSection() {
           />
         </div>
 
-        <BusinessInfoModal
-          isOpen={showBusinessModal}
-          onClose={() => setShowBusinessModal(false)}
-          onSubmit={handleSubmitBusinessInfo}
-          isProcessing={isProcessing}
-        />
-
         <MollieCheckoutModal
           isOpen={showCheckoutModal}
           onClose={handleCloseCheckout}
-          checkoutUrl={checkoutUrl}
+          amount={selectedPrice || 0}
         />
 
         {isProcessing && (

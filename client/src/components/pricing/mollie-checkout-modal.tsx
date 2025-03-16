@@ -2,31 +2,43 @@ import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog";
-import { Loader2 } from "lucide-react";
+import { MolliePaymentForm } from "./mollie-payment-form";
+import { useToast } from "@/hooks/use-toast";
 
 interface MollieCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  checkoutUrl?: string;
+  amount: number;
 }
 
-export function MollieCheckoutModal({ isOpen, onClose, checkoutUrl }: MollieCheckoutModalProps) {
+export function MollieCheckoutModal({ isOpen, onClose, amount }: MollieCheckoutModalProps) {
+  const { toast } = useToast();
+
+  const handleSuccess = () => {
+    toast({
+      title: "Erfolg",
+      description: "Ihre Zahlung wurde erfolgreich verarbeitet",
+    });
+    onClose();
+  };
+
+  const handleError = (error: Error) => {
+    toast({
+      title: "Fehler",
+      description: "Bei der Zahlung ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+      variant: "destructive"
+    });
+    console.error('Payment error:', error);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[800px] sm:h-[600px] p-0">
-        {checkoutUrl ? (
-          <iframe
-            src={checkoutUrl}
-            className="w-full h-full border-none rounded-lg"
-            title="Mollie Checkout"
-            allow="payment"
-            sandbox="allow-same-origin allow-scripts allow-forms allow-modals"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full">
-            <Loader2 className="h-8 w-8 animate-spin" />
-          </div>
-        )}
+      <DialogContent className="sm:max-w-[500px]">
+        <MolliePaymentForm
+          amount={amount}
+          onSuccess={handleSuccess}
+          onError={handleError}
+        />
       </DialogContent>
     </Dialog>
   );
