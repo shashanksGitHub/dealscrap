@@ -127,9 +127,9 @@ async function startServer() {
     log("Starting server initialization...");
     const server = await import('http').then(({ createServer }) => createServer(app));
 
-    // Set environment based on NODE_ENV
-    const isProduction = process.env.NODE_ENV === "production";
-    log(`Starting server in ${isProduction ? 'production' : 'development'} mode`);
+    // Force production mode for deployment
+    const isProduction = true;
+    log(`Starting server in production mode`);
 
     // Check all services before proceeding
     const serviceStatus = await recoveryService.checkServices();
@@ -137,39 +137,32 @@ async function startServer() {
       throw new Error("Critical services are not available");
     }
 
-    if (isProduction) {
-      log("Setting up production static file serving...");
+    // In production, serve the built client files from dist/public
+    const publicDir = path.join(process.cwd(), 'dist/public');
+    log(`Serving static files from: ${publicDir}`);
 
-      // In production, serve the built client files from dist/public
-      const publicDir = path.join(process.cwd(), 'dist/public');
-      log(`Serving static files from: ${publicDir}`);
-
-      if (!fs.existsSync(publicDir)) {
-        throw new Error(`Production build directory not found: ${publicDir}`);
-      }
-
-      // Serve static files with cache control
-      app.use(express.static(publicDir, {
-        maxAge: '1y',
-        etag: true,
-        lastModified: true,
-      }));
-
-      // Always return index.html for any unknown routes (SPA support)
-      app.get('*', (req, res) => {
-        res.sendFile(path.join(publicDir, 'index.html'));
-      });
-    } else {
-      log("Setting up development Vite middleware...");
-      await setupVite(app, server);
+    if (!fs.existsSync(publicDir)) {
+      throw new Error(`Production build directory not found: ${publicDir}`);
     }
+
+    // Serve static files with cache control
+    app.use(express.static(publicDir, {
+      maxAge: '1y',
+      etag: true,
+      lastModified: true,
+    }));
+
+    // Always return index.html for any unknown routes (SPA support)
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(publicDir, 'index.html'));
+    });
 
     // Add error handler last
     app.use(errorHandler);
 
     const port = Number(process.env.PORT || 5000);
     server.listen(port, "0.0.0.0", () => {
-      log(`Server running at http://0.0.0.0:${port} in ${isProduction ? 'production' : 'development'} mode`);
+      log(`Server running at http://0.0.0.0:${port} in production mode`);
     });
 
   } catch (error: any) {
