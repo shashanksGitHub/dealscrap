@@ -124,24 +124,6 @@ export function PricingSection() {
                   `${credits} Credits für ${price}€ kaufen`
                 )}
               </button>
-
-              {/* Bewertungssektion */}
-              <div className="mt-8 text-center">
-                <div className="flex justify-center gap-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-6 h-6 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                </div>
-                <div className="text-lg font-semibold">
-                  4,9 / 5 Sterne
-                </div>
-                <div className="text-muted-foreground">
-                  Über 1000 zufriedene Kunden
-                </div>
-              </div>
             </div>
           </div>
         </Card>

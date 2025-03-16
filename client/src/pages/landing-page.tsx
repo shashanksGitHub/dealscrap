@@ -45,14 +45,6 @@ export default function LandingPage() {
                 </Button>
               </Link>
             </div>
-            <div className="flex justify-center gap-8 animate-fade-in-up animation-delay-500">
-              <div className="transform transition-all duration-300">
-                <DSGVOBadge size="sm" />
-              </div>
-              <div className="transform transition-all duration-300">
-                <HamburgBadge size="sm" />
-              </div>
-            </div>
             {/* Ratings Section */}
             <div className="mt-8 flex items-center justify-center gap-8 text-center animate-fade-in-up animation-delay-600">
               <div className="flex flex-col">
@@ -66,6 +58,14 @@ export default function LandingPage() {
               <div className="w-px h-8 bg-border/50" />
               <div>
                 <p className="text-sm font-medium">Über 1000 zufriedene Kunden</p>
+              </div>
+            </div>
+            <div className="flex justify-center gap-8 animate-fade-in-up animation-delay-500">
+              <div className="transform transition-all duration-300">
+                <DSGVOBadge size="sm" />
+              </div>
+              <div className="transform transition-all duration-300">
+                <HamburgBadge size="sm" />
               </div>
             </div>
           </div>
