@@ -11,6 +11,8 @@ export function Header() {
             src="/leadscraper-logo.png" 
             alt="LeadScraper Logo" 
             className="h-8"
+            width={160}
+            height={32}
           />
         </Link>
 
