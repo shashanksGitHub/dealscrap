@@ -15,7 +15,8 @@ const imagesToCopy = [
   'Logo_570px_ihk.png',
   'dsgvo-grey-523x480.png',
   'Testvid.mp4',
-  'favicon.svg'  // Füge das Favicon zur Kopierliste hinzu
+  'favicon.svg',
+  'leadscraper-logo.png'
 ];
 
 // Kopiere die Bilder
