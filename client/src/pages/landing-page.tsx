@@ -47,11 +47,11 @@ export default function LandingPage() {
               Höchsteffiziente Leadgenerierung durch KI-Technologie
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
-              KI-gestützte Lead-Generierung für den DACH-Raum
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight bg-gradient-to-r from-blue-500 via-blue-600 to-violet-600 text-transparent bg-clip-text">
+              Einfach & kostengünstig B2B-Leads scrapen
             </h1>
             <p className="text-xl text-muted-foreground max-w-xl mx-auto mb-8">
-              Nutzen Sie modernste KI-Technologie, um qualifizierte B2B-Leads automatisch zu generieren und Ihren Vertrieb zu optimieren
+              Finden Sie qualifizierte Geschäftskontakte mit unserem leistungsstarken Tool und steigern Sie Ihren Vertriebserfolg.
             </p>
 
             <motion.div
