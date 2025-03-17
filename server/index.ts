@@ -92,47 +92,16 @@ setupAuth(app);
 log("Registering API routes...");
 const apiRouter = express.Router();
 registerRoutes(apiRouter);
-
-// Mount API router with explicit content type
-app.use('/api', (req, res, next) => {
-  // Special handling for Stripe webhooks
-  if (req.path === '/stripe-webhook') {
-    res.setHeader('Content-Type', 'application/json');
-    return next();
-  }
-  // Force JSON content type for other API routes
-  res.setHeader('Content-Type', 'application/json');
-  log(`Processing API request: ${req.method} ${req.path}`);
-  next();
-}, apiRouter);
-
-// Enhanced error handler middleware with recovery mechanism
-const errorHandler = async (err: any, _req: Request, res: Response, _next: NextFunction) => {
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-
-  log(`Error: ${message}`);
-
-  // Attempt recovery for critical errors
-  if (status >= 500) {
-    try {
-      await recoveryService.handleDeploymentError(err);
-    } catch (recoveryError) {
-      log(`Recovery failed: ${recoveryError}`);
-    }
-  }
-
-  res.status(status).json({ message });
-};
+app.use('/api', apiRouter);
 
 async function startServer() {
   try {
     log("Starting server initialization...");
     const server = await import('http').then(({ createServer }) => createServer(app));
 
-    // Force production mode for deployment
-    const isProduction = true;
-    log(`Starting server in production mode`);
+    // Set to development mode for Vite dev server
+    const isProduction = process.env.NODE_ENV === 'production';
+    log(`Starting server in ${isProduction ? 'production' : 'development'} mode`);
 
     // Check all services before proceeding
     const serviceStatus = await recoveryService.checkServices();
@@ -140,32 +109,21 @@ async function startServer() {
       throw new Error("Critical services are not available");
     }
 
-    // In production, serve the built client files from dist/public
-    const publicDir = path.join(process.cwd(), 'dist/public');
-    log(`Serving static files from: ${publicDir}`);
-
-    if (!fs.existsSync(publicDir)) {
-      throw new Error(`Production build directory not found: ${publicDir}`);
+    if (isProduction) {
+      // In production, serve the built client files
+      const publicDir = path.join(process.cwd(), 'dist/public');
+      if (!fs.existsSync(publicDir)) {
+        throw new Error(`Production build directory not found: ${publicDir}`);
+      }
+      serveStatic(app);
+    } else {
+      // In development, set up Vite dev server
+      await setupVite(app, server);
     }
-
-    // Serve static files with cache control
-    app.use(express.static(publicDir, {
-      maxAge: '1y',
-      etag: true,
-      lastModified: true,
-    }));
-
-    // Always return index.html for any unknown routes (SPA support)
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(publicDir, 'index.html'));
-    });
-
-    // Add error handler last
-    app.use(errorHandler);
 
     const port = Number(process.env.PORT || 5000);
     server.listen(port, "0.0.0.0", () => {
-      log(`Server running at http://0.0.0.0:${port} in production mode`);
+      log(`Server running at http://0.0.0.0:${port} in ${isProduction ? 'production' : 'development'} mode`);
     });
 
   } catch (error: any) {
