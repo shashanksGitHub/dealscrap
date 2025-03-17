@@ -91,6 +91,13 @@ function LoginForm() {
   return (
     <Card className="border-0 shadow-none">
       <CardContent className="p-0 pt-6">
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/images/leadscraper-logo.png" 
+            alt="LeadScraper" 
+            className="h-12"
+          />
+        </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">E-Mail</Label>
@@ -162,6 +169,13 @@ function RegisterForm() {
   return (
     <Card className="border-0 shadow-none">
       <CardContent className="p-0 pt-6">
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/images/leadscraper-logo.png" 
+            alt="LeadScraper" 
+            className="h-12"
+          />
+        </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">E-Mail</Label>

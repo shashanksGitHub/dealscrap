@@ -89,8 +89,8 @@ export default function LandingPage() {
               >
                 <div className="flex flex-col items-center">
                   <img 
-                    src="/public/dsgvo-logo.svg" 
-                    alt="DSGVO" 
+                    src="/images/leadscraper-logo.png" 
+                    alt="LeadScraper" 
                     className="h-8 mb-2"
                     loading="lazy"
                   />

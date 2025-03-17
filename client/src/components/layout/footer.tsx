@@ -30,6 +30,14 @@ export function Footer() {
           </div>
         )}
 
+        {/* Logo Section */}
+        <div className="flex justify-center mb-8">
+          <img 
+            src="/images/leadscraper-logo.png" 
+            alt="LeadScraper" 
+            className="h-10"
+          />
+        </div>
         {/* Trust Icons Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12">
           <div className="flex flex-col items-center text-center p-2">
