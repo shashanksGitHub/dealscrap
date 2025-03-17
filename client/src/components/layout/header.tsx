@@ -1,6 +1,5 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Header() {
   return (
@@ -8,7 +7,7 @@ export function Header() {
       <nav className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <img 
-            src="/leadscraper-logo.png" 
+            src="/assets/images/leadscraper-logo.png" 
             alt="LeadScraper Logo" 
             className="h-8"
             width={160}
@@ -23,7 +22,6 @@ export function Header() {
           <Link href="/auth">
             <Button>Login</Button>
           </Link>
-          <ThemeToggle />
         </div>
       </nav>
     </header>
