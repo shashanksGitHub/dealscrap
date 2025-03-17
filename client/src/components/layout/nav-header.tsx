@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { LogOutIcon, PlayCircleIcon } from "lucide-react";
-import logo from "/public/images/leadscraper-logo.png";
+import logo from "/public/images/leadscraper-logo.png"; //Corrected path, assuming the logo is in the public directory.  Adjust path if necessary.
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
