@@ -23,10 +23,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
-    "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
-    "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app; " +
-    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app wss://*.replit.dev wss://*.replit.app; " +
+    "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co; " +
+    "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co; " +
+    "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co; " +
+    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
     "style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: https: http:; " +
     "font-src 'self' data:;"
@@ -34,25 +34,26 @@ app.use((req, res, next) => {
   next();
 });
 
-// Enhance CORS middleware with support for custom domains
+// Enhanced CORS middleware with support for all Replit domains
 app.use((req, res, next) => {
   const allowedOrigins = [
     'https://replit.com',
     'https://*.replit.dev',
     'https://*.replit.app',
+    'https://*.repl.co',
     'http://localhost:3000',
     'http://localhost:5000',
     'https://leadscraper.de',
     'https://www.leadscraper.de',
     'https://lead-harvester-1-scalingup.replit.app',
-    'https://leadscraper.replit.app'  // Add the new domain explicitly
+    'https://leadscraper.replit.app'
   ];
 
   const origin = req.headers.origin;
   if (origin) {
     const isAllowed = allowedOrigins.some(allowedOrigin => {
       if (allowedOrigin.includes('*')) {
-        const pattern = new RegExp(allowedOrigin.replace('*', '.*'));
+        const pattern = new RegExp('^' + allowedOrigin.replace(/\./g, '\\.').replace(/\*/g, '[^.]+') + '$');
         return pattern.test(origin);
       }
       return allowedOrigin === origin;
@@ -60,14 +61,14 @@ app.use((req, res, next) => {
 
     if (isAllowed) {
       res.header('Access-Control-Allow-Origin', origin);
+      // Add additional CORS headers for better browser support
+      res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, stripe-signature');
+      res.header('Access-Control-Allow-Credentials', 'true');
     }
   }
 
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, stripe-signature");
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
   next();
