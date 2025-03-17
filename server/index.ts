@@ -34,16 +34,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// Enhanced CORS middleware with support for custom domains
+// Enhance CORS middleware with support for custom domains
 app.use((req, res, next) => {
   const allowedOrigins = [
     'https://replit.com',
     'https://*.replit.dev',
+    'https://*.replit.app',
     'http://localhost:3000',
     'http://localhost:5000',
     'https://leadscraper.de',
     'https://www.leadscraper.de',
-    'https://lead-harvester-1-scalingup.replit.app'
+    'https://lead-harvester-1-scalingup.replit.app',
+    'https://leadscraper.replit.app'  // Add the new domain explicitly
   ];
 
   const origin = req.headers.origin;

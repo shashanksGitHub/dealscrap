@@ -1,9 +1,9 @@
 import { ApifyClient } from 'apify-client';
 
-if (!process.env.APIFY_API_KEY) {
-  throw new Error('Missing required Apify secret: APIFY_API_KEY');
+if (!process.env.APIFY_TOKEN) {
+  throw new Error('Missing required Apify secret: APIFY_TOKEN');
 }
 
 export const apifyClient = new ApifyClient({
-  token: process.env.APIFY_API_KEY,
+  token: process.env.APIFY_TOKEN,
 });
