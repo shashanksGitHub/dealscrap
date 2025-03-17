@@ -37,19 +37,18 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="pt-32 pb-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:radial-gradient(black,transparent_70%)] -z-10" />
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.7 }}
-          className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl animate-blob" 
-        />
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.7 }}
-          className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl animate-blob animation-delay-2000" 
-        />
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/10 rounded-full filter blur-3xl opacity-70 animate-blob" />
+        <div className="absolute bottom-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
 
         <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center max-w-xl mx-auto text-center">
+          <div className="flex flex-col items-center max-w-2xl mx-auto text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
+              KI-gestützte Lead-Generierung für den DACH-Raum
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-xl mx-auto mb-8">
+              Nutzen Sie modernste KI-Technologie, um qualifizierte B2B-Leads automatisch zu generieren und Ihren Vertrieb zu optimieren
+            </p>
+
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
