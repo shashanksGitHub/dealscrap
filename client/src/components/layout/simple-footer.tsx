@@ -4,6 +4,13 @@ export function SimpleFooter() {
   return (
     <footer className="border-t">
       <div className="container mx-auto px-6 py-8">
+        <div className="flex justify-center mb-8">
+          <img 
+            src="/images/leadscraper-logo.png" 
+            alt="LeadScraper" 
+            className="h-10"
+          />
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
             <h3 className="font-semibold mb-3">Unternehmen</h3>
