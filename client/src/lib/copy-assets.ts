@@ -14,7 +14,8 @@ const imagesToCopy = [
   'DEU_Hamburg_COA.svg.png',
   'Logo_570px_ihk.png',
   'dsgvo-grey-523x480.png',
-  'Testvid.mp4'
+  'Testvid.mp4',
+  'favicon.svg'  // Füge das Favicon zur Kopierliste hinzu
 ];
 
 // Kopiere die Bilder
