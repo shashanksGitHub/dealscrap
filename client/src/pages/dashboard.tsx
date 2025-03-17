@@ -37,11 +37,11 @@ export default function Dashboard() {
   useEffect(() => {
     // Show tutorial only on first login
     const tutorialWatched = localStorage.getItem("tutorialWatched");
-    if (!tutorialWatched) {
+    if (!tutorialWatched && user) { // Only show tutorial if user is logged in
       setShowTutorial(true);
       localStorage.setItem("tutorialWatched", "true");
     }
-  }, []);
+  }, [user]); // Add user as dependency
 
   const searchStatuses = [
     "Neue Unternehmen werden gesucht...",
