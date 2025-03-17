@@ -16,7 +16,8 @@ const imagesToCopy = [
   'dsgvo-grey-523x480.png',
   'Testvid.mp4',
   'favicon.svg',
-  'leadscraper-logo.png'
+  'leadscraper-logo.png',
+  'Leadscraper Logo.png'
 ];
 
 // Kopiere die Bilder
