@@ -42,6 +42,11 @@ export default function LandingPage() {
 
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center max-w-2xl mx-auto text-center">
+            <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-primary/10 text-primary mb-8">
+              <Zap className="h-4 w-4 mr-2" />
+              Höchsteffiziente Leadgenerierung durch KI-Technologie
+            </div>
+
             <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
               KI-gestützte Lead-Generierung für den DACH-Raum
             </h1>
