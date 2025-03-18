@@ -6,7 +6,7 @@ export function SimpleFooter() {
       <div className="container mx-auto px-6 py-8">
         <div className="flex justify-center mb-8">
           <img 
-            src="/images/leadscraper-logo.png" 
+            src="/images/Leadscraper Logo.png" 
             alt="LeadScraper" 
             className="h-10"
           />
