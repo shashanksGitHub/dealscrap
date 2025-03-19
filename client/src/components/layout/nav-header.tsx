@@ -67,6 +67,9 @@ export function NavHeader() {
                     <LogOutIcon className="h-4 w-4 mr-2" />
                     Logout
                   </Button>
+                  <Link href="/impressum" className="text-muted-foreground hover:text-primary">
+                    Impressum
+                  </Link>
                 </div>
               ) : (
                 <Link href="/auth">
