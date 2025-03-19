@@ -36,35 +36,43 @@ app.use((req, res, next) => {
 
 // Enhanced CORS middleware with support for all Replit domains
 app.use((req, res, next) => {
-  const allowedOrigins = [
-    'https://replit.com',
-    'https://*.replit.dev',
-    'https://*.replit.app',
-    'https://*.repl.co',
-    'http://localhost:3000',
-    'http://localhost:5000',
-    'https://leadscraper.de',
-    'https://www.leadscraper.de',
-    'https://lead-harvester-1-scalingup.replit.app',
-    'https://leadscraper.replit.app'
-  ];
-
-  const origin = req.headers.origin;
-  if (origin) {
-    const isAllowed = allowedOrigins.some(allowedOrigin => {
-      if (allowedOrigin.includes('*')) {
-        const pattern = new RegExp('^' + allowedOrigin.replace(/\./g, '\\.').replace(/\*/g, '[^.]+') + '$');
-        return pattern.test(origin);
-      }
-      return allowedOrigin === origin;
-    });
-
-    if (isAllowed) {
+  // Accept all origins in development mode
+  if (process.env.NODE_ENV === 'development') {
+    const origin = req.headers.origin;
+    if (origin) {
       res.header('Access-Control-Allow-Origin', origin);
-      // Add additional CORS headers for better browser support
       res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
       res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, stripe-signature');
       res.header('Access-Control-Allow-Credentials', 'true');
+    }
+  } else {
+    const allowedOrigins = [
+      'https://replit.com',
+      'https://*.replit.dev',
+      'https://*.replit.app',
+      'https://*.repl.co',
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'https://leadscraper.de',
+      'https://www.leadscraper.de'
+    ];
+
+    const origin = req.headers.origin;
+    if (origin) {
+      const isAllowed = allowedOrigins.some(allowedOrigin => {
+        if (allowedOrigin.includes('*')) {
+          const pattern = new RegExp('^' + allowedOrigin.replace(/\./g, '\\.').replace(/\*/g, '[^.]+') + '$');
+          return pattern.test(origin);
+        }
+        return allowedOrigin === origin;
+      });
+
+      if (isAllowed) {
+        res.header('Access-Control-Allow-Origin', origin);
+        res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, stripe-signature');
+        res.header('Access-Control-Allow-Credentials', 'true');
+      }
     }
   }
 
@@ -99,8 +107,8 @@ async function startServer() {
     log("Starting server initialization...");
     const server = await import('http').then(({ createServer }) => createServer(app));
 
-    // Set to development mode for Vite dev server
-    const isProduction = process.env.NODE_ENV === 'production';
+    // Force development mode when VITE_FORCE_DEV_SERVER is true
+    const isProduction = process.env.VITE_FORCE_DEV_SERVER !== 'true' && process.env.NODE_ENV === 'production';
     log(`Starting server in ${isProduction ? 'production' : 'development'} mode`);
 
     // Check all services before proceeding
@@ -118,7 +126,9 @@ async function startServer() {
       serveStatic(app);
     } else {
       // In development, set up Vite dev server
+      log("Setting up Vite development server...");
       await setupVite(app, server);
+      log("Vite development server setup complete");
     }
 
     const port = Number(process.env.PORT || 5000);
