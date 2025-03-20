@@ -98,4 +98,4 @@ args = "cd server && npm install --no-audit"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "NODE_ENV=development tsx watch server/index.ts"
+args = "NODE_ENV=development tsx watch server/index.ts --timeout 120000"
