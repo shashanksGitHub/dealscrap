@@ -7,6 +7,32 @@ import { NavHeader } from "@/components/layout/nav-header";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import LandingPage from "@/pages/landing-page";
+import { useAuth } from "@/hooks/use-auth";
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Switch>
+          <Route path="/" component={LandingPage} />
+          <Route path="/auth" component={AuthPage} />
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/blog" component={BlogPage} />
+          <Route path="/blog/new" component={NewBlogPost} />
+          <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/impressum" component={Impressum} />
+          <Route path="/datenschutz" component={Datenschutz} />
+          <Route path="/agb" component={AGB} />
+          <Route path="/leads-kaufen" component={LeadsKaufen} />
+          <Route component={NotFound} />
+        </Switch>
+        <Toaster />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
 import BlogPage from "@/pages/blog";
 import NewBlogPost from "@/pages/blog-new";
 import ResetPassword from "@/pages/reset-password";
