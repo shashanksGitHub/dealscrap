@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Lock, ShieldCheck, CreditCard, Award, Shield } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth"; // Updated import path
 
 export function Footer() {
   const { user } = useAuth();
@@ -30,36 +30,21 @@ export function Footer() {
           </div>
         )}
 
-        {/* Logo Section */}
-        <div className="flex justify-center mb-8">
-          <img 
-            src="/images/new-leadscraper-logo.png" 
-            alt="LeadScraper" 
-            className="h-10"
-          />
-        </div>
         {/* Trust Icons Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12">
-          <div className="flex flex-col items-center text-center p-2">
-            <div className="h-12 w-12 mb-2">
-              <img src="/images/dsgvo-grey-523x480.png" alt="DSGVO" className="w-full h-full object-contain" />
-            </div>
-            <h3 className="text-xs font-medium mb-0.5">DSGVO-konform</h3>
-            <p className="text-[10px] text-muted-foreground">Höchste Sicherheitsstandards</p>
-          </div>
-          <div className="flex flex-col items-center text-center p-2">
-            <div className="h-12 w-12 mb-2">
-              <img src="/images/DEU_Hamburg_COA.svg.png" alt="Hamburg" className="w-full h-full object-contain" />
-            </div>
-            <h3 className="text-xs font-medium mb-0.5">Hamburg</h3>
-            <p className="text-[10px] text-muted-foreground">Entwickelt für den DACH-Raum</p>
-          </div>
           <div className="flex flex-col items-center text-center p-2">
             <div className="bg-primary/10 p-2 rounded-full mb-2">
               <Lock className="h-4 w-4 text-primary" />
             </div>
             <h3 className="text-xs font-medium mb-0.5">SSL-Verschlüsselt</h3>
             <p className="text-[10px] text-muted-foreground">Sichere Datenübertragung</p>
+          </div>
+          <div className="flex flex-col items-center text-center p-2">
+            <div className="bg-primary/10 p-2 rounded-full mb-2">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+            </div>
+            <h3 className="text-xs font-medium mb-0.5">DSGVO-konform</h3>
+            <p className="text-[10px] text-muted-foreground">Höchste Sicherheitsstandards</p>
           </div>
           <div className="flex flex-col items-center text-center p-2">
             <div className="bg-primary/10 p-2 rounded-full mb-2">
@@ -79,20 +64,8 @@ export function Footer() {
             <div className="bg-primary/10 p-2 rounded-full mb-2">
               <Shield className="h-4 w-4 text-primary" />
             </div>
-            <h3 className="text-xs font-medium mb-0.5">Sicherer Service</h3>
-            <p className="text-[10px] text-muted-foreground">Made in Germany</p>
-          </div>
-        </div>
-
-        {/* Made in Germany Badge */}
-        <div className="flex justify-center mb-16">
-          <div className="bg-background/50 backdrop-blur-sm border border-primary/10 rounded-xl p-4 flex items-center gap-3">
-            <div className="relative w-6 h-4 rounded overflow-hidden shadow-sm">
-              <div className="absolute inset-0 bg-black"></div>
-              <div className="absolute inset-y-0 w-full bg-red-600" style={{ top: '33.33%' }}></div>
-              <div className="absolute inset-y-0 w-full bg-yellow-400" style={{ top: '66.66%' }}></div>
-            </div>
-            <span className="font-medium">Made in Germany</span>
+            <h3 className="text-xs font-medium mb-0.5">Made in Germany</h3>
+            <p className="text-[10px] text-muted-foreground">Entwickelt in Hamburg</p>
           </div>
         </div>
 

@@ -25,10 +25,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co; " +
-    "frame-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co; " +
-    "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co; " +
-    "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
+    "default-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
+    "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
+    "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
     "style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: blob: https: http: *; " +
     "font-src 'self' data:;"

@@ -1,6 +1,6 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { queryClient } from "@/lib/query-client";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { queryClient } from "@/lib/queryClient";
+import { Route, Switch } from "wouter";
 import { AuthProvider } from "@/hooks/auth";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
@@ -14,27 +14,27 @@ import Datenschutz from "@/pages/datenschutz";
 import AGB from "@/pages/agb";
 import LeadsKaufen from "@/pages/leads-kaufen";
 import Dashboard from "@/pages/dashboard";
+import { NavHeader } from "@/components/layout/nav-header";
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/new" element={<NewBlogPost />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/impressum" element={<Impressum />} />
-            <Route path="/datenschutz" element={<Datenschutz />} />
-            <Route path="/agb" element={<AGB />} />
-            <Route path="/leads-kaufen" element={<LeadsKaufen />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <Toaster />
-        </Router>
+        <NavHeader />
+        <Switch>
+          <Route path="/" component={LandingPage} />
+          <Route path="/auth" component={AuthPage} />
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/blog" component={BlogPage} />
+          <Route path="/blog/new" component={NewBlogPost} />
+          <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/impressum" component={Impressum} />
+          <Route path="/datenschutz" component={Datenschutz} />
+          <Route path="/agb" component={AGB} />
+          <Route path="/leads-kaufen" component={LeadsKaufen} />
+          <Route component={NotFound} />
+        </Switch>
+        <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   );

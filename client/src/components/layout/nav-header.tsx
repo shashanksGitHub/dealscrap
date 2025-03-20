@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth";
 import { Button } from "@/components/ui/button";
 import { LogOutIcon, PlayCircleIcon } from "lucide-react";
 import logo from "/images/leadscraper-logo.png";

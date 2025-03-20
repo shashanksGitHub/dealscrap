@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/auth"; // Fixed import path
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
-import { Star } from "lucide-react";
 
 export function PricingSection() {
   const { user } = useAuth();
