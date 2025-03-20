@@ -19,10 +19,15 @@ export function Navigation() {
       <NavigationMenuList className="gap-2">
         <NavigationMenuItem>
           <Link href="/">
-            <div className="flex items-center px-4 py-2">
+            <div className="flex items-center gap-4 px-4 py-2">
               <img 
-                src="/images/leadscraper-black.png" 
-                alt="LeadScraper" 
+                src="/images/dsgvo-grey-523x480.png" 
+                alt="DSGVO konform" 
+                className="h-8" 
+              />
+              <img 
+                src="/images/DEU_Hamburg_COA.svg.png" 
+                alt="Hamburg" 
                 className="h-8" 
               />
             </div>
