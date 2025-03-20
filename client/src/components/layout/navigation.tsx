@@ -15,27 +15,8 @@ export function Navigation() {
       <NavigationMenuList className="gap-2">
         <NavigationMenuItem>
           <Link href="/">
-            <div className="flex flex-col items-center gap-2 px-4 py-2">
-              <div className="flex items-center gap-8">
-                <div className="flex flex-col items-center">
-                  <img 
-                    src="/images/dsgvo-grey-523x480.png" 
-                    alt="DSGVO konform" 
-                    className="h-12" 
-                  />
-                  <span className="text-lg font-semibold">DSGVO-konform</span>
-                  <span className="text-sm text-gray-600">Höchste Sicherheitsstandards</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <img 
-                    src="/images/DEU_Hamburg_COA.svg.png" 
-                    alt="Hamburg" 
-                    className="h-12" 
-                  />
-                  <span className="text-lg font-semibold">Hamburg</span>
-                  <span className="text-sm text-gray-600">Entwickelt für den DACH-Raum</span>
-                </div>
-              </div>
+            <div className="flex items-center gap-4 px-4 py-2">
+              <h1 className="text-2xl font-bold text-black">LeadScraper</h1>
             </div>
           </Link>
         </NavigationMenuItem>
