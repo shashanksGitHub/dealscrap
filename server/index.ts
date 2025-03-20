@@ -8,6 +8,10 @@ import path from "path";
 import { recoveryService } from "./services/recovery";
 import fs from 'fs';
 import { createServer } from 'http';
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -85,7 +89,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Request logging
+// Request logging with detailed error reporting
 app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
@@ -123,8 +127,10 @@ async function startServer() {
     log("Service health checks passed successfully");
 
     if (isDev) {
-      // In development, set up Vite dev server
+      // In development, set up Vite dev server with detailed logging
       log("Setting up Vite development server...");
+      process.env.VITE_CJS_IGNORE_WARNING = 'true'; // Suppress CJS warnings
+      process.env.VITE_FORCE_DEV_SERVER = 'true';   // Force dev server mode
       await setupVite(app, server);
       log("Vite development server setup complete");
     } else {
@@ -132,12 +138,21 @@ async function startServer() {
       log("Setting up static file serving for production...");
       const publicDir = path.resolve(__dirname, '../dist/public');
       if (!fs.existsSync(publicDir)) {
-        throw new Error(`Production build directory not found: ${publicDir}`);
+        log(`Production build directory not found at ${publicDir}, falling back to dist directory`);
+        const fallbackDir = path.resolve(__dirname, '../dist');
+        if (!fs.existsSync(fallbackDir)) {
+          throw new Error('No production build directory found. Please build the project first.');
+        }
+        app.use(express.static(fallbackDir));
+        app.get('*', (_req, res) => {
+          res.sendFile(path.join(fallbackDir, 'index.html'));
+        });
+      } else {
+        app.use(express.static(publicDir));
+        app.get('*', (_req, res) => {
+          res.sendFile(path.join(publicDir, 'index.html'));
+        });
       }
-      app.use(express.static(publicDir));
-      app.get('*', (_req, res) => {
-        res.sendFile(path.join(publicDir, 'index.html'));
-      });
       log("Static file serving setup complete");
     }
 

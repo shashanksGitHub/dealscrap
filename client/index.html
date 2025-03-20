@@ -21,7 +21,17 @@
         console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
         return false;
       };
+      // Track initialization steps
       console.log('Page loaded at:', new Date().toISOString());
+      // Check for root element early
+      document.addEventListener('DOMContentLoaded', function() {
+        const root = document.getElementById('root');
+        if (!root) {
+          console.error('Root element not found after DOMContentLoaded');
+        } else {
+          console.log('Root element found');
+        }
+      });
     </script>
   </head>
   <body>
