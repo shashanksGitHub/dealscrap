@@ -20,11 +20,10 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
-// Enhanced Security headers including CSP for production
+// Enhanced Security headers including CSP
 app.use((req, res, next) => {
   const isDev = process.env.NODE_ENV !== 'production';
 
-  // Less restrictive CSP for development
   if (isDev) {
     res.setHeader(
       'Content-Security-Policy',
@@ -37,41 +36,42 @@ app.use((req, res, next) => {
       "font-src 'self' data:;"
     );
   } else {
-    // More restrictive CSP for production
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'self' https://*.leadscraper.de https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+      "default-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
       "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
       "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
       "style-src 'self' 'unsafe-inline'; " +
-      "img-src 'self' data: blob: https://*.leadscraper.de https://*.stripe.com; " +
+      "img-src 'self' data: blob: https://*.stripe.com; " +
       "font-src 'self' data:;"
     );
   }
   next();
 });
 
-// Enhanced CORS middleware with support for production domain
+// CORS middleware for development and production
 app.use((req, res, next) => {
   const isDev = process.env.NODE_ENV !== 'production';
 
   if (isDev) {
+    // In development, accept all Replit domains
     const origin = req.headers.origin;
-    if (origin) {
+    if (origin && (
+      origin.endsWith('.replit.dev') ||
+      origin.endsWith('.replit.app') ||
+      origin.endsWith('.repl.co') ||
+      origin === 'https://replit.com'
+    )) {
       res.header('Access-Control-Allow-Origin', origin);
       res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
       res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, stripe-signature');
       res.header('Access-Control-Allow-Credentials', 'true');
     }
   } else {
-    const allowedOrigins = [
-      'https://leadscraper.de',
-      'https://www.leadscraper.de'
-    ];
-
+    // In production, only accept your domain
     const origin = req.headers.origin;
-    if (origin && allowedOrigins.includes(origin)) {
+    if (origin === process.env.PRODUCTION_URL) {
       res.header('Access-Control-Allow-Origin', origin);
       res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
       res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, stripe-signature');
