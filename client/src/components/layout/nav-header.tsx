@@ -44,9 +44,6 @@ export function NavHeader() {
                   <Link href="/blog" className="text-muted-foreground hover:text-primary">
                     Ratgeber
                   </Link>
-                  <Link href="/impressum" className="text-muted-foreground hover:text-primary">
-                    Impressum
-                  </Link>
                 </>
               )}
               {currentUser ? (
