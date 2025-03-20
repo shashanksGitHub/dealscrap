@@ -34,8 +34,8 @@ export function NavHeader() {
     <header className="bg-background border-b">
       <div className="max-w-[1200px] mx-auto py-4 px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <Link href={currentUser ? "/dashboard" : "/"} className="text-2xl lg:text-3xl font-bold text-primary hover:opacity-90 transition-opacity">
-            LeadScraper
+          <Link href={currentUser ? "/dashboard" : "/"} className="flex items-center">
+            <img src="/images/leadscraper-black.png" alt="LeadScraper Logo" className="h-8 w-auto" />
           </Link>
           <nav>
             <div className="flex items-center gap-4">
