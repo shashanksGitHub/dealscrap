@@ -2,7 +2,7 @@ import "../shim.js";
 import "tsconfig-paths/register.js";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { log } from "./vite";
+import { setupVite, log } from "./vite";
 import { setupAuth } from "./auth";
 import path from "path";
 import { recoveryService } from "./services/recovery";
@@ -13,15 +13,11 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Force production mode always
-process.env.NODE_ENV = 'production';
-
 const app = express();
 
-// Basic middleware with raw body parsing for Stripe webhooks
+// Basic middleware
 app.use(express.json({
   verify: (req, res, buf) => {
-    // Raw body needed for Stripe webhook verification
     (req as any).rawBody = buf;
   }
 }));
@@ -31,18 +27,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
-    "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
-    "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+    "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co data: blob:; " +
+    "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
+    "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
     "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: blob: https://*.stripe.com; " +
+    "img-src 'self' data: blob: https: http: *; " +
     "font-src 'self' data:;"
   );
   next();
 });
 
-// Request logging with detailed error reporting
+// Request logging
 app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
@@ -52,11 +48,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// First set up auth as it's needed for protected routes
+// Set up auth
 log("Setting up authentication...");
 setupAuth(app);
 
-// Then register API routes before any static middleware
+// Register API routes
 log("Registering API routes...");
 const apiRouter = express.Router();
 registerRoutes(apiRouter);
@@ -75,34 +71,39 @@ async function startServer() {
     }
     log("Service health checks passed successfully");
 
-    // Serve static files from the production build
-    log("Setting up static file serving...");
-    const publicDir = path.resolve(__dirname, '../dist/public');
-    if (!fs.existsSync(publicDir)) {
-      log(`Production build directory not found at ${publicDir}, falling back to dist directory`);
-      const fallbackDir = path.resolve(__dirname, '../dist');
-      if (!fs.existsSync(fallbackDir)) {
-        throw new Error('No production build directory found. Please build the project first.');
-      }
-      app.use(express.static(fallbackDir));
-      // Serve index.html for all routes to support client-side routing
-      app.get('*', (_req, res) => {
-        log('Serving index.html for client-side routing');
-        res.sendFile(path.join(fallbackDir, 'index.html'));
-      });
+    // Set up Vite in development mode
+    if (process.env.NODE_ENV !== 'production') {
+      log("Setting up Vite development server...");
+      await setupVite(app, server);
+      log("Vite development server setup complete");
     } else {
-      app.use(express.static(publicDir));
-      // Serve index.html for all routes to support client-side routing
-      app.get('*', (_req, res) => {
-        log('Serving index.html for client-side routing');
-        res.sendFile(path.join(publicDir, 'index.html'));
-      });
+      // In production, serve static files
+      log("Setting up static file serving...");
+      const publicDir = path.resolve(__dirname, '../dist/public');
+      if (!fs.existsSync(publicDir)) {
+        log(`Production build directory not found at ${publicDir}, falling back to dist directory`);
+        const fallbackDir = path.resolve(__dirname, '../dist');
+        if (!fs.existsSync(fallbackDir)) {
+          throw new Error('No production build directory found. Please build the project first.');
+        }
+        app.use(express.static(fallbackDir));
+        app.get('*', (_req, res) => {
+          log('Serving index.html for client-side routing');
+          res.sendFile(path.join(fallbackDir, 'index.html'));
+        });
+      } else {
+        app.use(express.static(publicDir));
+        app.get('*', (_req, res) => {
+          log('Serving index.html for client-side routing');
+          res.sendFile(path.join(publicDir, 'index.html'));
+        });
+      }
+      log("Static file serving setup complete");
     }
-    log("Static file serving setup complete");
 
     // Start the server
-    server.listen(PORT, () => {
-      log(`Server running in production mode on port ${PORT}`);
+    server.listen(PORT, "0.0.0.0", () => {
+      log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
     });
 
     // Handle server errors
