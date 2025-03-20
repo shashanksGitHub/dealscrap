@@ -2,11 +2,16 @@ import { Link } from "wouter";
 import { useAuth } from "@/hooks/auth";
 import { Button } from "@/components/ui/button";
 import { LogOutIcon, PlayCircleIcon } from "lucide-react";
-import logo from "/images/leadscraper-logo.png";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
 import { VideoTutorialDialog } from "@/components/ui/video-tutorial-dialog";
+
+interface User {
+  id: string;
+  email: string;
+  credits: number;
+}
 
 export function NavHeader() {
   const { user, logout } = useAuth();
@@ -15,16 +20,12 @@ export function NavHeader() {
   });
 
   // Fetch fresh user data every 5 seconds
-  const { data: freshUserData } = useQuery({
+  const { data: freshUserData } = useQuery<User>({
     queryKey: ['/api/user'],
-    queryFn: async () => {
-      const response = await apiRequest('GET', '/api/user');
-      const data = await response.json();
-      return data;
-    },
-    enabled: !!user, // Only run query if user is logged in
-    refetchInterval: 5000, // Refetch every 5 seconds while component is mounted
-    staleTime: 0 // Consider data immediately stale
+    queryFn: () => apiRequest('/api/user', 'GET'),
+    enabled: !!user,
+    refetchInterval: 5000,
+    staleTime: 0
   });
 
   // Use the latest user data from the query
@@ -34,14 +35,14 @@ export function NavHeader() {
     <header className="bg-background border-b">
       <div className="max-w-[1200px] mx-auto py-4 px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          <Link href={currentUser ? "/dashboard" : "/"} className="flex items-center">
+          <Link href={currentUser ? "#/dashboard" : "#/"} className="flex items-center">
             <img src="/images/leadscraper-black.png" alt="LeadScraper Logo" className="h-8 w-auto" />
           </Link>
           <nav>
             <div className="flex items-center gap-4">
               {!currentUser && (
                 <>
-                  <Link href="/blog" className="text-muted-foreground hover:text-primary">
+                  <Link href="#/blog" className="text-muted-foreground hover:text-primary">
                     Ratgeber
                   </Link>
                 </>
@@ -54,7 +55,7 @@ export function NavHeader() {
                       {currentUser.credits}
                     </span>
                   </div>
-                  <Link href="/impressum" className="text-muted-foreground hover:text-primary">
+                  <Link href="#/impressum" className="text-muted-foreground hover:text-primary">
                     Impressum
                   </Link>
                   <Button
@@ -72,7 +73,7 @@ export function NavHeader() {
                   </Button>
                 </div>
               ) : (
-                <Link href="/auth">
+                <Link href="#/auth">
                   <Button variant="outline" size="sm" className="ml-4">
                     Login
                   </Button>

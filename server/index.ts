@@ -2,7 +2,7 @@ import "../shim.js";
 import "tsconfig-paths/register.js";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite,  log } from "./vite";
+import { setupVite, log } from "./vite";
 import { setupAuth } from "./auth";
 import path from "path";
 import { recoveryService } from "./services/recovery";
@@ -12,6 +12,9 @@ import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Force production mode for testing
+process.env.NODE_ENV = 'production';
 
 const app = express();
 

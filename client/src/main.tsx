@@ -98,5 +98,5 @@ window.addEventListener('unhandledrejection', (event) => {
 console.log('Environment:', {
   nodeEnv: import.meta.env.MODE,
   isDev: import.meta.env.DEV,
-  baseUrl: import.meta.env.BASE_URL,
+  baseUrl: window.location.origin,
 });

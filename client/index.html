@@ -41,7 +41,21 @@
       height="0" width="0" style="display:none;visibility:hidden"></iframe>
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback content while JavaScript loads -->
+      <div style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+      ">
+        <div style="text-align: center;">
+          <img src="/images/leadscraper-black.png" alt="LeadScraper" style="width: 200px; margin-bottom: 20px;" />
+          <p style="color: #666;">Laden...</p>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- Fallback content -->
     <noscript>
