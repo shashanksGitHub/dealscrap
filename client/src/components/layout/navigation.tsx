@@ -16,7 +16,7 @@ export function Navigation() {
         <NavigationMenuItem>
           <Link href="/">
             <div className="flex items-center gap-4 px-4 py-2">
-              <h1 className="text-2xl font-bold text-black">LeadScraper</h1>
+              <h1 className="text-2xl font-bold text-black tracking-tighter">LeadScraper</h1>
             </div>
           </Link>
         </NavigationMenuItem>
