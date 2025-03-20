@@ -39,12 +39,13 @@ export function PricingSection() {
       const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: price })
+        credentials: 'include',
+        body: JSON.stringify({ amount: price, credits })
       });
 
       if (!response.ok) {
         const data = await response.json();
-        if (data.message?.includes('Payment service is not available')) {
+        if (response.status === 503) {
           toast({
             title: "Service nicht verfügbar",
             description: "Das Zahlungssystem ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.",
@@ -57,14 +58,20 @@ export function PricingSection() {
 
       const data = await response.json();
       if (data.checkoutUrl) {
+        // Add success message before redirect
+        toast({
+          title: "Weiterleitung",
+          description: "Sie werden zum sicheren Zahlungsformular weitergeleitet..."
+        });
         window.location.href = data.checkoutUrl;
       } else {
         throw new Error('Keine Checkout-URL erhalten');
       }
     } catch (error: any) {
+      console.error('Payment error:', error);
       toast({
         title: "Fehler",
-        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
         variant: "destructive"
       });
     } finally {
@@ -95,6 +102,7 @@ export function PricingSection() {
                 max={1000}
                 step={50}
                 className="w-full"
+                disabled={isProcessing}
               />
               <div className="flex justify-between mt-2 text-sm text-muted-foreground">
                 <span>50</span>
@@ -113,13 +121,13 @@ export function PricingSection() {
               <button
                 onClick={handleSelect}
                 disabled={isProcessing}
-                className="w-full bg-primary text-primary-foreground rounded-lg px-6 py-3 font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                className="w-full bg-primary text-primary-foreground rounded-lg px-6 py-3 font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 relative"
               >
                 {isProcessing ? (
-                  <>
-                    <div className="animate-spin w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full inline-block mr-2" />
-                    Verarbeitung...
-                  </>
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full mr-2" />
+                    <span>Verarbeitung...</span>
+                  </div>
                 ) : (
                   `${credits} Credits für ${price}€ kaufen`
                 )}

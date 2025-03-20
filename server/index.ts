@@ -7,6 +7,8 @@ import { setupAuth } from "./auth";
 import path from "path";
 import { recoveryService } from "./services/recovery";
 import fs from 'fs';
+import { createServer } from 'http';
+import { AddressInfo } from 'net';
 
 const app = express();
 
@@ -105,7 +107,8 @@ app.use('/api', apiRouter);
 async function startServer() {
   try {
     log("Starting server initialization...");
-    const server = await import('http').then(({ createServer }) => createServer(app));
+    const server = createServer(app);
+    const PORT = 5000; // Fixed port for Replit
 
     // Force development mode when VITE_FORCE_DEV_SERVER is true
     const isProduction = process.env.VITE_FORCE_DEV_SERVER !== 'true' && process.env.NODE_ENV === 'production';
@@ -131,9 +134,22 @@ async function startServer() {
       log("Vite development server setup complete");
     }
 
-    const port = Number(process.env.PORT || 5000);
-    server.listen(port, "0.0.0.0", () => {
-      log(`Server running at http://0.0.0.0:${port} in ${isProduction ? 'production' : 'development'} mode`);
+    // Attempt to start server on port 5000
+    server.listen(PORT, "0.0.0.0", () => {
+      const address = server.address() as AddressInfo;
+      log(`Server running at http://0.0.0.0:${PORT} in ${isProduction ? 'production' : 'development'} mode`);
+    });
+
+    // Handle server errors
+    server.on('error', async (error: any) => {
+      if (error.code === 'EADDRINUSE') {
+        log(`ERROR: Port ${PORT} is already in use. The application must run on port ${PORT}.`);
+        log(`Please ensure no other processes are using port ${PORT} and try again.`);
+        process.exit(1);
+      } else {
+        log(`Server error: ${error.message}`);
+        await recoveryService.handleDeploymentError(error);
+      }
     });
 
   } catch (error: any) {

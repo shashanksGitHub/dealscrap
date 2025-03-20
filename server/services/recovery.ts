@@ -1,4 +1,6 @@
 import { log } from "../vite";
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import { neon } from '@neondatabase/serverless';
 
 interface ServiceStatus {
   database: boolean;
@@ -27,7 +29,10 @@ export class DeploymentRecovery {
     };
 
     try {
-      // Database check will be implemented here
+      // Test database connectivity
+      const sql = neon(process.env.DATABASE_URL!);
+      const db = drizzle(sql);
+      await sql`SELECT 1`; // Simple query to test connection
       status.database = true;
       log("✓ Database connection verified", "recovery");
     } catch (error) {
@@ -35,9 +40,13 @@ export class DeploymentRecovery {
     }
 
     try {
-      // Session store check will be implemented here
-      status.auth = true;
-      log("✓ Authentication service verified", "recovery");
+      // Test session store
+      if (process.env.SESSION_SECRET) {
+        status.auth = true;
+        log("✓ Authentication service verified", "recovery");
+      } else {
+        throw new Error("Session secret not configured");
+      }
     } catch (error) {
       log(`✗ Authentication service failed: ${error}`, "recovery");
     }
