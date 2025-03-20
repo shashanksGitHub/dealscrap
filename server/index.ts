@@ -2,7 +2,7 @@ import "../shim.js";
 import "tsconfig-paths/register.js";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, log } from "./vite";
+import { log } from "./vite";
 import { setupAuth } from "./auth";
 import path from "path";
 import { recoveryService } from "./services/recovery";
@@ -13,7 +13,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Force production mode for testing
+// Force production mode always
 process.env.NODE_ENV = 'production';
 
 const app = express();
@@ -29,66 +29,16 @@ app.use(express.urlencoded({ extended: false }));
 
 // Enhanced Security headers including CSP
 app.use((req, res, next) => {
-  const isDev = process.env.NODE_ENV !== 'production';
-
-  if (isDev) {
-    res.setHeader(
-      'Content-Security-Policy',
-      "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co data: blob:; " +
-      "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
-      "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
-      "style-src 'self' 'unsafe-inline'; " +
-      "img-src 'self' data: blob: https: http: *; " +
-      "font-src 'self' data:;"
-    );
-  } else {
-    res.setHeader(
-      'Content-Security-Policy',
-      "default-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
-      "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
-      "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
-      "style-src 'self' 'unsafe-inline'; " +
-      "img-src 'self' data: blob: https://*.stripe.com; " +
-      "font-src 'self' data:;"
-    );
-  }
-  next();
-});
-
-// CORS middleware for development and production
-app.use((req, res, next) => {
-  const isDev = process.env.NODE_ENV !== 'production';
-
-  if (isDev) {
-    // In development, accept all Replit domains
-    const origin = req.headers.origin;
-    if (origin && (
-      origin.endsWith('.replit.dev') ||
-      origin.endsWith('.replit.app') ||
-      origin.endsWith('.repl.co') ||
-      origin === 'https://replit.com'
-    )) {
-      res.header('Access-Control-Allow-Origin', origin);
-      res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, stripe-signature');
-      res.header('Access-Control-Allow-Credentials', 'true');
-    }
-  } else {
-    // In production, only accept your domain
-    const origin = req.headers.origin;
-    if (origin === process.env.PRODUCTION_URL) {
-      res.header('Access-Control-Allow-Origin', origin);
-      res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, stripe-signature');
-      res.header('Access-Control-Allow-Credentials', 'true');
-    }
-  }
-
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+    "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+    "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data: blob: https://*.stripe.com; " +
+    "font-src 'self' data:;"
+  );
   next();
 });
 
@@ -117,11 +67,7 @@ async function startServer() {
     log("Starting server initialization...");
     const server = createServer(app);
     const PORT = process.env.PORT || 5000;
-    const isDev = process.env.NODE_ENV !== 'production';
 
-    log(`Starting server in ${isDev ? 'development' : 'production'} mode`);
-
-    // Check all services before proceeding
     log("Running service health checks...");
     const serviceStatus = await recoveryService.checkServices();
     if (!Object.values(serviceStatus).every(status => status)) {
@@ -129,73 +75,35 @@ async function startServer() {
     }
     log("Service health checks passed successfully");
 
-    if (isDev) {
-      // In development, set up Vite dev server with detailed logging
-      log("Setting up Vite development server...");
-      process.env.VITE_CJS_IGNORE_WARNING = 'true'; // Suppress CJS warnings
-      process.env.VITE_FORCE_DEV_SERVER = 'true';   // Force dev server mode
-      await setupVite(app, server);
-      log("Vite development server setup complete");
+    // Serve static files from the production build
+    log("Setting up static file serving...");
+    const publicDir = path.resolve(__dirname, '../dist/public');
+    if (!fs.existsSync(publicDir)) {
+      log(`Production build directory not found at ${publicDir}, falling back to dist directory`);
+      const fallbackDir = path.resolve(__dirname, '../dist');
+      if (!fs.existsSync(fallbackDir)) {
+        throw new Error('No production build directory found. Please build the project first.');
+      }
+      app.use(express.static(fallbackDir));
+      // Serve index.html for all routes to support client-side routing
+      app.get('*', (_req, res) => {
+        log('Serving index.html for client-side routing');
+        res.sendFile(path.join(fallbackDir, 'index.html'));
+      });
     } else {
-      // In production, serve the built client files
-      log("Setting up static file serving for production...");
-      const publicDir = path.resolve(__dirname, '../dist/public');
-      if (!fs.existsSync(publicDir)) {
-        log(`Production build directory not found at ${publicDir}, falling back to dist directory`);
-        const fallbackDir = path.resolve(__dirname, '../dist');
-        if (!fs.existsSync(fallbackDir)) {
-          throw new Error('No production build directory found. Please build the project first.');
-        }
-        app.use(express.static(fallbackDir));
-        app.get('*', (_req, res) => {
-          res.sendFile(path.join(fallbackDir, 'index.html'));
-        });
-      } else {
-        app.use(express.static(publicDir));
-        app.get('*', (_req, res) => {
-          res.sendFile(path.join(publicDir, 'index.html'));
-        });
-      }
-      log("Static file serving setup complete");
+      app.use(express.static(publicDir));
+      // Serve index.html for all routes to support client-side routing
+      app.get('*', (_req, res) => {
+        log('Serving index.html for client-side routing');
+        res.sendFile(path.join(publicDir, 'index.html'));
+      });
     }
+    log("Static file serving setup complete");
 
-    // Attempt to start server with retries
-    let retries = 3;
-    while (retries > 0) {
-      try {
-        await new Promise((resolve, reject) => {
-          server.listen(PORT, "0.0.0.0", () => {
-            const address = server.address();
-            if (address && typeof address === 'object') {
-              log(`Server running at http://0.0.0.0:${PORT} in ${isDev ? 'development' : 'production'} mode`);
-              resolve(undefined);
-            } else {
-              reject(new Error('Failed to get server address'));
-            }
-          });
-
-          server.on('error', (error: NodeJS.ErrnoException) => {
-            if (error.code === 'EADDRINUSE') {
-              reject(error);
-            }
-          });
-        });
-        break; // Server started successfully
-      } catch (error: any) {
-        if (error.code === 'EADDRINUSE') {
-          if (retries > 1) {
-            log(`Port ${PORT} is in use, waiting before retry...`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            retries--;
-          } else {
-            log(`ERROR: Port ${PORT} is still in use after retries.`);
-            throw error;
-          }
-        } else {
-          throw error;
-        }
-      }
-    }
+    // Start the server
+    server.listen(PORT, () => {
+      log(`Server running in production mode on port ${PORT}`);
+    });
 
     // Handle server errors
     server.on('error', async (error: any) => {
