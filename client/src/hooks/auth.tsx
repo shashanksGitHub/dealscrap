@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -27,17 +27,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const { data: user, isLoading, refetch } = useQuery({
     queryKey: ['/api/auth/user'],
-    queryFn: () => apiRequest<User | null>('/api/auth/user'),
+    queryFn: () => apiRequest<User | null>('/api/auth/user', 'GET'),
     retry: false,
     initialData: null
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      const response = await apiRequest('/api/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(credentials),
-      });
+      const response = await apiRequest<User>('/api/auth/login', 'POST', credentials);
       await refetch();
       return response;
     },
@@ -52,10 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const response = await apiRequest('/api/auth/register', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      const response = await apiRequest<User>('/api/auth/register', 'POST', data);
       await refetch();
       return response;
     },
@@ -70,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await apiRequest('/api/auth/logout', { method: 'POST' });
+      await apiRequest('/api/auth/logout', 'POST');
       await refetch();
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Logout failed'));
