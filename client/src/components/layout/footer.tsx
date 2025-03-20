@@ -41,11 +41,18 @@ export function Footer() {
         {/* Trust Icons Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-12">
           <div className="flex flex-col items-center text-center p-2">
-            <div className="bg-primary/10 p-2 rounded-full mb-2">
-              <ShieldCheck className="h-4 w-4 text-primary" />
+            <div className="h-12 w-12 mb-2">
+              <img src="/images/dsgvo-grey-523x480.png" alt="DSGVO" className="w-full h-full object-contain" />
             </div>
             <h3 className="text-xs font-medium mb-0.5">DSGVO-konform</h3>
-            <p className="text-[10px] text-muted-foreground">100% Datenschutz-konform</p>
+            <p className="text-[10px] text-muted-foreground">Höchste Sicherheitsstandards</p>
+          </div>
+          <div className="flex flex-col items-center text-center p-2">
+            <div className="h-12 w-12 mb-2">
+              <img src="/images/DEU_Hamburg_COA.svg.png" alt="Hamburg" className="w-full h-full object-contain" />
+            </div>
+            <h3 className="text-xs font-medium mb-0.5">Hamburg</h3>
+            <p className="text-[10px] text-muted-foreground">Entwickelt für den DACH-Raum</p>
           </div>
           <div className="flex flex-col items-center text-center p-2">
             <div className="bg-primary/10 p-2 rounded-full mb-2">
