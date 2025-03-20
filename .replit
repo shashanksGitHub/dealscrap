@@ -90,12 +90,12 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd client && npm install && npm run build"
+args = "cd client && npm install --no-audit"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd server && npm install && NODE_ENV=development tsx watch index.ts"
+args = "cd server && npm install --no-audit"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd client && NODE_ENV=development npx vite --host 0.0.0.0 --port 3000"
+args = "NODE_ENV=development tsx watch server/index.ts"

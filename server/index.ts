@@ -28,7 +28,7 @@ app.use((req, res, next) => {
     "script-src 'self' 'unsafe-inline' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co; " +
     "connect-src 'self' https://*.stripe.com https://*.stripe.network *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
     "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: https: http:; " +
+    "img-src 'self' data: blob: https: http: *; " +
     "font-src 'self' data:;"
   );
   next();
