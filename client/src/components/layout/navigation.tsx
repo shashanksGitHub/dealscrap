@@ -6,13 +6,6 @@
                 </NavigationMenuLink>
               </Link>
             </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href="/impressum">
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Impressum
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
 <NavigationMenu>
   <NavigationMenuList>
     <NavigationMenuItem>
