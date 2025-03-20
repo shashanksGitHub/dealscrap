@@ -1,6 +1,4 @@
-
 import Link from "next/link";
-import { useAuth } from "@/hooks/use-auth";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,8 +10,6 @@ import {
 } from "@/components/ui/navigation-menu";
 
 export function Navigation() {
-  const { user } = useAuth();
-
   return (
     <NavigationMenu className="mx-auto max-w-screen-xl px-4">
       <NavigationMenuList className="gap-2">
@@ -50,32 +46,13 @@ export function Navigation() {
           </Link>
         </NavigationMenuItem>
 
-        {user ? (
-          <>
-            <NavigationMenuItem>
-              <Link href="/dashboard">
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Dashboard
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link href="/account">
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Konto
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-          </>
-        ) : (
-          <NavigationMenuItem>
-            <Link href="/auth">
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Anmelden
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-        )}
+        <NavigationMenuItem>
+          <Link href="/auth">
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Anmelden
+            </NavigationMenuLink>
+          </Link>
+        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );
