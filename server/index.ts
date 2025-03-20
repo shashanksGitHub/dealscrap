@@ -108,17 +108,19 @@ async function startServer() {
   try {
     log("Starting server initialization...");
     const server = createServer(app);
-    const PORT = 5000; // Fixed port for Replit
+    const PORT = process.env.PORT || 5000;
 
     // Force development mode when VITE_FORCE_DEV_SERVER is true
     const isProduction = process.env.VITE_FORCE_DEV_SERVER !== 'true' && process.env.NODE_ENV === 'production';
     log(`Starting server in ${isProduction ? 'production' : 'development'} mode`);
 
     // Check all services before proceeding
+    log("Running service health checks...");
     const serviceStatus = await recoveryService.checkServices();
     if (!Object.values(serviceStatus).every(status => status)) {
       throw new Error("Critical services are not available");
     }
+    log("Service health checks passed successfully");
 
     if (isProduction) {
       // In production, serve the built client files
@@ -134,26 +136,52 @@ async function startServer() {
       log("Vite development server setup complete");
     }
 
-    // Attempt to start server on port 5000
-    server.listen(PORT, "0.0.0.0", () => {
-      const address = server.address() as AddressInfo;
-      log(`Server running at http://0.0.0.0:${PORT} in ${isProduction ? 'production' : 'development'} mode`);
-    });
+    // Attempt to start server with retries
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        await new Promise((resolve, reject) => {
+          server.listen(PORT, "0.0.0.0", () => {
+            const address = server.address();
+            if (address && typeof address === 'object') {
+              log(`Server running at http://0.0.0.0:${PORT} in ${isProduction ? 'production' : 'development'} mode`);
+              resolve(undefined);
+            } else {
+              reject(new Error('Failed to get server address'));
+            }
+          });
+
+          server.on('error', (error: NodeJS.ErrnoException) => {
+            if (error.code === 'EADDRINUSE') {
+              reject(error);
+            }
+          });
+        });
+        break; // Server started successfully
+      } catch (error: any) {
+        if (error.code === 'EADDRINUSE') {
+          if (retries > 1) {
+            log(`Port ${PORT} is in use, waiting before retry...`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            retries--;
+          } else {
+            log(`ERROR: Port ${PORT} is still in use after retries. The application must run on port ${PORT}.`);
+            throw error;
+          }
+        } else {
+          throw error;
+        }
+      }
+    }
 
     // Handle server errors
     server.on('error', async (error: any) => {
-      if (error.code === 'EADDRINUSE') {
-        log(`ERROR: Port ${PORT} is already in use. The application must run on port ${PORT}.`);
-        log(`Please ensure no other processes are using port ${PORT} and try again.`);
-        process.exit(1);
-      } else {
-        log(`Server error: ${error.message}`);
-        await recoveryService.handleDeploymentError(error);
-      }
+      log(`Server error: ${error.message}`);
+      await recoveryService.handleDeploymentError(error);
     });
 
   } catch (error: any) {
-    log(`Fatal error during server initialization: ${error}`);
+    log(`Fatal error during server initialization: ${error.stack || error}`);
     await recoveryService.handleDeploymentError(error);
     process.exit(1);
   }
