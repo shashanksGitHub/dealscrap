@@ -2,13 +2,12 @@ import "../shim.js";
 import "tsconfig-paths/register.js";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { setupVite,  log } from "./vite";
 import { setupAuth } from "./auth";
 import path from "path";
 import { recoveryService } from "./services/recovery";
 import fs from 'fs';
 import { createServer } from 'http';
-import { AddressInfo } from 'net';
 
 const app = express();
 
@@ -21,25 +20,43 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: false }));
 
-// Enhanced Security headers including CSP for Stripe and static assets
+// Enhanced Security headers including CSP for production
 app.use((req, res, next) => {
-  res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
-    "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
-    "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
-    "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: blob: https: http: *; " +
-    "font-src 'self' data:;"
-  );
+  const isDev = process.env.NODE_ENV !== 'production';
+
+  // Less restrictive CSP for development
+  if (isDev) {
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co data: blob:; " +
+      "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
+      "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "img-src 'self' data: blob: https: http: *; " +
+      "font-src 'self' data:;"
+    );
+  } else {
+    // More restrictive CSP for production
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'self' https://*.leadscraper.de https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+      "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+      "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "img-src 'self' data: blob: https://*.leadscraper.de https://*.stripe.com; " +
+      "font-src 'self' data:;"
+    );
+  }
   next();
 });
 
-// Enhanced CORS middleware with support for all Replit domains
+// Enhanced CORS middleware with support for production domain
 app.use((req, res, next) => {
-  // Accept all origins in development mode
-  if (process.env.NODE_ENV === 'development') {
+  const isDev = process.env.NODE_ENV !== 'production';
+
+  if (isDev) {
     const origin = req.headers.origin;
     if (origin) {
       res.header('Access-Control-Allow-Origin', origin);
@@ -49,32 +66,16 @@ app.use((req, res, next) => {
     }
   } else {
     const allowedOrigins = [
-      'https://replit.com',
-      'https://*.replit.dev',
-      'https://*.replit.app',
-      'https://*.repl.co',
-      'http://localhost:3000',
-      'http://localhost:5000',
       'https://leadscraper.de',
       'https://www.leadscraper.de'
     ];
 
     const origin = req.headers.origin;
-    if (origin) {
-      const isAllowed = allowedOrigins.some(allowedOrigin => {
-        if (allowedOrigin.includes('*')) {
-          const pattern = new RegExp('^' + allowedOrigin.replace(/\./g, '\\.').replace(/\*/g, '[^.]+') + '$');
-          return pattern.test(origin);
-        }
-        return allowedOrigin === origin;
-      });
-
-      if (isAllowed) {
-        res.header('Access-Control-Allow-Origin', origin);
-        res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, stripe-signature');
-        res.header('Access-Control-Allow-Credentials', 'true');
-      }
+    if (origin && allowedOrigins.includes(origin)) {
+      res.header('Access-Control-Allow-Origin', origin);
+      res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, stripe-signature');
+      res.header('Access-Control-Allow-Credentials', 'true');
     }
   }
 
@@ -84,7 +85,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Request logging with improved error handling 
+// Request logging
 app.use((req, res, next) => {
   const start = Date.now();
   res.on("finish", () => {
@@ -109,10 +110,9 @@ async function startServer() {
     log("Starting server initialization...");
     const server = createServer(app);
     const PORT = process.env.PORT || 5000;
+    const isDev = process.env.NODE_ENV !== 'production';
 
-    // Force development mode when VITE_FORCE_DEV_SERVER is true
-    const isProduction = process.env.VITE_FORCE_DEV_SERVER !== 'true' && process.env.NODE_ENV === 'production';
-    log(`Starting server in ${isProduction ? 'production' : 'development'} mode`);
+    log(`Starting server in ${isDev ? 'development' : 'production'} mode`);
 
     // Check all services before proceeding
     log("Running service health checks...");
@@ -122,18 +122,23 @@ async function startServer() {
     }
     log("Service health checks passed successfully");
 
-    if (isProduction) {
-      // In production, serve the built client files
-      const publicDir = path.join(process.cwd(), 'dist/public');
-      if (!fs.existsSync(publicDir)) {
-        throw new Error(`Production build directory not found: ${publicDir}`);
-      }
-      serveStatic(app);
-    } else {
+    if (isDev) {
       // In development, set up Vite dev server
       log("Setting up Vite development server...");
       await setupVite(app, server);
       log("Vite development server setup complete");
+    } else {
+      // In production, serve the built client files
+      log("Setting up static file serving for production...");
+      const publicDir = path.resolve(__dirname, '../dist/public');
+      if (!fs.existsSync(publicDir)) {
+        throw new Error(`Production build directory not found: ${publicDir}`);
+      }
+      app.use(express.static(publicDir));
+      app.get('*', (_req, res) => {
+        res.sendFile(path.join(publicDir, 'index.html'));
+      });
+      log("Static file serving setup complete");
     }
 
     // Attempt to start server with retries
@@ -144,7 +149,7 @@ async function startServer() {
           server.listen(PORT, "0.0.0.0", () => {
             const address = server.address();
             if (address && typeof address === 'object') {
-              log(`Server running at http://0.0.0.0:${PORT} in ${isProduction ? 'production' : 'development'} mode`);
+              log(`Server running at http://0.0.0.0:${PORT} in ${isDev ? 'development' : 'production'} mode`);
               resolve(undefined);
             } else {
               reject(new Error('Failed to get server address'));
@@ -165,7 +170,7 @@ async function startServer() {
             await new Promise(resolve => setTimeout(resolve, 1000));
             retries--;
           } else {
-            log(`ERROR: Port ${PORT} is still in use after retries. The application must run on port ${PORT}.`);
+            log(`ERROR: Port ${PORT} is still in use after retries.`);
             throw error;
           }
         } else {
