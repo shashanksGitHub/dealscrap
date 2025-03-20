@@ -1,5 +1,5 @@
 import { log } from "../vite";
-import { drizzle } from 'drizzle-orm/neon-serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 
 interface ServiceStatus {
@@ -23,12 +23,14 @@ export class DeploymentRecovery {
   }
 
   async checkServices(): Promise<ServiceStatus> {
+    log("Starting service health check...", "recovery");
     const status: ServiceStatus = {
       database: false,
       auth: false
     };
 
     try {
+      log("Testing database connection...", "recovery");
       // Test database connectivity
       const sql = neon(process.env.DATABASE_URL!);
       const db = drizzle(sql);
@@ -37,9 +39,11 @@ export class DeploymentRecovery {
       log("✓ Database connection verified", "recovery");
     } catch (error) {
       log(`✗ Database connection failed: ${error}`, "recovery");
+      throw error; // Propagate database errors as they are critical
     }
 
     try {
+      log("Testing authentication service...", "recovery");
       // Test session store
       if (process.env.SESSION_SECRET) {
         status.auth = true;
@@ -49,6 +53,7 @@ export class DeploymentRecovery {
       }
     } catch (error) {
       log(`✗ Authentication service failed: ${error}`, "recovery");
+      throw error; // Propagate auth errors as they are critical
     }
 
     return status;
@@ -88,6 +93,7 @@ export class DeploymentRecovery {
 
     if (!recovered) {
       log("Recovery failed - system requires manual intervention", "recovery");
+      process.exit(1);
     }
   }
 }
