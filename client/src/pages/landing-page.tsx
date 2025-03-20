@@ -89,7 +89,7 @@ export default function LandingPage() {
               >
                 <div className="flex flex-col items-center">
                   <img 
-                    src="/images/Leadscraper Logo.png" 
+                    src="/images/leadscraper-black.png" 
                     alt="LeadScraper" 
                     className="h-8 mb-2"
                     loading="lazy"

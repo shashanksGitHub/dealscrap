@@ -33,7 +33,7 @@ export function Footer() {
         {/* Logo Section */}
         <div className="flex justify-center mb-8">
           <img 
-            src="/images/Leadscraper Logo.png" 
+            src="/images/leadscraper-black.png" 
             alt="LeadScraper" 
             className="h-10"
           />
