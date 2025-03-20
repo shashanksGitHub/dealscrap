@@ -8,6 +8,7 @@ import {
 import { useState } from "react";
 import { PlayCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/auth"; // Assuming this hook exists
 
 export function VideoTutorialDialog({
   open,
@@ -16,7 +17,12 @@ export function VideoTutorialDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { user } = useAuth();
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return user && localStorage.getItem("tutorialWatched") !== "true";
+  });
+
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -25,7 +31,11 @@ export function VideoTutorialDialog({
     if (video) {
       video.play();
     }
+    localStorage.setItem("tutorialWatched", "true"); //Set after first play
+    onOpenChange(false); //Close dialog after playing
   };
+
+  if (!showTutorial) return null; //Only render if showTutorial is true
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -67,7 +77,7 @@ export function VideoTutorialDialog({
             src="/Testvid.mp4"
             controls={isPlaying}
             onClick={handlePlay}
-            style={{ cursor: !isPlaying ? 'pointer' : 'default' }}
+            style={{ cursor: !isPlaying ? "pointer" : "default" }}
           />
         </div>
       </DialogContent>
