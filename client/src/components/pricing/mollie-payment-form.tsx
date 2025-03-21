@@ -37,7 +37,7 @@ export function MolliePaymentForm({ amount, onSuccess, onError }: MolliePaymentF
   const initializeMollie = async () => {
     try {
       // Vite-Umgebungsvariablen für Mollie
-      const isDev = process.env.NODE_ENV === 'development' || window.location.hostname.includes('replit');
+      const isDev = window.location.hostname.includes('replit') || window.location.hostname === 'localhost';
       let mollieProfileId = undefined;
       
       // In einer echten Produktionsumgebung sollte dies aus den Umgebungsvariablen kommen
