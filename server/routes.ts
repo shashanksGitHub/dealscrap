@@ -46,15 +46,6 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ message: "Betrag ist erforderlich" });
       }
 
-      // Bestimme die Domain für die URLs
-      const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || 
-                    process.env.CUSTOM_DOMAIN || 
-                    req.get('host');
-
-      if (!domain) {
-        throw new Error('Keine gültige Domain gefunden');
-      }
-
       const checkoutUrl = await createPayment(
         req.user.id,
         amount,
@@ -73,6 +64,51 @@ export async function registerRoutes(router: Router) {
       });
     } catch (error: any) {
       console.error('Error creating payment:', error);
+      res.status(400).json({ 
+        message: "Fehler bei der Zahlungsvorbereitung", 
+        details: error.message 
+      });
+    }
+  });
+  
+  // Neuer Endpunkt für Mollie-Zahlungen
+  router.post("/payments/create", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Nicht authentifiziert" });
+    }
+
+    try {
+      console.log('Processing Mollie payment request:', {
+        userId: req.user.id,
+        amount: req.body.amount,
+        method: req.body.method
+      });
+
+      const amount = parseFloat(req.body.amount);
+      if (isNaN(amount) || amount <= 0) {
+        return res.status(400).json({ message: "Gültiger Betrag ist erforderlich" });
+      }
+
+      const description = req.body.description || `${amount} Guthaben auf LeadScraper`;
+
+      const checkoutUrl = await createPayment(
+        req.user.id,
+        amount,
+        description
+      );
+
+      if (!checkoutUrl) {
+        throw new Error('Keine Checkout-URL von Mollie erhalten');
+      }
+
+      console.log('Mollie payment created, redirecting to:', checkoutUrl);
+
+      res.json({
+        success: true,
+        checkoutUrl
+      });
+    } catch (error: any) {
+      console.error('Error creating Mollie payment:', error);
       res.status(400).json({ 
         message: "Fehler bei der Zahlungsvorbereitung", 
         details: error.message 

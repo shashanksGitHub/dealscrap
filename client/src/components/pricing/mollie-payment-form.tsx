@@ -36,16 +36,31 @@ export function MolliePaymentForm({ amount, onSuccess, onError }: MolliePaymentF
 
   const initializeMollie = async () => {
     try {
-      const mollie = window.Mollie(process.env.MOLLIE_PROFILE_ID, {
+      // Mollie-Profile-ID aus den Vite-Umgebungsvariablen laden
+      const mollieProfileId = import.meta.env.VITE_MOLLIE_PROFILE_ID;
+      
+      if (!mollieProfileId) {
+        console.warn('VITE_MOLLIE_PROFILE_ID nicht gefunden. Mollie wird im Test-Modus initialisiert.');
+      }
+      
+      // Temporär deaktiviere tatsächliche Mollie-Komponente Initialisierung
+      console.log('Initialisiere Mollie-Komponenten (Test-Modus)');
+      
+      // Wir simulieren das erfolgreiche Laden der Komponenten
+      // In einer echten Umgebung mit VITE_MOLLIE_PROFILE_ID würden wir hier tatsächlich
+      // die Mollie-Komponenten initialisieren
+      /*
+      const mollie = window.Mollie(mollieProfileId || 'test_profile_id', {
         locale: 'de_DE',
-        testmode: true // Set to false in production
+        testmode: true
       });
 
-      // Initialize payment methods
+      // Zahlungsmethoden initialisieren
       const methods = ['ideal', 'creditcard', 'bancontact', 'sofort'];
       methods.forEach(method => {
         mollie.createComponent(method);
       });
+      */
 
       setIsLoading(false);
     } catch (error) {
@@ -66,13 +81,37 @@ export function MolliePaymentForm({ amount, onSuccess, onError }: MolliePaymentF
 
     setIsLoading(true);
     try {
-      // Your payment processing logic here
-      onSuccess();
+      // API zur Erstellung einer Mollie-Zahlung aufrufen
+      const response = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: amount,
+          description: `${amount} Guthaben auf LeadScraper`,
+          method: selectedMethod,
+        }),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text() || 'Zahlungsfehler');
+      }
+
+      const { checkoutUrl } = await response.json();
+      
+      if (checkoutUrl) {
+        // Benutzer zur Mollie Checkout-Seite weiterleiten
+        window.location.href = checkoutUrl;
+      } else {
+        throw new Error('Keine Checkout-URL erhalten');
+      }
+      
     } catch (error) {
       console.error('Payment error:', error);
       onError(error as Error);
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Setze Loading nur zurück, wenn ein Fehler auftritt
     }
   };
 
