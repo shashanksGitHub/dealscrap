@@ -29,18 +29,30 @@ export async function createPayment(
 
   console.log('Creating Mollie payment for user:', userId, 'amount:', amount);
 
-  // Get the domain from REPLIT_DOMAINS or custom domain, fallback to a default if not available
-  const domain = process.env.CUSTOM_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || '';
-
-  // Ensure we have a valid domain
-  if (!domain) {
-    throw new Error('No valid domain found for redirect URL');
+  // Prüfe zuerst auf die Verwendung der BASE_URL Umgebungsvariable (für die gesamte Produktion)
+  const baseUrl = process.env.BASE_URL || process.env.VITE_BASE_URL;
+  
+  // Falls keine BASE_URL gesetzt ist, verwende domain-basierte Konstruktion als Fallback
+  let redirectUrl, webhookUrl;
+  
+  if (baseUrl) {
+    // Verwende vorkonfigurierte BASE_URL
+    redirectUrl = `${baseUrl}/dashboard`;
+    webhookUrl = `${baseUrl}/api/mollie-webhook`;
+  } else {
+    // Fallback zur domain-basierten Konstruktion
+    const domain = process.env.CUSTOM_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || '';
+    
+    // Stelle sicher, dass eine gültige Domain existiert
+    if (!domain) {
+      throw new Error('Keine gültige Domain für Redirect-URL gefunden');
+    }
+    
+    // Erstelle URLs mit der Domain
+    const domainBaseUrl = `https://${domain}`;
+    redirectUrl = `${domainBaseUrl}/dashboard`;
+    webhookUrl = `${domainBaseUrl}/api/mollie-webhook`;
   }
-
-  // Create proper URLs using the domain
-  const baseUrl = `https://${domain}`;
-  const redirectUrl = `${baseUrl}/dashboard`;
-  const webhookUrl = `${baseUrl}/api/mollie-webhook`;
 
   console.log('Using URLs:', { redirectUrl, webhookUrl });
 

@@ -25,16 +25,38 @@ app.use(express.urlencoded({ extended: false }));
 
 // Enhanced Security headers including CSP
 app.use((req, res, next) => {
-  res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mollie.com https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co data: blob:; " +
-    "frame-src 'self' https://*.mollie.com https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mollie.com https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
-    "connect-src 'self' https://*.mollie.com https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
-    "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: blob: https: http: *; " +
+  // Benutzerdefinierte Domains aus der Umgebung auslesen
+  const customDomain = process.env.CUSTOM_DOMAIN;
+  
+  // CSP-Teile definieren
+  const defaultSrc = ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://*.mollie.com", "https://*.googletagmanager.com", "*.replit.dev", "*.replit.app", "*.repl.co", "data:", "blob:"];
+  const frameSrc = ["'self'", "https://*.mollie.com", "https://*.googletagmanager.com", "*.replit.dev", "*.replit.app", "*.repl.co"];
+  const scriptSrc = ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://*.mollie.com", "https://*.googletagmanager.com", "*.replit.dev", "*.replit.app", "*.repl.co"];
+  const connectSrc = ["'self'", "https://*.mollie.com", "https://*.googletagmanager.com", "*.replit.dev", "*.replit.app", "*.repl.co", "wss://*.replit.dev", "wss://*.replit.app", "wss://*.repl.co"];
+  
+  // Benutzerdefinierte Domain hinzufügen, wenn vorhanden
+  if (customDomain) {
+    const domainEntries = [`https://*.${customDomain}`, `https://${customDomain}`];
+    const wssDomainEntries = [`wss://*.${customDomain}`, `wss://${customDomain}`];
+    
+    defaultSrc.push(...domainEntries);
+    frameSrc.push(...domainEntries);
+    scriptSrc.push(...domainEntries);
+    connectSrc.push(...domainEntries, ...wssDomainEntries);
+  }
+  
+  // CSP-Header zusammenstellen
+  const cspValue = [
+    `default-src ${defaultSrc.join(' ')};`,
+    `frame-src ${frameSrc.join(' ')};`,
+    `script-src ${scriptSrc.join(' ')};`,
+    `connect-src ${connectSrc.join(' ')};`,
+    "style-src 'self' 'unsafe-inline';",
+    "img-src 'self' data: blob: https: http: *;",
     "font-src 'self' data:;"
-  );
+  ].join(' ');
+  
+  res.setHeader('Content-Security-Policy', cspValue);
   next();
 });
 
