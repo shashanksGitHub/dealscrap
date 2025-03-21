@@ -27,10 +27,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co data: blob:; " +
-    "frame-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
-    "connect-src 'self' https://*.stripe.com https://*.stripe.network https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
+    "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mollie.com https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co data: blob:; " +
+    "frame-src 'self' https://*.mollie.com https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mollie.com https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co; " +
+    "connect-src 'self' https://*.mollie.com https://*.googletagmanager.com *.replit.dev *.replit.app *.repl.co wss://*.replit.dev wss://*.replit.app wss://*.repl.co; " +
     "style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: blob: https: http: *; " +
     "font-src 'self' data:;"
@@ -102,8 +102,9 @@ async function startServer() {
     }
 
     // Start the server
-    server.listen(PORT, "0.0.0.0", () => {
-      log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+    const portNumber = typeof PORT === 'string' ? parseInt(PORT) : PORT;
+    server.listen(portNumber, "0.0.0.0", () => {
+      log(`Server running on port ${portNumber} in ${process.env.NODE_ENV} mode`);
     });
 
     // Handle server errors

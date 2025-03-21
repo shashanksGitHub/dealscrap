@@ -29,8 +29,8 @@ export async function createPayment(
 
   console.log('Creating Mollie payment for user:', userId, 'amount:', amount);
 
-  // Get the domain from REPLIT_DOMAINS, fallback to a default if not available
-  const domain = process.env.REPLIT_DOMAINS?.split(',')[0] || '';
+  // Get the domain from REPLIT_DOMAINS or custom domain, fallback to a default if not available
+  const domain = process.env.CUSTOM_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || '';
 
   // Ensure we have a valid domain
   if (!domain) {
