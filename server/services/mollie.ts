@@ -12,7 +12,7 @@ try {
     log('Mollie client initialized successfully');
   }
 } catch (error) {
-  log('Error initializing Mollie client:', error);
+  log('Error initializing Mollie client:', error instanceof Error ? error.message : String(error));
 }
 
 export async function createPayment(
@@ -73,6 +73,12 @@ export async function createPayment(
   }
 }
 
+// Typdefinitionen für Mollie-Rückgabewerte
+interface MolliePaymentMetadata {
+  userId: string;
+  creditAmount: string;
+}
+
 export async function handleWebhookEvent(paymentId: string): Promise<void> {
   if (!mollieClient) {
     throw new Error('Payment service is not available');
@@ -84,8 +90,16 @@ export async function handleWebhookEvent(paymentId: string): Promise<void> {
     console.log('Payment status:', payment.status);
 
     if (payment.status === "paid") {
-      const userId = parseInt(payment.metadata.userId);
-      const creditAmount = parseInt(payment.metadata.creditAmount);
+      // Sichere Typumwandlung für payment.metadata
+      const metadata = payment.metadata as unknown as MolliePaymentMetadata;
+      
+      if (!metadata || !metadata.userId || !metadata.creditAmount) {
+        console.error('Invalid payment metadata:', metadata);
+        throw new Error('Invalid payment metadata');
+      }
+      
+      const userId = parseInt(metadata.userId);
+      const creditAmount = parseInt(metadata.creditAmount);
 
       console.log('Adding credits for payment:', {
         userId,
