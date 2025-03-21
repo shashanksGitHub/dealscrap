@@ -36,23 +36,30 @@ export function MolliePaymentForm({ amount, onSuccess, onError }: MolliePaymentF
 
   const initializeMollie = async () => {
     try {
-      // Mollie-Profile-ID aus den Vite-Umgebungsvariablen laden
-      const mollieProfileId = import.meta.env.VITE_MOLLIE_PROFILE_ID;
+      // Vite-Umgebungsvariablen für Mollie
+      const isDev = process.env.NODE_ENV === 'development' || window.location.hostname.includes('replit');
+      let mollieProfileId = undefined;
+      
+      // In einer echten Produktionsumgebung sollte dies aus den Umgebungsvariablen kommen
+      try {
+        mollieProfileId = (window as any).__ENV?.VITE_MOLLIE_PROFILE_ID;
+      } catch (e) {
+        console.warn('Konnte VITE_MOLLIE_PROFILE_ID nicht abrufen');
+      }
       
       if (!mollieProfileId) {
-        console.warn('VITE_MOLLIE_PROFILE_ID nicht gefunden. Mollie wird im Test-Modus initialisiert.');
+        console.warn('Mollie Profil-ID nicht gefunden. Mollie wird im Test-Modus initialisiert.');
       }
       
       // Temporär deaktiviere tatsächliche Mollie-Komponente Initialisierung
       console.log('Initialisiere Mollie-Komponenten (Test-Modus)');
       
       // Wir simulieren das erfolgreiche Laden der Komponenten
-      // In einer echten Umgebung mit VITE_MOLLIE_PROFILE_ID würden wir hier tatsächlich
-      // die Mollie-Komponenten initialisieren
+      // In einer echten Umgebung mit Mollie Profil-ID würden wir die Mollie-Komponenten initialisieren:
       /*
       const mollie = window.Mollie(mollieProfileId || 'test_profile_id', {
         locale: 'de_DE',
-        testmode: true
+        testmode: isDev
       });
 
       // Zahlungsmethoden initialisieren
@@ -62,7 +69,10 @@ export function MolliePaymentForm({ amount, onSuccess, onError }: MolliePaymentF
       });
       */
 
-      setIsLoading(false);
+      // Nach kurzer Verzögerung für die Simulation laden beenden
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     } catch (error) {
       console.error('Error initializing Mollie:', error);
       onError(error as Error);
