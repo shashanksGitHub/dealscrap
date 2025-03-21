@@ -26,7 +26,6 @@ export interface IStorage {
   getBlogPosts(authorId?: number): Promise<BlogPost[]>;
   updateBlogPost(id: number, post: Partial<BlogPost>): Promise<BlogPost>;
   sessionStore: session.Store;
-  updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User>;
   updateBusinessInfo(userId: number, businessInfo: BusinessInfo): Promise<User>;
 }
 
@@ -140,16 +139,6 @@ export class DatabaseStorage implements IStorage {
       .returning();
     if (!post) throw new Error("Blog post not found");
     return post;
-  }
-
-  async updateStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set({ stripeCustomerId })
-      .where(eq(users.id, userId))
-      .returning();
-    if (!user) throw new Error("User not found");
-    return user;
   }
 
   async updateBusinessInfo(userId: number, businessInfo: BusinessInfo): Promise<User> {

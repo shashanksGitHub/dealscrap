@@ -19,8 +19,6 @@ export const users = pgTable("users", {
   city: text("city"),
   postalCode: text("postal_code"),
   country: text("country"),
-  // Stripe information
-  stripeCustomerId: text("stripe_customer_id"),
 });
 
 // Neue Tabelle für die Suchen
