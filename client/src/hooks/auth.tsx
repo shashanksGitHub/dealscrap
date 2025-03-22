@@ -26,15 +26,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<Error | null>(null);
 
   const { data: user, isLoading, refetch } = useQuery({
-    queryKey: ['/api/auth/user'],
-    queryFn: () => apiRequest<User | null>('/api/auth/user', 'GET'),
+    queryKey: ['/api/user'],
+    queryFn: () => apiRequest<User | null>('/api/user', 'GET'),
     retry: false,
     initialData: null
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      const response = await apiRequest<User>('/api/auth/login', 'POST', credentials);
+      const response = await apiRequest<User>('/api/login', 'POST', credentials);
       await refetch();
       return response;
     },
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (data: { email: string; password: string }) => {
-      const response = await apiRequest<User>('/api/auth/register', 'POST', data);
+      const response = await apiRequest<User>('/api/register', 'POST', data);
       await refetch();
       return response;
     },
@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await apiRequest('/api/auth/logout', 'POST');
+      await apiRequest('/api/logout', 'POST');
       await refetch();
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Logout failed'));
