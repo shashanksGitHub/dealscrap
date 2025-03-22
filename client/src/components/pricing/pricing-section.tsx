@@ -35,7 +35,7 @@ export function PricingSection() {
 
     try {
       setIsProcessing(true);
-      const response = await fetch('/api/create-payment', {
+      const response = await fetch('/api/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
