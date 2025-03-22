@@ -165,7 +165,7 @@ export default function Dashboard() {
   const handlePurchase = async (price: number) => {
     setIsProcessingPayment(true);
     try {
-      const response = await apiRequest("POST", "/api/payments/create", {
+      const response = await apiRequest("/api/payments/create", "POST", {
         amount: price
       });
 
@@ -226,7 +226,7 @@ export default function Dashboard() {
 
   const markSearchAsRead = useMutation({
     mutationFn: async (searchId: number) => {
-      const response = await apiRequest("PATCH", `/api/searches/${searchId}/mark-read`);
+      const response = await apiRequest(`/api/searches/${searchId}/mark-read`, "PATCH");
       return response.json();
     },
     onSuccess: () => {
