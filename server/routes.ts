@@ -30,48 +30,6 @@ export async function registerRoutes(router: Router) {
 
 
   // Business information and payment routes
-  router.post("/create-payment", async (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Nicht authentifiziert" });
-    }
-
-    try {
-      console.log('Processing payment request:', {
-        userId: req.user.id,
-        amount: req.body.amount
-      });
-
-      const amount = parseInt(req.body.amount);
-      if (!amount) {
-        return res.status(400).json({ message: "Betrag ist erforderlich" });
-      }
-
-      const checkoutUrl = await createPayment(
-        req.user.id,
-        amount,
-        `${amount} Credits`
-      );
-
-      if (!checkoutUrl) {
-        throw new Error('Keine Checkout-URL von Mollie erhalten');
-      }
-
-      console.log('Payment created, redirecting to:', checkoutUrl);
-
-      res.json({
-        success: true,
-        checkoutUrl
-      });
-    } catch (error: any) {
-      console.error('Error creating payment:', error);
-      res.status(400).json({ 
-        message: "Fehler bei der Zahlungsvorbereitung", 
-        details: error.message 
-      });
-    }
-  });
-  
-  // Neuer Endpunkt für Mollie-Zahlungen
   router.post("/payments/create", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Nicht authentifiziert" });
