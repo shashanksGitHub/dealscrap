@@ -13,8 +13,8 @@ export const queryClient = new QueryClient({
 
 // Helper function for API requests
 export async function apiRequest<T>(
-  method: string,
   path: string,
+  method: string = 'GET',
   data?: unknown,
   options: RequestInit = {}
 ): Promise<T> {
