@@ -165,7 +165,7 @@ export default function Dashboard() {
   const handlePurchase = async (price: number) => {
     setIsProcessingPayment(true);
     try {
-      const response = await apiRequest("POST", "/api/create-payment", {
+      const response = await apiRequest("POST", "/api/payments/create", {
         amount: price
       });
 
