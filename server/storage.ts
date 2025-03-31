@@ -2,9 +2,10 @@ import { users, leads, blogPosts, type User, type Lead, type BlogPost, type Inse
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
 import session from "express-session";
-import createMemoryStore from "memorystore";
+import pgSession from "connect-pg-simple";
+import { pool } from "./db";
 
-const MemoryStore = createMemoryStore(session);
+const PostgresStore = pgSession(session);
 
 interface BusinessInfo {
   [key: string]: any;
@@ -19,6 +20,7 @@ export interface IStorage {
   clearResetToken(userId: number): Promise<void>;
   updatePassword(userId: number, hashedPassword: string): Promise<void>;
   addCredits(userId: number, amount: number): Promise<User>;
+  deductCredits(userId: number, amount: number): Promise<User>;
   createLead(lead: Omit<Lead, "id" | "createdAt">): Promise<Lead>;
   getLeadsByUserId(userId: number): Promise<Lead[]>;
   createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
@@ -33,8 +35,12 @@ export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
   constructor() {
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
+    this.sessionStore = new PostgresStore({
+      pool: pool,
+      tableName: 'session',
+      createTableIfMissing: true,
+      pruneSessionInterval: 60 * 15, // Prune expired sessions every 15 minutes
+      errorLog: console.error.bind(console),
     });
   }
 
@@ -87,6 +93,25 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({
         credits: sql`${users.credits} + ${amount}`,
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    if (!user) {
+      console.error(`User not found: ${userId}`);
+      throw new Error("User not found");
+    }
+
+    console.log(`Updated credits for user ${userId} to ${user.credits}`);
+    return user;
+  }
+
+  async deductCredits(userId: number, amount: number): Promise<User> {
+    console.log(`Deducting credits - User ID: ${userId}, Amount: ${amount}`);
+    const [user] = await db
+      .update(users)
+      .set({
+        credits: sql`${users.credits} - ${amount}`,
       })
       .where(eq(users.id, userId))
       .returning();

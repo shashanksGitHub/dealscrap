@@ -21,7 +21,7 @@ async function hashPassword(password: string) {
   return `${buf.toString("hex")}.${salt}`;
 }
 
-async function comparePasswords(supplied: string, stored: string) {
+export async function comparePasswords(supplied: string, stored: string) {
   const [hashed, salt] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
@@ -52,18 +52,19 @@ async function notifyZapier(userData: { email: string }) {
 
 export function setupAuth(app: Express) {
   app.use(session({
+    store: storage.sessionStore,
     secret: process.env.SESSION_SECRET || 'development_secret',
     resave: false,
     saveUninitialized: false,
-    store: storage.sessionStore,
     name: 'sid',
     cookie: {
       secure: process.env.NODE_ENV === 'production',
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       path: '/'
-    }
+    },
+    rolling: true // Extends session lifetime on activity
   }));
 
   app.use(passport.initialize());

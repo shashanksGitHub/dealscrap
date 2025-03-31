@@ -6,20 +6,29 @@ import { apifyClient } from "./services/apify";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 import { searches, leads } from "@shared/schema";
+import { cacheService } from "./services/cache";
 
 export async function registerRoutes(router: Router) {
-  // Get user info with additional verification
+  // Get user info with additional verification and caching
   router.get("/user", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Nicht authentifiziert" });
     }
 
     try {
+      // Try to get from cache first
+      const cachedUser = await cacheService.getUser(req.user.id);
+      if (cachedUser) {
+        return res.json(cachedUser);
+      }
+
       const user = await storage.getUser(req.user.id);
       if (!user) {
         return res.status(404).json({ message: "Benutzer nicht gefunden" });
       }
 
+      // Cache the user data
+      await cacheService.setUser(req.user.id, user);
       console.log(`Sending user info - ID: ${user.id}, Credits: ${user.credits}`);
       res.json(user);
     } catch (error: any) {
@@ -113,11 +122,27 @@ export async function registerRoutes(router: Router) {
     }
   });
 
-  // Lead management
+  // Lead management with caching
   router.get("/leads", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
-    const leads = await storage.getLeadsByUserId(req.user.id);
-    res.json(leads);
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Nicht authentifiziert" });
+    }
+
+    try {
+      // Try to get from cache first
+      const cachedLeads = await cacheService.getLeads(req.user.id);
+      if (cachedLeads) {
+        return res.json(cachedLeads);
+      }
+
+      const leads = await storage.getLeadsByUserId(req.user.id);
+      // Cache the leads
+      await cacheService.setLeads(req.user.id, leads);
+      res.json(leads);
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+      res.status(500).json({ message: "Failed to fetch leads" });
+    }
   });
 
   // Blog routes
@@ -207,94 +232,162 @@ export async function registerRoutes(router: Router) {
     }
   });
 
+  // Lead generation endpoint
   router.post("/scrape", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
-    const { query, location, count } = req.body;
+    console.log('=== SCRAPE REQUEST ===');
+    console.log('Request body:', req.body);
 
-    if (!query || !location || !count) {
-      return res.status(400).json({ message: "Query, location, and count are required" });
+    if (!req.isAuthenticated()) {
+      console.error('Authentication check failed');
+      return res.status(401).json({ 
+        error: 'Unauthorized',
+        message: 'Nicht authentifiziert'
+      });
     }
 
-    if (count < 1 || count > 100) {
-      return res.status(400).json({ message: "Lead count must be between 1 and 100" });
+    const { searchTerm, location, maxResults = 100 } = req.body;
+
+    if (!searchTerm?.trim() || !location?.trim()) {
+      console.error('Missing required parameters:', { searchTerm, location });
+      return res.status(400).json({ 
+        error: 'Missing parameters',
+        message: 'Suchbegriff und Standort sind erforderlich'
+      });
     }
 
+    const count = Math.min(Math.max(1, maxResults), 100);
     const user = await storage.getUser(req.user.id);
-    if (!user || user.credits < count) {
-      return res.status(403).json({ message: "Insufficient credits" });
+    
+    if (!user) {
+      console.error('User not found:', req.user.id);
+      return res.status(404).json({ 
+        error: 'User not found',
+        message: 'Benutzer nicht gefunden'
+      });
+    }
+
+    if (user.credits < count) {
+      console.error('Insufficient credits:', { required: count, available: user.credits });
+      return res.status(403).json({ 
+        error: 'Insufficient credits',
+        message: `Sie benötigen ${count} Credits für diese Suche. Sie haben ${user.credits} Credits.`
+      });
     }
 
     try {
-      console.log('Creating new search record');
+      console.log('Starting scraping with Apify...', { searchTerm, location, count });
+      
+      // Create search record
       const [search] = await db.insert(searches)
         .values({
           userId: req.user.id,
-          query,
-          location,
-          count
+          query: searchTerm,
+          location: location,
+          count: count,
+          isRead: false
         })
         .returning();
-      console.log('Created search:', search);
 
-      console.log(`Starting scrape for ${count} leads with query: ${query}, location: ${location}`);
+      // Set up streaming response
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Transfer-Encoding', 'chunked');
 
-      const run = await apifyClient.actor("nwua9Gu5YrADL7ZDj").call({
-        searchStringsArray: [query],
-        locationQuery: `${location}, Deutschland`,
-        language: "de",
-        maxCrawledPlacesPerSearch: count,
-        includeWebResults: false,
-        maxQuestions: 0,
-        onlyDataFromSearchPage: false,
-        scrapeDirectories: false,
-        scrapeImageAuthors: false,
-        scrapeReviewsPersonalData: true,
-        scrapeTableReservationProvider: false,
-        skipClosedPlaces: false
-      });
-
-      const { items } = await apifyClient.dataset(run.defaultDatasetId).listItems();
-      console.log(`Received ${items.length} leads from Apify`);
-
-      await storage.addCredits(req.user.id, -count);
-
-      console.log('Raw Apify data:', JSON.stringify(items, null, 2));
-
-      const savedLeads = await Promise.all(items.map(async (data: any) => {
-        try {
-          const leadData = {
-            userId: req.user.id,
-            searchId: search.id,
-            businessName: data.title || data.name || "",
-            address: data.address || "",
-            phone: data.phone || data.phoneNumber || "",
-            email: data.email || "",
-            website: data.website || "",
-            category: query,
-            metadata: {
-              rating: data.rating,
-              totalScore: data.reviewsCount,
-              placeId: data.placeId
-            }
-          };
-          console.log('Trying to save lead with data:', leadData);
-          const lead = await storage.createLead(leadData);
-          console.log('Successfully saved lead:', lead);
-          return lead;
-        } catch (error) {
-          console.error('Error saving lead:', error);
-          throw error;
-        }
+      // Initial progress
+      res.write(JSON.stringify({ 
+        type: 'progress',
+        current: 0,
+        total: count,
+        leads: []
       }));
 
-      console.log(`Successfully saved ${savedLeads.length} leads to database`);
-      res.json({ search, leads: savedLeads });
-    } catch (error: any) {
-      console.error('Error during scraping:', error);
-      res.status(500).json({ 
-        message: "Failed to scrape data", 
-        error: error.message 
+      const run = await apifyClient.actor("apify/google-places-scraper").call({
+        searchStrings: [`${searchTerm} ${location}`],
+        maxCrawledPlaces: count,
+        language: "de",
+        maxImages: 0,
+        maxReviews: 0,
+        includeHistogram: false,
+        includeOpeningHours: true,
+        includePeopleAlsoSearch: false
       });
+
+      console.log('Getting dataset...');
+      const dataset = await apifyClient.dataset(run.defaultDatasetId);
+      const { items } = await dataset.listItems();
+
+      if (!items || items.length === 0) {
+        console.error('No leads found');
+        return res.status(404).json({
+          error: 'No leads found',
+          message: 'Keine passenden Leads gefunden'
+        });
+      }
+
+      const foundLeads = [];
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        
+        // Create the lead in database
+        const [lead] = await db.insert(leads)
+          .values({
+            userId: req.user.id,
+            searchId: search.id,
+            businessName: item.title,
+            address: item.address,
+            website: item.website || null,
+            phone: item.phone || null,
+            email: null,
+            category: item.category || searchTerm,
+            source: 'google',
+            rawData: item
+          })
+          .returning();
+
+        foundLeads.push(lead);
+
+        // Send progress update
+        res.write(JSON.stringify({
+          type: 'progress',
+          current: i + 1,
+          total: items.length,
+          leads: [lead]
+        }));
+      }
+
+      // Deduct credits
+      await db.update(users)
+        .set({ credits: user.credits - count })
+        .where(eq(users.id, req.user.id));
+
+      // Clear user caches
+      await cacheService.clearUserCaches(req.user.id);
+
+      console.log('Scraping successful:', { 
+        searchId: search.id, 
+        leadsFound: foundLeads.length 
+      });
+      
+      // Final response
+      res.write(JSON.stringify({
+        type: 'complete',
+        leads: foundLeads
+      }));
+      res.end();
+
+    } catch (error) {
+      console.error('Scraping error:', error);
+      if (!res.headersSent) {
+        res.status(500).json({ 
+          error: 'Scraping failed',
+          message: 'Es ist ein Fehler bei der Lead-Generierung aufgetreten'
+        });
+      } else {
+        res.write(JSON.stringify({
+          type: 'error',
+          message: 'Es ist ein Fehler bei der Lead-Generierung aufgetreten'
+        }));
+        res.end();
+      }
     }
   });
 }

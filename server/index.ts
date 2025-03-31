@@ -1,3 +1,4 @@
+import "./config";  // Import config first to load environment variables
 import "../shim.js";
 import "tsconfig-paths/register.js";
 import express, { type Request, Response, NextFunction } from "express";
@@ -9,19 +10,94 @@ import { recoveryService } from "./services/recovery";
 import fs from 'fs';
 import { createServer } from 'http';
 import { fileURLToPath } from "url";
+import compression from "compression";
+import { storage } from "./storage";
+import session from "express-session";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import { comparePasswords } from "./auth";
+import { CONFIG } from "./config";
+import { initializePool } from "./db";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Basic middleware
-app.use(express.json({
-  verify: (req, res, buf) => {
-    (req as any).rawBody = buf;
+// Add compression middleware
+app.use(compression());
+
+// Optimize static file serving
+app.use(express.static("dist/public", {
+  maxAge: "1h",
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, path) => {
+    // Cache images and videos for longer
+    if (path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.gif') || path.endsWith('.mp4')) {
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours
+    }
+    // Cache CSS and JS for a shorter time
+    else if (path.endsWith('.css') || path.endsWith('.js')) {
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour
+    }
   }
 }));
-app.use(express.urlencoded({ extended: false }));
+
+// Body parser middleware with limits
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
+// Session middleware with optimized settings
+app.use(session({
+  store: storage.sessionStore,
+  secret: CONFIG.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(
+  { usernameField: "email" },
+  async (email, password, done) => {
+    try {
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return done(null, false, { message: "Invalid email or password" });
+      }
+
+      const isValid = await comparePasswords(password, user.password);
+      if (!isValid) {
+        return done(null, false, { message: "Invalid email or password" });
+      }
+
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
+  }
+));
+
+passport.serializeUser((user: any, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id: number, done) => {
+  try {
+    const user = await storage.getUser(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
+});
 
 // Enhanced Security headers including CSP
 app.use((req, res, next) => {
@@ -79,6 +155,11 @@ log("Registering API routes...");
 const apiRouter = express.Router();
 registerRoutes(apiRouter);
 app.use('/api', apiRouter);
+
+// Serve index.html for all other routes (SPA)
+app.get("*", (req, res) => {
+  res.sendFile("dist/public/index.html", { root: "." });
+});
 
 async function startServer() {
   try {
@@ -148,3 +229,15 @@ startServer().catch(async (error) => {
   await recoveryService.handleDeploymentError(error);
   process.exit(1);
 });
+
+// Initialize database pool before starting server
+try {
+  await initializePool();
+  const port = CONFIG.PORT;
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+} catch (error) {
+  console.error("Failed to start server:", error);
+  process.exit(1);
+}

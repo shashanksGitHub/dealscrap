@@ -2,8 +2,12 @@ import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
+import { CONFIG } from './config';
 
+// Configure WebSocket for Neon
 neonConfig.webSocketConstructor = ws;
+neonConfig.useSecureWebSocket = true; // Enable secure WebSocket
+neonConfig.pipelineConnect = true; // Enable pipeline for better performance
 
 if (!process.env.DATABASE_URL) {
   throw new Error(
@@ -11,51 +15,79 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Optimized pool configuration for Neon serverless
+// Optimized pool configuration for better performance
 export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  connectionTimeoutMillis: 3000, // Reduced from 5000
-  max: 10, // Reduced from 20 to prevent connection overload
-  idleTimeoutMillis: 10000, // Reduced from 30000 to release connections faster
-  allowExitOnIdle: false // Changed to false to maintain minimal connections
+  connectionString: CONFIG.DATABASE_URL,
+  connectionTimeoutMillis: 10000, // Increased timeout
+  max: 10, // Increased pool size for better concurrency
+  idleTimeoutMillis: 30000, // Increased idle timeout
+  allowExitOnIdle: true,
+  ssl: {
+    rejectUnauthorized: true,
+    require: true
+  }
 });
 
-// Enhanced error handling for the pool
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle database client', err);
-  // Don't exit process, try to recover
-  pool.connect().catch(connectErr => {
-    console.error('Failed to recover pool connection:', connectErr);
-    process.exit(-1);
-  });
-});
+// Initialize Drizzle with the pool
+export const db = drizzle(pool, { schema });
 
-pool.on('connect', (client) => {
-  client.on('error', (err) => {
-    console.error('Database client error:', err);
-  });
-});
-
-export const db = drizzle({ client: pool, schema });
-
-// Initialize pool with better error handling
+// Initialize pool with better error handling and connection management
 async function initializePool() {
-  try {
-    await pool.connect();
-    console.log('Database connected successfully');
-    const result = await pool.query('SELECT NOW()');
-    console.log('Database query successful:', result.rows[0]);
-  } catch (err) {
-    console.error('Database connection error:', err);
-    // Try to reconnect once before giving up
+  let retries = 3;
+  let connected = false;
+
+  while (retries > 0 && !connected) {
     try {
-      await pool.connect();
-      console.log('Database reconnection successful');
-    } catch (retryErr) {
-      console.error('Database reconnection failed:', retryErr);
-      process.exit(-1);
+      const client = await pool.connect();
+      console.log('Database connected successfully');
+      
+      // Test query with timeout
+      const queryPromise = client.query('SELECT NOW()');
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Query timeout')), 5000)
+      );
+      
+      const result = await Promise.race([queryPromise, timeoutPromise]);
+      console.log('Database query successful:', result.rows[0]);
+      
+      client.release();
+      connected = true;
+      
+      // Add event listeners for pool errors
+      pool.on('error', (err) => {
+        console.error('Unexpected error on idle client', err);
+        process.exit(-1);
+      });
+      
+      // Add connection status monitoring
+      setInterval(async () => {
+        try {
+          const client = await pool.connect();
+          client.release();
+        } catch (err) {
+          console.error('Connection check failed:', err);
+        }
+      }, 60000); // Check every minute
+      
+    } catch (err) {
+      console.error(`Database connection error (${retries} retries left):`, err.message);
+      retries--;
+      
+      if (retries === 0) {
+        console.error('Failed to connect to database after multiple attempts');
+        process.exit(-1);
+      }
+      
+      // Exponential backoff
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, 3 - retries) * 1000));
     }
   }
 }
 
-initializePool();
+// Initialize the pool
+initializePool().catch(err => {
+  console.error('Failed to initialize database pool:', err);
+  process.exit(-1);
+});
+
+export { initializePool };

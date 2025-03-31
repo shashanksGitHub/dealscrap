@@ -25,11 +25,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const [error, setError] = useState<Error | null>(null);
 
+  // Optimize the initial auth check
   const { data: user, isLoading, refetch } = useQuery({
     queryKey: ['/api/user'],
     queryFn: () => apiRequest<User | null>('/api/user', 'GET'),
-    retry: false,
-    initialData: null
+    retry: 0,
+    staleTime: 5000,
+    cacheTime: 300000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: false,
+    initialData: null,
+    // Add a short timeout to prevent hanging
+    networkMode: 'online',
   });
 
   const loginMutation = useMutation({

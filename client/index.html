@@ -107,26 +107,41 @@
         }
         
         .initial-loader {
-          visibility: hidden;
-          opacity: 0;
           position: fixed;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          background-color: #fff;
+          background: #fff;
           display: flex;
           justify-content: center;
           align-items: center;
-          transition: visibility 0s, opacity 0.2s ease-out;
           z-index: 9999;
-        }
-
-        /* Nur anzeigen, wenn die App länger zum Laden braucht */
-        .js-loading .initial-loader {
-          visibility: visible;
           opacity: 1;
-          transition-delay: 0.3s;
+        }
+        
+        .loader-content {
+          text-align: center;
+        }
+        
+        .loader-logo {
+          width: 200px;
+          margin-bottom: 20px;
+        }
+        
+        .loader-spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid #f3f3f3;
+          border-top: 3px solid #3498db;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto;
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
         
         /* Header-Komponente */
@@ -237,16 +252,10 @@
       
       <!-- Loader für verzögertes Laden (wird nur angezeigt, wenn es länger dauert) -->
       <div class="initial-loader">
-        <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#2563eb">
-          <g fill="none" fill-rule="evenodd">
-            <g transform="translate(1 1)" stroke-width="2">
-              <circle stroke-opacity=".5" cx="18" cy="18" r="18"/>
-              <path d="M36 18c0-9.94-8.06-18-18-18">
-                <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"/>
-              </path>
-            </g>
-          </g>
-        </svg>
+        <div class="loader-content">
+          <img src="/images/leadscraper-black.png" alt="LeadScraper" class="loader-logo" />
+          <div class="loader-spinner"></div>
+        </div>
       </div>
       
       <script>

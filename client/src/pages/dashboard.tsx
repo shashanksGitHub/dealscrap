@@ -33,6 +33,8 @@ export default function Dashboard() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [searchStatus, setSearchStatus] = useState("");
   const [showTutorial, setShowTutorial] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     // Show tutorial only on first login
@@ -53,10 +55,12 @@ export default function Dashboard() {
 
   const { data: searches = [], isLoading: isSearchesLoading } = useQuery({
     queryKey: ['/api/searches'],
+    queryFn: () => apiRequest('/api/searches', 'GET'),
   });
 
   const { data: leads = [] } = useQuery({
     queryKey: ['/api/leads'],
+    queryFn: () => apiRequest('/api/leads', 'GET'),
     initialData: [],
   });
 
@@ -81,17 +85,46 @@ export default function Dashboard() {
       }, 2000);
 
       try {
-        const res = await apiRequest("POST", "/api/scrape", data);
-        clearInterval(statusInterval);
-        return res.json();
+        const response = await apiRequest('/api/scrape', 'POST', {
+          searchTerm: data.query,
+          location: data.location,
+          maxResults: data.count
+        }, {
+          stream: true,
+          onProgress: (data) => {
+            if (data.type === 'progress') {
+              setProgress(data.current || 0);
+              setTotal(data.total || 0);
+              if (data.leads) {
+                // Update leads query with accumulated leads
+                queryClient.setQueryData(['/api/leads'], (old: Lead[] = []) => {
+                  const newLeads = [...old];
+                  for (const lead of data.leads) {
+                    if (!newLeads.some(l => l.id === lead.id)) {
+                      newLeads.push(lead);
+                    }
+                  }
+                  return newLeads;
+                });
+              }
+            }
+          }
+        });
+
+        return response;
       } catch (error) {
-        clearInterval(statusInterval);
+        if (error.name === 'AbortError') {
+          throw new Error("Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es mit einer kleineren Anzahl an Leads.");
+        }
         throw error;
+      } finally {
+        clearInterval(statusInterval);
       }
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/searches"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
 
       toast({
         title: (
@@ -118,9 +151,9 @@ export default function Dashboard() {
             className="space-y-2"
           >
             <p>
-              Es wurden <span className="font-medium">{data.leads.length} neue Leads</span> für
-              <span className="font-medium"> {data.search.query}</span> in
-              <span className="font-medium"> {data.search.location}</span> gefunden.
+              Es wurden <span className="font-medium">{data.length} neue Leads</span> für
+              <span className="font-medium"> {query}</span> in
+              <span className="font-medium"> {searchLocation}</span> gefunden.
             </p>
             <p className="text-sm text-muted-foreground">
               Sie können die Leads jetzt in der untenstehenden Liste einsehen oder als CSV-Datei exportieren.
@@ -351,7 +384,34 @@ export default function Dashboard() {
                   />
                 </div>
                 <Button
-                  onClick={() => scrapeMutation.mutate({ query, location: searchLocation, count: leadCount })}
+                  onClick={() => {
+                    console.log('🖱️ Lead generation button clicked', {
+                      query,
+                      location: searchLocation,
+                      count: leadCount
+                    });
+                    
+                    // Check if user has enough credits
+                    if (user && user.credits < leadCount) {
+                      console.error('❌ Insufficient credits', {
+                        required: leadCount,
+                        available: user.credits
+                      });
+                      toast({
+                        title: "Nicht genügend Credits",
+                        description: `Sie benötigen ${leadCount} Credits für diese Suche. Bitte kaufen Sie weitere Credits.`,
+                        variant: "destructive"
+                      });
+                      return;
+                    }
+
+                    console.log('✅ Credit check passed, starting scrape...');
+                    scrapeMutation.mutate({
+                      query,
+                      location: searchLocation,
+                      count: leadCount
+                    });
+                  }}
                   disabled={scrapeMutation.isPending || !user?.credits}
                   className="w-full text-base py-6"
                   size="lg"
@@ -359,7 +419,7 @@ export default function Dashboard() {
                   {scrapeMutation.isPending ? (
                     <div className="flex items-center justify-center gap-3">
                       <Loader2 className="h-5 w-5 animate-spin" />
-                      <span>{searchStatus}</span>
+                      <span>{searchStatus || 'Lead wird generiert...'}</span>
                     </div>
                   ) : (
                     <>
