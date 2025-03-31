@@ -3,9 +3,9 @@ import { toast } from 'react-hot-toast';
 import { apiRequest } from "@/lib/queryClient";
 
 interface ScrapeParams {
-  searchTerm: string;
+  query: string;
   location: string;
-  maxResults: number;
+  count: number;
 }
 
 export function useScrape() {
@@ -15,18 +15,18 @@ export function useScrape() {
     mutationFn: async (data: ScrapeParams) => {
       // Step 1: Input validation
       console.log('🔍 Step 1: Validating inputs', {
-        searchTerm: data.searchTerm,
+        query: data.query,
         location: data.location,
-        maxResults: data.maxResults
+        count: data.count
       });
 
-      if (!data.searchTerm.trim() || !data.location.trim()) {
-        console.error('❌ Input validation failed: Empty searchTerm or location');
+      if (!data.query.trim() || !data.location.trim()) {
+        console.error('❌ Input validation failed: Empty query or location');
         throw new Error("Suchbegriff und Standort dürfen nicht leer sein");
       }
 
-      if (data.maxResults < 1 || data.maxResults > 100) {
-        console.error('❌ Input validation failed: Invalid maxResults', data.maxResults);
+      if (data.count < 1 || data.count > 100) {
+        console.error('❌ Input validation failed: Invalid count', data.count);
         throw new Error("Bitte wählen Sie zwischen 1 und 100 Leads");
       }
 
@@ -37,9 +37,9 @@ export function useScrape() {
       
       try {
         const response = await apiRequest('/api/scrape', 'POST', {
-          searchTerm: data.searchTerm,
+          query: data.query,
           location: data.location,
-          maxResults: data.maxResults
+          count: data.count
         }, {
           stream: true,
           onProgress: (progressData) => {

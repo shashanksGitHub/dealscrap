@@ -5,7 +5,7 @@ import { createPayment, handleWebhookEvent } from "./services/mollie";
 import { apifyClient } from "./services/apify";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
-import { searches, leads } from "@shared/schema";
+import { searches, leads, users } from "@shared/schema";
 import { cacheService } from "./services/cache";
 
 export async function registerRoutes(router: Router) {
@@ -29,7 +29,6 @@ export async function registerRoutes(router: Router) {
 
       // Cache the user data
       await cacheService.setUser(req.user.id, user);
-      console.log(`Sending user info - ID: ${user.id}, Credits: ${user.credits}`);
       res.json(user);
     } catch (error: any) {
       console.error('Error fetching user info:', error);
@@ -43,32 +42,25 @@ export async function registerRoutes(router: Router) {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Nicht authentifiziert" });
     }
-
     try {
-      console.log('Processing Mollie payment request:', {
-        userId: req.user.id,
-        amount: req.body.amount,
-        method: req.body.method
-      });
-
       const amount = parseFloat(req.body.amount);
+      const creditAmount = parseInt(req.body.creditAmount);
+
       if (isNaN(amount) || amount <= 0) {
         return res.status(400).json({ message: "Gültiger Betrag ist erforderlich" });
       }
 
-      const description = req.body.description || `${amount} Guthaben auf LeadScraper`;
+      const description = req.body.description || `${creditAmount} Credits auf LeadScraper`;
 
       const checkoutUrl = await createPayment(
         req.user.id,
         amount,
-        description
+        description,
       );
 
       if (!checkoutUrl) {
         throw new Error('Keine Checkout-URL von Mollie erhalten');
       }
-
-      console.log('Mollie payment created, redirecting to:', checkoutUrl);
 
       res.json({
         success: true,
@@ -90,7 +82,6 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ message: "Payment ID fehlt" });
       }
 
-      console.log('Received webhook for payment:', paymentId);
       await handleWebhookEvent(paymentId);
       res.json({ received: true });
     } catch (error: any) {
@@ -103,7 +94,6 @@ export async function registerRoutes(router: Router) {
   router.post("/credits/add", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
 
-    console.log('Adding credits for user:', req.user.id);
     const amount = parseInt(req.body.amount);
 
     if (isNaN(amount) || amount <= 0) {
@@ -112,9 +102,7 @@ export async function registerRoutes(router: Router) {
     }
 
     try {
-      console.log(`Adding ${amount} credits to user ${req.user.id}`);
       const user = await storage.addCredits(req.user.id, amount);
-      console.log('Updated user credits:', user.credits);
       res.json(user);
     } catch (error) {
       console.error('Error adding credits:', error);
@@ -180,11 +168,9 @@ export async function registerRoutes(router: Router) {
     if (!req.isAuthenticated()) return res.status(401).json({ message: "Nicht authentifiziert" });
 
     try {
-      console.log('Fetching searches for user:', req.user.id);
       const userSearches = await db.select().from(searches)
         .where(eq(searches.userId, req.user.id))
         .orderBy(desc(searches.createdAt));
-      console.log('Found searches:', userSearches);
       res.json(userSearches);
     } catch (error) {
       console.error('Error fetching searches:', error);
@@ -234,160 +220,103 @@ export async function registerRoutes(router: Router) {
 
   // Lead generation endpoint
   router.post("/scrape", async (req, res) => {
-    console.log('=== SCRAPE REQUEST ===');
-    console.log('Request body:', req.body);
 
-    if (!req.isAuthenticated()) {
-      console.error('Authentication check failed');
-      return res.status(401).json({ 
-        error: 'Unauthorized',
-        message: 'Nicht authentifiziert'
-      });
+    if (!req.user) {
+      return res.status(401).json({ message: "Nicht authentifiziert" });
     }
-
-    const { searchTerm, location, maxResults = 100 } = req.body;
-
-    if (!searchTerm?.trim() || !location?.trim()) {
-      console.error('Missing required parameters:', { searchTerm, location });
-      return res.status(400).json({ 
-        error: 'Missing parameters',
-        message: 'Suchbegriff und Standort sind erforderlich'
-      });
+    
+    const { query, location, count } = req.body;
+  
+    if (!query || !location || !count) {
+      return res.status(400).json({ message: "Query, location, and count are required" });
     }
-
-    const count = Math.min(Math.max(1, maxResults), 100);
+  
+    if (count < 1 || count > 100) {
+      return res.status(400).json({ message: "Lead count must be between 1 and 100" });
+    }
+  
     const user = await storage.getUser(req.user.id);
     
-    if (!user) {
-      console.error('User not found:', req.user.id);
-      return res.status(404).json({ 
-        error: 'User not found',
-        message: 'Benutzer nicht gefunden'
-      });
+    if (!user || user.credits < count) {
+      return res.status(403).json({ message: "Insufficient credits" });
     }
-
-    if (user.credits < count) {
-      console.error('Insufficient credits:', { required: count, available: user.credits });
-      return res.status(403).json({ 
-        error: 'Insufficient credits',
-        message: `Sie benötigen ${count} Credits für diese Suche. Sie haben ${user.credits} Credits.`
-      });
-    }
-
+  
     try {
-      console.log('Starting scraping with Apify...', { searchTerm, location, count });
+      const startTime = Date.now();
       
-      // Create search record
       const [search] = await db.insert(searches)
         .values({
           userId: req.user.id,
-          query: searchTerm,
-          location: location,
-          count: count,
-          isRead: false
+          query,
+          location,
+          count
         })
         .returning();
-
-      // Set up streaming response
-      res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Transfer-Encoding', 'chunked');
-
-      // Initial progress
-      res.write(JSON.stringify({ 
-        type: 'progress',
-        current: 0,
-        total: count,
-        leads: []
-      }));
-
-      const run = await apifyClient.actor("apify/google-places-scraper").call({
-        searchStrings: [`${searchTerm} ${location}`],
-        maxCrawledPlaces: count,
-        language: "de",
-        maxImages: 0,
-        maxReviews: 0,
-        includeHistogram: false,
-        includeOpeningHours: true,
-        includePeopleAlsoSearch: false
-      });
-
-      console.log('Getting dataset...');
-      const dataset = await apifyClient.dataset(run.defaultDatasetId);
-      const { items } = await dataset.listItems();
-
-      if (!items || items.length === 0) {
-        console.error('No leads found');
-        return res.status(404).json({
-          error: 'No leads found',
-          message: 'Keine passenden Leads gefunden'
-        });
-      }
-
-      const foundLeads = [];
-      for (let i = 0; i < items.length; i++) {
-        const item = items[i];
         
-        // Create the lead in database
-        const [lead] = await db.insert(leads)
-          .values({
-            userId: req.user.id,
-            searchId: search.id,
-            businessName: item.title,
-            address: item.address,
-            website: item.website || null,
-            phone: item.phone || null,
-            email: null,
-            category: item.category || searchTerm,
-            source: 'google',
-            rawData: item
-          })
-          .returning();
-
-        foundLeads.push(lead);
-
-        // Send progress update
-        res.write(JSON.stringify({
-          type: 'progress',
-          current: i + 1,
-          total: items.length,
-          leads: [lead]
-        }));
-      }
-
-      // Deduct credits
-      await db.update(users)
-        .set({ credits: user.credits - count })
-        .where(eq(users.id, req.user.id));
-
-      // Clear user caches
-      await cacheService.clearUserCaches(req.user.id);
-
-      console.log('Scraping successful:', { 
-        searchId: search.id, 
-        leadsFound: foundLeads.length 
-      });
+      const apifyStartTime = Date.now();
       
-      // Final response
-      res.write(JSON.stringify({
-        type: 'complete',
-        leads: foundLeads
-      }));
-      res.end();
-
-    } catch (error) {
-      console.error('Scraping error:', error);
-      if (!res.headersSent) {
-        res.status(500).json({ 
-          error: 'Scraping failed',
-          message: 'Es ist ein Fehler bei der Lead-Generierung aufgetreten'
-        });
-      } else {
-        res.write(JSON.stringify({
-          type: 'error',
-          message: 'Es ist ein Fehler bei der Lead-Generierung aufgetreten'
-        }));
-        res.end();
+      const run = await apifyClient.actor("nwua9Gu5YrADL7ZDj").call({
+        searchStringsArray: [query],
+        locationQuery: `${location}, Deutschland`,
+        language: "de",
+        maxCrawledPlacesPerSearch: count,
+        includeWebResults: false,
+        maxQuestions: 0,
+        onlyDataFromSearchPage: false,
+        scrapeDirectories: false,
+        scrapeImageAuthors: false,
+        scrapeReviewsPersonalData: true,
+        scrapeTableReservationProvider: false,
+        skipClosedPlaces: false
+      });
+  
+      const { items } = await apifyClient.dataset(run.defaultDatasetId).listItems();  
+      // We've already checked that req.user exists above, but TypeScript needs reassurance
+      if (!req.user) {
+        throw new Error('User authentication lost during scraping');
       }
+      
+      await storage.addCredits(req.user.id, -count);
+  
+      // We already checked req.user above, but need to do it again for TypeScript
+      const userId = req.user?.id;
+      if (!userId) {
+        throw new Error('User authentication lost during lead processing');
+      }
+      
+      
+      const savedLeads = await Promise.all(items.map(async (data: any, index: number) => {
+        try {
+          const leadData = {
+            userId,
+            searchId: search.id,
+            businessName: data.title || data.name || "",
+            address: data.address || "",
+            phone: data.phone || data.phoneNumber || "",
+            email: data.email || "",
+            website: data.website || "",
+            category: query,
+            metadata: {
+              rating: data.rating,
+              totalScore: data.reviewsCount,
+              placeId: data.placeId
+            }
+          };
+          
+          const lead = await storage.createLead(leadData);
+          return lead;
+        } catch (error) {
+          console.error(`Error saving lead ${index + 1}:`, error);
+          throw error;
+        }
+      }));
+        res.json({ search, leads: savedLeads });
+    } catch (error: any) {
+      console.error('Error during scraping:', error);
+      res.status(500).json({ 
+        message: "Failed to scrape data", 
+        error: error.message 
+      });
     }
   });
 }

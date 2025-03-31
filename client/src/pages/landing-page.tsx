@@ -9,8 +9,11 @@ import { Zap, Users, BarChart, Code, Megaphone, ShoppingCart, Wallet, Factory, D
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet";
+import { useAuth } from "@/hooks/auth";
 
 export default function LandingPage() {
+  const { user } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
@@ -58,9 +61,17 @@ export default function LandingPage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Link href="/auth">
+              <Link href={user ? "/dashboard" : "/auth"}>
                 <Button size="lg" className="rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300">
-                  Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-4 w-4" />
+                  {user ? (
+                    <>
+                      Zum Dashboard <ArrowRightIcon className="ml-2 h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      Kostenloses Konto erstellen <ArrowRightIcon className="ml-2 h-4 w-4" />
+                    </>
+                  )}
                 </Button>
               </Link>
             </motion.div>
@@ -89,7 +100,7 @@ export default function LandingPage() {
               >
                 <div className="flex flex-col items-center">
                   <img 
-                    src="/images/leadscraper-black.png" 
+                    src="/images/logo-blue.png" 
                     alt="LeadScraper" 
                     className="h-8 mb-2"
                     loading="lazy"

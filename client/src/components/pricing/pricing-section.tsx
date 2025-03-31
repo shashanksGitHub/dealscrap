@@ -20,8 +20,9 @@ export function PricingSection() {
     if (credits <= 500) return credits * 0.7; // 0.70€ pro Credit
     return credits * 0.6; // 0.60€ pro Credit ab 500
   };
-
+  console.log('Calculating price for:', credits);
   const price = Math.round(calculatePrice(credits));
+  console.log('Calculated price:', price);
 
   const handleSelect = async () => {
     if (!user) {

@@ -93,7 +93,7 @@ function LoginForm() {
       <CardContent className="p-0 pt-6">
         <div className="flex justify-center mb-6">
           <img 
-            src="/images/leadscraper-logo.png" 
+            src="/images/logo-blue.png" 
             alt="LeadScraper" 
             className="h-12"
           />
@@ -171,7 +171,7 @@ function RegisterForm() {
       <CardContent className="p-0 pt-6">
         <div className="flex justify-center mb-6">
           <img 
-            src="/images/leadscraper-logo.png" 
+            src="/images/logo-blue.png" 
             alt="LeadScraper" 
             className="h-12"
           />

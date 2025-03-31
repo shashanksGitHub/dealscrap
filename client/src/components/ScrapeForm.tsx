@@ -6,9 +6,9 @@ import { Input } from './ui/input';
 import { Progress } from './ui/progress';
 
 export function ScrapeForm() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [query, setQuery] = useState('');
   const [location, setLocation] = useState('');
-  const [maxResults, setMaxResults] = useState(100);
+  const [count, setCount] = useState(100);
   const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
 
   const { mutate: scrape, isPending } = useScrape();
@@ -18,9 +18,9 @@ export function ScrapeForm() {
 
     // Log the form data being sent
     console.log('Submitting form with data:', {
-      searchTerm,
+      query,
       location,
-      maxResults
+      count
     });
 
     // Reset progress
@@ -29,9 +29,9 @@ export function ScrapeForm() {
     // Start scraping
     scrape(
       {
-        searchTerm: searchTerm.trim(),
+        query: query.trim(),
         location: location.trim(),
-        maxResults: Number(maxResults)
+        count: Number(count)
       },
       {
         onSuccess: (response: any) => {
@@ -58,13 +58,11 @@ export function ScrapeForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <label htmlFor="searchTerm" className="block text-sm font-medium">
-          Suchbegriff
-        </label>
+        <label htmlFor="query">Suchbegriff</label>
         <Input
-          id="searchTerm"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          id="query"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           placeholder="z.B. Restaurant"
           required
           disabled={isPending}
@@ -72,9 +70,7 @@ export function ScrapeForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="location" className="block text-sm font-medium">
-          Standort
-        </label>
+        <label htmlFor="location">Standort</label>
         <Input
           id="location"
           value={location}
@@ -86,16 +82,14 @@ export function ScrapeForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="maxResults" className="block text-sm font-medium">
-          Anzahl der Leads (1-100)
-        </label>
+        <label htmlFor="count">Anzahl der Leads (1-100)</label>
         <Input
-          id="maxResults"
+          id="count"
           type="number"
           min={1}
           max={100}
-          value={maxResults}
-          onChange={(e) => setMaxResults(parseInt(e.target.value, 10))}
+          value={count}
+          onChange={(e) => setCount(parseInt(e.target.value, 10))}
           required
           disabled={isPending}
         />
@@ -112,7 +106,7 @@ export function ScrapeForm() {
 
       <Button
         type="submit"
-        disabled={isPending || !searchTerm || !location}
+        disabled={isPending || !query || !location}
         className="w-full"
       >
         {isPending ? 'Leads werden generiert...' : 'Leads generieren'}

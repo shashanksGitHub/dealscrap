@@ -7,11 +7,12 @@ export function Header() {
       <nav className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <img 
-            src="/assets/images/leadscraper-logo.png" 
-            alt="LeadScraper Logo" 
-            className="h-8"
+            src="/images/logo-blue.png" 
+            alt="Lead Scraper" 
+            className="h-8 w-auto object-contain"
             width={160}
             height={32}
+            loading="eager"
           />
         </Link>
 

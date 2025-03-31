@@ -44,6 +44,31 @@ export default function Dashboard() {
       localStorage.setItem("tutorialWatched", "true");
     }
   }, [user]); // Add user as dependency
+  
+  useEffect(() => {
+    const fetchLeadsOnLoad = async () => {
+      console.log('🔄 Fetching leads on page load');
+      try {
+        // Fetch all leads
+        const response = await apiRequest('/api/leads', 'GET');
+        
+        // Update the leads query cache with fetched data
+        queryClient.setQueryData(['/api/leads'], (old: Lead[] = []) => {
+          const newLeads = [...old];
+          for (const lead of response) {
+            if (!newLeads.some(l => l.id === lead.id)) {
+              newLeads.push(lead);
+            }
+          }
+          return newLeads;
+        });
+      } catch (error) {
+        console.error('Error fetching leads:', error);
+      }
+    };
+
+    fetchLeadsOnLoad();
+  }, []); // Empty dependency array means this runs once on page load
 
   const searchStatuses = [
     "Neue Unternehmen werden gesucht...",
@@ -62,6 +87,8 @@ export default function Dashboard() {
     queryKey: ['/api/leads'],
     queryFn: () => apiRequest('/api/leads', 'GET'),
     initialData: [],
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const scrapeMutation = useMutation({
@@ -85,28 +112,35 @@ export default function Dashboard() {
       }, 2000);
 
       try {
+        console.log('Scraping with data:', data);
         const response = await apiRequest('/api/scrape', 'POST', {
-          searchTerm: data.query,
+          query: data.query,
           location: data.location,
-          maxResults: data.count
+          count: data.count
         }, {
           stream: true,
           onProgress: (data) => {
-            if (data.type === 'progress') {
+            console.log('data-----', data);
+            // if (data.type === 'progress') {
               setProgress(data.current || 0);
               setTotal(data.total || 0);
+              console.log('data', data);
               if (data.leads) {
+                console.log('data.leads', data.leads);
                 // Update leads query with accumulated leads
                 queryClient.setQueryData(['/api/leads'], (old: Lead[] = []) => {
+                  console.log('Updating leads query with new leads:', old.length, data.leads.length);
                   const newLeads = [...old];
                   for (const lead of data.leads) {
-                    if (!newLeads.some(l => l.id === lead.id)) {
+                    if (newLeads.findIndex(l => l.id === lead.id) === -1) {
+                      console.log('lead', lead);
                       newLeads.push(lead);
                     }
                   }
+                  console.log('newLeadsLength', newLeads.length);
                   return newLeads;
                 });
-              }
+              // }
             }
           }
         });

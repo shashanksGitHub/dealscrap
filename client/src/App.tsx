@@ -34,7 +34,8 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   const [, navigate] = useLocation();
 
   React.useEffect(() => {
-    if (!isLoading && !user) {
+    const isLogoClick = localStorage.getItem('isLogoClick') === 'true';
+    if (!isLoading && !user && !isLogoClick) {
       navigate('/auth');
     }
   }, [user, isLoading, navigate]);
@@ -52,9 +53,14 @@ function Root() {
   const [, navigate] = useLocation();
 
   React.useEffect(() => {
-    if (!isLoading && user) {
+    const isLogoClick = localStorage.getItem('isLogoClick') === 'true';
+    
+    if (!isLoading && user && !isLogoClick) {
       navigate('/dashboard');
     }
+
+    // Clear the flag after checking
+    localStorage.removeItem('isLogoClick');
   }, [user, isLoading, navigate]);
 
   return <LandingPage />;

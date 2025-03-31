@@ -9,9 +9,10 @@ interface MollieCheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   amount: number;
+  creditAmount: number;
 }
 
-export function MollieCheckoutModal({ isOpen, onClose, amount }: MollieCheckoutModalProps) {
+export function MollieCheckoutModal({ isOpen, onClose, amount, creditAmount }: MollieCheckoutModalProps) {
   const { toast } = useToast();
 
   const handleSuccess = () => {
@@ -38,6 +39,7 @@ export function MollieCheckoutModal({ isOpen, onClose, amount }: MollieCheckoutM
           amount={amount}
           onSuccess={handleSuccess}
           onError={handleError}
+          creditAmount={creditAmount}
         />
       </DialogContent>
     </Dialog>

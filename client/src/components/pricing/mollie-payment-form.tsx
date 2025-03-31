@@ -14,9 +14,10 @@ interface MolliePaymentFormProps {
   amount: number;
   onSuccess: () => void;
   onError: (error: Error) => void;
+  creditAmount: number;
 }
 
-export function MolliePaymentForm({ amount, onSuccess, onError }: MolliePaymentFormProps) {
+export function MolliePaymentForm({ creditAmount, amount, onSuccess, onError }: MolliePaymentFormProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedMethod, setSelectedMethod] = useState<string>('');
   const { toast } = useToast();
@@ -99,7 +100,7 @@ export function MolliePaymentForm({ amount, onSuccess, onError }: MolliePaymentF
         },
         body: JSON.stringify({
           amount: amount,
-          description: `${amount} Guthaben auf LeadScraper`,
+          description: `${creditAmount} Guthaben auf LeadScraper`,
           method: selectedMethod,
         }),
         credentials: 'include',

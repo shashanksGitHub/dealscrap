@@ -12,14 +12,25 @@ try {
     log('Mollie client initialized successfully');
   }
 } catch (error) {
+  console.log('Error initializing Mollie client:', error instanceof Error ? error.message : String(error));
   log('Error initializing Mollie client:', error instanceof Error ? error.message : String(error));
 }
 
 export async function createPayment(
   userId: number,
   amount: number,
-  description: string
+  description: string,
 ) {
+  let creditAmount = 0;
+  if (amount === 100) {
+    creditAmount = 100;
+  } else if (amount === 200) {
+    creditAmount = 250;
+  } else if (amount === 350) {
+    creditAmount = 500;
+  } else if (amount === 600) {
+    creditAmount = 1000;
+  }
   if (!mollieClient) {
     throw new Error('Payment service is not available');
   }
@@ -29,29 +40,26 @@ export async function createPayment(
 
   console.log('Creating Mollie payment for user:', userId, 'amount:', amount);
 
-  // Prüfe zuerst auf die Verwendung der BASE_URL Umgebungsvariable (für die gesamte Produktion)
-  const baseUrl = process.env.BASE_URL || process.env.VITE_BASE_URL;
+  // Check if we're in development
+  const isDevelopment = process.env.NODE_ENV === 'development';
   
-  // Falls keine BASE_URL gesetzt ist, verwende domain-basierte Konstruktion als Fallback
   let redirectUrl, webhookUrl;
   
-  if (baseUrl) {
-    // Verwende vorkonfigurierte BASE_URL
-    redirectUrl = `${baseUrl}/dashboard`;
-    webhookUrl = `${baseUrl}/api/mollie-webhook`;
+  if (isDevelopment) {
+    // In development, use a dummy webhook URL that Mollie accepts
+    redirectUrl = 'https://38ab-103-214-63-108.ngrok-free.app/dashboard';
+    webhookUrl = 'https://38ab-103-214-63-108.ngrok-free.app/api/mollie-webhook';
+    console.log('Development mode: Using dummy URLs');
   } else {
-    // Fallback zur domain-basierten Konstruktion
-    const domain = process.env.CUSTOM_DOMAIN || process.env.REPLIT_DOMAINS?.split(',')[0] || '';
+    // Production logic
+    const baseUrl = process.env.BASE_URL || process.env.VITE_BASE_URL;
     
-    // Stelle sicher, dass eine gültige Domain existiert
-    if (!domain) {
-      throw new Error('Keine gültige Domain für Redirect-URL gefunden');
+    if (!baseUrl) {
+      throw new Error('BASE_URL is not configured');
     }
     
-    // Erstelle URLs mit der Domain
-    const domainBaseUrl = `https://${domain}`;
-    redirectUrl = `${domainBaseUrl}/dashboard`;
-    webhookUrl = `${domainBaseUrl}/api/mollie-webhook`;
+    redirectUrl = `${baseUrl}/dashboard`;
+    webhookUrl = `${baseUrl}/api/mollie-webhook`;
   }
 
   console.log('Using URLs:', { redirectUrl, webhookUrl });
@@ -60,14 +68,14 @@ export async function createPayment(
     const payment = await mollieClient.payments.create({
       amount: {
         currency: "EUR",
-        value: amount.toFixed(2) // Mollie erwartet einen String mit 2 Dezimalstellen
+        value: amount.toFixed(2)
       },
-      description,
+      description: `${creditAmount} Credits auf LeadScraper`,
       redirectUrl,
       webhookUrl,
       metadata: {
         userId: userId.toString(),
-        creditAmount: amount.toString()
+        creditAmount: creditAmount.toString()
       },
       billingEmail: user.email
     });
@@ -75,7 +83,9 @@ export async function createPayment(
     console.log('Mollie payment created:', {
       id: payment.id,
       status: payment.status,
-      checkoutUrl: payment._links?.checkout?.href
+      checkoutUrl: payment._links?.checkout?.href,
+      amount: amount,
+      creditAmount: creditAmount
     });
 
     return payment._links?.checkout?.href;
