@@ -100,7 +100,7 @@ export default function LandingPage() {
               >
                 <div className="flex flex-col items-center">
                   <img 
-                    src="/images/logo-blue.png" 
+                    src="/dsgvo-logo.png" 
                     alt="LeadScraper" 
                     className="h-8 mb-2"
                     loading="lazy"
@@ -114,7 +114,7 @@ export default function LandingPage() {
                 className="bg-white/5 backdrop-blur-sm p-6 rounded-xl text-center"
               >
                 <img 
-                  src="/hamburg-coa.svg" 
+                  src="/DEU_Hamburg_COA.svg.png" 
                   alt="Hamburg" 
                   className="h-8 mb-2"
                   loading="lazy"

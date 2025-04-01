@@ -47,8 +47,8 @@ export async function createPayment(
   
   if (isDevelopment) {
     // In development, use a dummy webhook URL that Mollie accepts
-    redirectUrl = 'https://38ab-103-214-63-108.ngrok-free.app/dashboard';
-    webhookUrl = 'https://38ab-103-214-63-108.ngrok-free.app/api/mollie-webhook';
+    redirectUrl = 'https://8645-103-214-63-108.ngrok-free.app/dashboard';
+    webhookUrl = 'https://8645-103-214-63-108.ngrok-free.app/api/mollie-webhook';
     console.log('Development mode: Using dummy URLs');
   } else {
     // Production logic

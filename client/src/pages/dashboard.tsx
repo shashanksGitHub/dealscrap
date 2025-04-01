@@ -236,9 +236,7 @@ export default function Dashboard() {
         amount: price
       });
 
-      const data = await response.json();
-
-      if (data.checkoutUrl) {
+      if (response.checkoutUrl) {
         toast({
           title: (
             <div className="flex items-center gap-2">
@@ -275,7 +273,7 @@ export default function Dashboard() {
         });
 
         setTimeout(() => {
-          window.location.href = data.checkoutUrl;
+          window.location.href = response.checkoutUrl;
         }, 1500);
       } else {
         throw new Error('Keine Checkout-URL erhalten');

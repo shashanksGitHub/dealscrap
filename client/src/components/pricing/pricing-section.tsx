@@ -43,8 +43,8 @@ export function PricingSection() {
         body: JSON.stringify({ amount: price, credits })
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        const data = await response.json();
         if (response.status === 503) {
           toast({
             title: "Service nicht verfügbar",
@@ -56,7 +56,6 @@ export function PricingSection() {
         throw new Error(data.message || 'Ein Fehler ist aufgetreten');
       }
 
-      const data = await response.json();
       if (data.checkoutUrl) {
         // Add success message before redirect
         toast({
@@ -68,6 +67,7 @@ export function PricingSection() {
         throw new Error('Keine Checkout-URL erhalten');
       }
     } catch (error: any) {
+      console.log('error-----', error);
       console.error('Payment error:', error);
       toast({
         title: "Fehler",
