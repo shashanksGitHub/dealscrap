@@ -122,13 +122,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify(data),
         });
 
+        const responseData = await response.json();
+
         if (!response.ok) {
-          throw new Error('Failed to register');
+          throw new Error(responseData.message || 'Failed to register');
         }
 
-        const data = await response.json();
         await refetch();
-        return data;
+        return responseData;
       } catch (error) {
         console.error('Registration error:', error instanceof Error ? error.message : String(error));
         throw error;
