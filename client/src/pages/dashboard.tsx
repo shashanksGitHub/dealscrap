@@ -126,18 +126,14 @@ export default function Dashboard() {
               setTotal(data.total || 0);
               console.log('data', data);
               if (data.leads) {
-                console.log('data.leads', data.leads);
                 // Update leads query with accumulated leads
                 queryClient.setQueryData(['/api/leads'], (old: Lead[] = []) => {
-                  console.log('Updating leads query with new leads:', old.length, data.leads.length);
                   const newLeads = [...old];
                   for (const lead of data.leads) {
                     if (newLeads.findIndex(l => l.id === lead.id) === -1) {
-                      console.log('lead', lead);
                       newLeads.push(lead);
                     }
                   }
-                  console.log('newLeadsLength', newLeads.length);
                   return newLeads;
                 });
               // }
@@ -156,7 +152,7 @@ export default function Dashboard() {
       }
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
+      // queryClient.invalidateQueries({ queryKey: ["/api/leads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/searches"] });
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
 
