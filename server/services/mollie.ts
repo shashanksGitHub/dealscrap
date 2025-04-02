@@ -42,25 +42,25 @@ export async function createPayment(
 
   // Check if we're in development
   const isDevelopment = process.env.NODE_ENV === 'development';
-  
+  console.log('isDevelopment', isDevelopment);
   let redirectUrl, webhookUrl;
   
-  if (isDevelopment) {
-    // In development, use a dummy webhook URL that Mollie accepts
-    redirectUrl = 'https://8645-103-214-63-108.ngrok-free.app/dashboard';
-    webhookUrl = 'https://8645-103-214-63-108.ngrok-free.app/api/mollie-webhook';
-    console.log('Development mode: Using dummy URLs');
-  } else {
+  // if (isDevelopment || isDevelopment !== undefined) {
+  //   // In development, use a dummy webhook URL that Mollie accepts
+  //   redirectUrl = 'https://8645-103-214-63-108.ngrok-free.app/dashboard';
+  //   webhookUrl = 'https://8645-103-214-63-108.ngrok-free.app/api/mollie-webhook';
+  //   console.log('Development mode: Using dummy URLs');
+  // } else {
+  //   console.log('Production mode: Using real URLs');
     // Production logic
     const baseUrl = process.env.BASE_URL || process.env.VITE_BASE_URL;
-    
     if (!baseUrl) {
       throw new Error('BASE_URL is not configured');
     }
     
     redirectUrl = `${baseUrl}/dashboard`;
     webhookUrl = `${baseUrl}/api/mollie-webhook`;
-  }
+  // }
 
   console.log('Using URLs:', { redirectUrl, webhookUrl });
 
