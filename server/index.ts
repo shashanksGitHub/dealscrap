@@ -233,11 +233,8 @@ startServer().catch(async (error) => {
 // Initialize database pool before starting server
 try {
   await initializePool();
-  const port = CONFIG.PORT;
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
+  // Server is already started in the startServer function
 } catch (error) {
-  console.error("Failed to start server:", error);
+  console.error("Failed to initialize database pool:", error);
   process.exit(1);
 }
