@@ -225,6 +225,51 @@ export default function Dashboard() {
     { id: "1000", credits: 1000, price: 600 },
   ];
 
+  useEffect(() => {
+    // Check for payment success flag in localStorage
+    const paymentSuccess = localStorage.getItem('paymentSuccess');
+    
+    if (paymentSuccess === 'true') {
+      // Clear the flag immediately
+      localStorage.removeItem('paymentSuccess');
+      
+      toast({
+        title: (
+          <div className="flex items-center gap-2">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20
+              }}
+            >
+              <Sparkles className="w-5 h-5 text-primary" />
+            </motion.div>
+            Credits erfolgreich aufgeladen! ⭐
+          </div>
+        ),
+        description: (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-2"
+          >
+            <p>
+              <span className="font-medium">Vielen Dank für Ihren Einkauf!</span>
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Sie können jetzt mit Ihren neuen Credits Leads generieren.
+            </p>
+          </motion.div>
+        ),
+        duration: 4000,
+      });
+    }
+  }, []); // Empty dependency array means this runs once when component mounts
+
   const handlePurchase = async (price: number) => {
     setIsProcessingPayment(true);
     try {
@@ -233,41 +278,14 @@ export default function Dashboard() {
       });
 
       if (response.checkoutUrl) {
+        // Set a flag in localStorage before redirecting
+        localStorage.setItem('paymentSuccess', 'true');
+        
         toast({
-          title: (
-            <div className="flex items-center gap-2">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 20
-                }}
-              >
-                <Sparkles className="w-5 h-5 text-primary" />
-              </motion.div>
-              Credits erfolgreich aufgeladen! ⭐
-            </div>
-          ),
-          description: (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-2"
-            >
-              <p>
-                <span className="font-medium">Vielen Dank für Ihren Einkauf!</span>
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Sie werden jetzt zur sicheren Zahlungsabwicklung weitergeleitet.
-              </p>
-            </motion.div>
-          ),
-          duration: 4000,
+          title: "Weiterleitung",
+          description: "Sie werden zum sicheren Zahlungsformular weitergeleitet..."
         });
-
+        
         setTimeout(() => {
           window.location.href = response.checkoutUrl;
         }, 1500);

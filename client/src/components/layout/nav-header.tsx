@@ -37,7 +37,13 @@ export function NavHeader() {
     e.preventDefault();
     // Set localStorage flag to indicate logo click
     localStorage.setItem('isLogoClick', 'true');
-    navigate('/');
+    
+    // Redirect to dashboard if user is logged in, otherwise to landing page
+    if (currentUser) {
+      navigate('/dashboard');
+    } else {
+      navigate('/');
+    }
   };
 
   return (
@@ -58,9 +64,9 @@ export function NavHeader() {
           </Link>
           <nav>
             <div className="flex items-center gap-4">
-              <Link href="/blog" className="text-muted-foreground hover:text-primary">
+              {!currentUser && <Link href="/blog" className="text-muted-foreground hover:text-primary">
                 Ratgeber
-              </Link>
+              </Link>}
               {currentUser ? (
                 <div className="flex items-center gap-4">
                   <div className="flex items-center px-3 py-1.5 bg-muted rounded-full">
@@ -69,9 +75,9 @@ export function NavHeader() {
                       {currentUser.credits}
                     </span>
                   </div>
-                  <Link href="/impressum" className="text-muted-foreground hover:text-primary">
+                  {/* <Link href="/impressum" className="text-muted-foreground hover:text-primary">
                     Impressum
-                  </Link>
+                  </Link> */}
                   <Button
                     variant="ghost"
                     size="sm"

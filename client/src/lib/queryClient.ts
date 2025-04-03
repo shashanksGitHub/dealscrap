@@ -23,13 +23,6 @@ export async function apiRequest<T>(
     ? normalizedPath 
     : `${window.location.origin}${normalizedPath}`;
 
-  console.log('Making API request:', {
-    url,
-    method,
-    body,
-    options
-  });
-
   try {
     const response = await fetch(url, {
       method,

@@ -113,14 +113,16 @@ export default function LandingPage() {
                 whileHover={{ scale: 1.05 }}
                 className="bg-white/5 backdrop-blur-sm p-6 rounded-xl text-center"
               >
-                <img 
-                  src="/DEU_Hamburg_COA.svg.png" 
-                  alt="Hamburg" 
-                  className="h-8 mb-2"
-                  loading="lazy"
-                />
-                <h3 className="text-lg font-medium">Hamburg</h3>
-                <p className="text-sm text-muted-foreground">Entwickelt für den DACH-Raum</p>
+                <div className="flex flex-col items-center">
+                  <img 
+                    src="/DEU_Hamburg_COA.svg.png" 
+                    alt="Hamburg" 
+                    className="h-8 mb-2"
+                    loading="lazy"
+                  />
+                  <h3 className="text-lg font-medium">Hamburg</h3>
+                  <p className="text-sm text-muted-foreground">Entwickelt für den DACH-Raum</p>
+                </div>
               </motion.div>
             </div>
           </div>
