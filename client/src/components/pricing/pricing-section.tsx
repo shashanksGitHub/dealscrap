@@ -67,8 +67,6 @@ export function PricingSection() {
         throw new Error('Keine Checkout-URL erhalten');
       }
     } catch (error: any) {
-      console.log('error-----', error);
-      console.error('Payment error:', error);
       toast({
         title: "Fehler",
         description: "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
