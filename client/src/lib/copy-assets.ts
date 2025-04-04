@@ -11,7 +11,7 @@ if (!fs.existsSync(targetDir)) {
 
 // Liste der zu kopierenden Bilder
 const imagesToCopy = [
-  'DEU_Hamburg_COA.svg.png',
+  'DEU_Hamburg_COA.png',
   'Logo_570px_ihk.png',
   'dsgvo-grey-523x480.png',
   'Testvid.mp4',

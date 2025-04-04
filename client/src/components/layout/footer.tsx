@@ -16,11 +16,11 @@ export function Footer() {
             <p className="text-base md:text-lg text-muted-foreground mb-8 md:mb-10 max-w-2xl mx-auto">
               Starten Sie noch heute mit LeadScraper und entdecken Sie, wie einfach moderne Lead-Generierung sein kann.
             </p>
-            <Link href="/auth">
+            {/* <Link href="/auth">
               <Button size="lg" className="w-full sm:w-auto rounded-full px-6 md:px-8 py-4 md:py-6 h-auto text-base md:text-lg font-medium transition-all duration-300 hover:scale-105 animate-wiggle">
                 Jetzt kostenloses Konto erstellen
               </Button>
-            </Link>
+            </Link> */}
             <p className="mt-4 text-sm text-muted-foreground">
               Fragen? Kontaktieren Sie unseren Support unter{" "}
               <a href="mailto:support@leadscraper.de" className="text-primary hover:underline">

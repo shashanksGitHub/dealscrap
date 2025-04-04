@@ -50,11 +50,11 @@ export default function BlogPage() {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Erfahren Sie mehr über Lead-Generierung, Vertriebsstrategien und wie Sie Ihr Business erfolgreich ausbauen können
           </p>
-          <Link href="/auth">
+          {/* <Link href="/auth">
             <Button size="lg" className="rounded-full px-6 py-5 h-auto text-base font-medium bg-primary hover:bg-primary/90 transition-all duration-300 hover:scale-105 animate-wiggle">
               Kostenloses Konto erstellen
             </Button>
-          </Link>
+          </Link> */}
         </div>
       </section>
 
