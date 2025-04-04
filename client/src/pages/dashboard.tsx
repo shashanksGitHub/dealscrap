@@ -47,19 +47,63 @@ export default function Dashboard() {
   
   useEffect(() => {
     const fetchLeadsOnLoad = async () => {
-      console.log('🔄 Fetching leads on page load');
       try {
         // Fetch all leads
         const response = await apiRequest('/api/leads', 'GET');
         
-        // Update the leads query cache with fetched data
+        // Get any locally stored leads from localStorage
+        const localLeads = JSON.parse(localStorage.getItem('newLeads') || '[]') as Lead[];
+        
+        // Update the leads query cache with fetched data and local leads
         queryClient.setQueryData(['/api/leads'], (old: Lead[] = []) => {
           const newLeads = [...old];
+          
+          // First add server response leads
           for (const lead of response) {
             if (!newLeads.some(l => l.id === lead.id)) {
               newLeads.push(lead);
             }
           }
+          
+          // Then add any locally stored leads that aren't in the response
+          for (const localLead of localLeads) {
+            // Check if this local lead now exists in the server response
+            const existsInResponse = response.some((l: Lead) => 
+              // Try to match on business properties if ID is temporary
+              (typeof localLead.id === 'number' && l.id === localLead.id) || 
+              (l.businessName === localLead.businessName && 
+               l.address === localLead.address &&
+               l.phone === localLead.phone)
+            );
+            
+            // If the lead exists in the response, we can remove it from localStorage
+            if (existsInResponse) {
+            } else if (!newLeads.some(l => 
+              (typeof localLead.id === 'number' && l.id === localLead.id) ||
+              (l.businessName === localLead.businessName && 
+               l.address === localLead.address)
+            )) {
+              // If lead is not in response and not already added, add it
+              newLeads.push(localLead);
+            }
+          }
+          
+          // Clean up localStorage if all local leads are now in the response
+          const notInResponse = localLeads.filter(localLead => 
+            !response.some((l: Lead) => 
+              (typeof localLead.id === 'number' && l.id === localLead.id) || 
+              (l.businessName === localLead.businessName && 
+               l.address === localLead.address &&
+               l.phone === localLead.phone)
+            )
+          );
+          
+          if (notInResponse.length === 0 && localLeads.length > 0) {
+            localStorage.removeItem('newLeads');
+          } else if (notInResponse.length < localLeads.length) {
+            localStorage.setItem('newLeads', JSON.stringify(notInResponse));
+          }
+          
           return newLeads;
         });
       } catch (error) {
@@ -112,7 +156,6 @@ export default function Dashboard() {
       }, 2000);
 
       try {
-        console.log('Scraping with data:', data);
         const response = await apiRequest('/api/scrape', 'POST', {
           query: data.query,
           location: data.location,
@@ -120,20 +163,40 @@ export default function Dashboard() {
         }, {
           stream: true,
           onProgress: (data) => {
-            console.log('data-----', data);
             // if (data.type === 'progress') {
               setProgress(data.current || 0);
               setTotal(data.total || 0);
-              console.log('data', data);
               if (data.leads) {
                 // Update leads query with accumulated leads
                 queryClient.setQueryData(['/api/leads'], (old: Lead[] = []) => {
                   const newLeads = [...old];
+                  
+                  // Store new leads in localStorage for persistence across refreshes
+                  const localLeads = JSON.parse(localStorage.getItem('newLeads') || '[]') as Lead[];
+                  const updatedLocalLeads = [...localLeads];
+                  const newLocalLeads = [];
+                  
                   for (const lead of data.leads) {
                     if (newLeads.findIndex(l => l.id === lead.id) === -1) {
                       newLeads.push(lead);
+                      
+                      // Add to local storage if not already there
+                      if (!localLeads.some(l => 
+                        (typeof l.id === 'number' && typeof lead.id === 'number' && l.id === lead.id) ||
+                        (l.businessName === lead.businessName && 
+                         l.address === lead.address &&
+                         l.phone === lead.phone)
+                      )) {
+                        newLocalLeads.push(lead);
+                      }
                     }
                   }
+                  
+                  if (newLocalLeads.length > 0) {
+                    updatedLocalLeads.push(...newLocalLeads);
+                    localStorage.setItem('newLeads', JSON.stringify(updatedLocalLeads));
+                  }
+                  
                   return newLeads;
                 });
               // }
@@ -431,11 +494,6 @@ export default function Dashboard() {
                 </div>
                 <Button
                   onClick={() => {
-                    console.log('🖱️ Lead generation button clicked', {
-                      query,
-                      location: searchLocation,
-                      count: leadCount
-                    });
                     
                     // Check if user has enough credits
                     if (user && user.credits < leadCount) {
@@ -451,7 +509,6 @@ export default function Dashboard() {
                       return;
                     }
 
-                    console.log('✅ Credit check passed, starting scrape...');
                     scrapeMutation.mutate({
                       query,
                       location: searchLocation,
