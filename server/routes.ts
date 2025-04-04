@@ -255,7 +255,7 @@ export async function registerRoutes(router: Router) {
         
       const apifyStartTime = Date.now();
       
-      const run = await apifyClient.actor("nwua9Gu5YrADL7ZDj").call({
+      const run = await apifyClient.actor("WnMxbsRLNbPeYL6ge").call({
         searchStringsArray: [query],
         locationQuery: `${location}, Deutschland`,
         language: "de",
