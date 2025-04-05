@@ -44,13 +44,13 @@ export default function AGB() {
           <section>
             <h2 className="text-xl font-semibold mb-3">4. Nutzungsbedingungen und Kreditsystem</h2>
             <p className="mb-4">
-              4.1 Die Nutzung der Plattform erfolgt auf Basis eines Kreditsystems. Für das Sammeln von Leads werden Leads verbraucht, die der Nutzer zuvor erworben hat.
+              4.1 Die Nutzung der Plattform erfolgt auf Basis eines Kreditsystems. Für das Sammeln von Leads werden Credits verbraucht, die der Nutzer zuvor erworben hat.
             </p>
             <p className="mb-4">
-              4.2 Die jeweils aktuellen Preise für Leads sind auf der Website einsehbar.
+              4.2 Die jeweils aktuellen Preise für Credits sind auf der Website einsehbar.
             </p>
             <p className="mb-4">
-              4.3 Erworbene Leads sind vom Umtausch ausgeschlossen. Eine Rückerstattung von gekauften Leads ist nicht möglich.
+              4.3 Erworbene Credits sind vom Umtausch ausgeschlossen. Eine Rückerstattung von gekauften Credits ist nicht möglich.
             </p>
             <p className="mb-4">
               4.4 Der Nutzer ist verpflichtet, die Plattform nur im Rahmen der geltenden Gesetze zu nutzen und nicht auf eine Weise, die den Betrieb der Plattform beeinträchtigen könnte.
@@ -63,7 +63,7 @@ export default function AGB() {
               5.1 Der Nutzungsvertrag wird auf unbestimmte Zeit geschlossen und kann von beiden Seiten jederzeit ohne Angabe von Gründen gekündigt werden.
             </p>
             <p className="mb-4">
-              5.2 Bei Kündigung verfallen nicht verbrauchte Leads ohne Erstattung.
+              5.2 Bei Kündigung verfallen nicht verbrauchte Credits ohne Erstattung.
             </p>
           </section>
 

@@ -19,7 +19,7 @@ export function HamburgBadge({ size = "default", className }: BadgeProps) {
         size === "default" && "h-12"
       )}>
         <img
-          src="/DEU_Hamburg_COA.png"
+          src="/attached_assets/DEU_Hamburg_COA.png"
           alt="Hamburg Wappen"
           className="object-contain h-full"
         />
