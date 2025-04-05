@@ -21,7 +21,7 @@ export const users = pgTable("users", {
   country: text("country"),
 });
 
-// Neue Tabelle für die Suchen
+// Neue Tabelle für 
 export const searches = pgTable("searches", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
