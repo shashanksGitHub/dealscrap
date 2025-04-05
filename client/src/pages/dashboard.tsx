@@ -37,10 +37,19 @@ export default function Dashboard() {
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    // Show tutorial only on first login
+    // Show tutorial on first login or after signup
     const tutorialWatched = localStorage.getItem("tutorialWatched");
-    if (!tutorialWatched && user) { // Only show tutorial if user is logged in
+    const showAfterSignup = localStorage.getItem("showTutorialAfterSignup");
+    
+    if (user && (showAfterSignup === "true" || !tutorialWatched)) {
       setShowTutorial(true);
+      
+      // Clear the signup flag after showing
+      if (showAfterSignup === "true") {
+        localStorage.removeItem("showTutorialAfterSignup");
+      }
+      
+      // Mark tutorial as watched
       localStorage.setItem("tutorialWatched", "true");
     }
   }, [user]); // Add user as dependency
