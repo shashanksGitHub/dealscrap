@@ -51,7 +51,7 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 // Session middleware with optimized settings
 app.use(session({
   store: storage.sessionStore,
-  secret: CONFIG.SESSION_SECRET,
+  secret: CONFIG.SESSION_SECRET || 'default_secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -230,11 +230,13 @@ startServer().catch(async (error) => {
   process.exit(1);
 });
 
-// Initialize database pool before starting server
-try {
-  await initializePool();
-  // Server is already started in the startServer function
-} catch (error) {
-  console.error("Failed to initialize database pool:", error);
-  process.exit(1);
-}
+// Initialize database pool with an IIFE
+(async () => {
+  try {
+    await initializePool();
+    // We don't need to start the server here as it's already started in the startServer function
+  } catch (error) {
+    console.error("Failed to initialize database pool:", error);
+    process.exit(1);
+  }
+})();

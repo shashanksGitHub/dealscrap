@@ -26,7 +26,7 @@ export function PriceCard({ credits, price, isRecommended, disabled, onSelect }:
       )}
       <CardHeader className="space-y-2 text-center pt-8">
         <div className="space-y-1">
-          <h3 className="text-2xl font-bold">{credits} Credits</h3>
+          <h3 className="text-2xl font-bold">{credits} Leads</h3>
           <p className="text-4xl font-bold text-primary">€{price}</p>
         </div>
       </CardHeader>
@@ -42,7 +42,7 @@ export function PriceCard({ credits, price, isRecommended, disabled, onSelect }:
           variant={isRecommended ? "default" : "outline"}
           disabled={disabled}
         >
-          Credits kaufen
+          Leads kaufen
         </Button>
       </CardFooter>
     </Card>

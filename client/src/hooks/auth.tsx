@@ -135,6 +135,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
+    onSuccess: () => {
+      // Set flag to show tutorial video after successful registration
+      localStorage.setItem('showTutorialAfterSignup', 'true');
+      // Remove tutorialWatched flag if it exists, to ensure the tutorial shows again
+      localStorage.removeItem('tutorialWatched');
+      
+      toast({
+        title: "Registrierung erfolgreich",
+        description: "Ihr Konto wurde erfolgreich erstellt. Sie werden zum Dashboard weitergeleitet.",
+      });
+    },
     onError: (error: Error) => {
       toast({
         title: "Registrierung fehlgeschlagen",

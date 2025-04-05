@@ -454,7 +454,7 @@ const benefits = [
 const faqs = [
   {
     question: "Wie funktioniert das Kreditsystem?",
-    answer: "Unser Kreditsystem ist einfach: Sie kaufen Credits und geben pro Lead einen Credit aus. Sie müssen nur für die Leads bezahlen, die Sie tatsächlich benötigen - ohne monatliche Gebühren oder versteckte Kosten."
+    answer: "Unser Kreditsystem ist einfach: Sie kaufen Leads und geben pro Lead einen Credit aus. Sie müssen nur für die Leads bezahlen, die Sie tatsächlich benötigen - ohne monatliche Gebühren oder versteckte Kosten."
   },
   {
     question: "Woher stammen die Daten und sind diese DSGVO-konform?",
@@ -469,7 +469,7 @@ const faqs = [
     answer: "Unsere Datenbank wird kontinuierlich aktualisiert, um sicherzustellen, dass Sie Zugriff auf die neuesten Informationen haben. Bei jeder Suchanfrage erhalten Sie die aktuellsten verfügbaren Daten."
   },
   {
-    question: "Gibt es eine Mindestabnahme von Credits?",
-    answer: "Nein, Sie können genau die Menge an Credits kaufen, die Sie benötigen. Wir bieten jedoch Mengenrabatte an, sodass der Preis pro Lead sinkt, je mehr Credits Sie auf einmal erwerben."
+    question: "Gibt es eine Mindestabnahme von Leads?",
+    answer: "Nein, Sie können genau die Menge an Leads kaufen, die Sie benötigen. Wir bieten jedoch Mengenrabatte an, sodass der Preis pro Lead sinkt, je mehr Leads Sie auf einmal erwerben."
   }
 ];

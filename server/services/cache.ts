@@ -2,18 +2,41 @@ import Redis from 'ioredis';
 import { CONFIG } from '../config';
 
 class CacheService {
-  private redis: Redis;
+  private redis: Redis | null = null;
   private defaultTTL = 300; // 5 minutes
+  private redisEnabled = false;
 
   constructor() {
-    this.redis = new Redis(CONFIG.REDIS_URL || 'redis://localhost:6379');
-    
-    this.redis.on('error', (err) => {
-      console.error('Redis error:', err);
-    });
+    try {
+      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+      this.redis = new Redis(redisUrl, {
+        maxRetriesPerRequest: 1,
+        retryStrategy: () => null, // Don't retry on failure
+        connectTimeout: 1000 // 1 second timeout
+      });
+      
+      this.redis.on('error', (err) => {
+        if (this.redisEnabled) {
+          console.error('Redis error:', err);
+          this.redisEnabled = false;
+        }
+      });
+      
+      this.redis.on('connect', () => {
+        console.log('Redis connected successfully');
+        this.redisEnabled = true;
+      });
+    } catch (error) {
+      console.error('Failed to initialize Redis:', error);
+      this.redis = null;
+    }
   }
 
   async get<T>(key: string): Promise<T | null> {
+    if (!this.redis || !this.redisEnabled) {
+      return null;
+    }
+    
     try {
       const data = await this.redis.get(key);
       return data ? JSON.parse(data) : null;
@@ -24,6 +47,10 @@ class CacheService {
   }
 
   async set(key: string, value: any, ttl: number = this.defaultTTL): Promise<void> {
+    if (!this.redis || !this.redisEnabled) {
+      return;
+    }
+    
     try {
       await this.redis.setex(key, ttl, JSON.stringify(value));
     } catch (error) {
@@ -32,6 +59,10 @@ class CacheService {
   }
 
   async del(key: string): Promise<void> {
+    if (!this.redis || !this.redisEnabled) {
+      return;
+    }
+    
     try {
       await this.redis.del(key);
     } catch (error) {

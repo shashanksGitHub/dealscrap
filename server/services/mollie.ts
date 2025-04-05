@@ -70,7 +70,7 @@ export async function createPayment(
         currency: "EUR",
         value: amount.toFixed(2)
       },
-      description: `${creditAmount} Credits auf LeadScraper`,
+      description: `${creditAmount} Leads auf LeadScraper`,
       redirectUrl,
       webhookUrl,
       metadata: {
@@ -123,7 +123,7 @@ export async function handleWebhookEvent(paymentId: string): Promise<void> {
       const userId = parseInt(metadata.userId);
       const creditAmount = parseInt(metadata.creditAmount);
 
-      console.log('Adding credits for payment:', {
+      console.log('Adding leads for payment:', {
         userId,
         creditAmount,
         paymentId: payment.id

@@ -29,5 +29,6 @@ export const CONFIG = {
   NODE_ENV: process.env.NODE_ENV,
   APIFY_TOKEN: process.env.APIFY_TOKEN,
   BASE_URL: process.env.BASE_URL,
-  CUSTOM_DOMAIN: process.env.CUSTOM_DOMAIN
+  CUSTOM_DOMAIN: process.env.CUSTOM_DOMAIN,
+  REDIS_URL: process.env.REDIS_URL
 } as const; 
