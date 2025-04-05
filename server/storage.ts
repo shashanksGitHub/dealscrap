@@ -88,7 +88,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async addCredits(userId: number, amount: number): Promise<User> {
-    console.log(`Adding credits - User ID: ${userId}, Amount: ${amount}`);
+    console.log(`Adding leads - User ID: ${userId}, Amount: ${amount}`);
     const [user] = await db
       .update(users)
       .set({
@@ -107,7 +107,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deductCredits(userId: number, amount: number): Promise<User> {
-    console.log(`Deducting credits - User ID: ${userId}, Amount: ${amount}`);
+    console.log(`Deducting leads - User ID: ${userId}, Amount: ${amount}`);
     const [user] = await db
       .update(users)
       .set({
@@ -121,7 +121,7 @@ export class DatabaseStorage implements IStorage {
       throw new Error("User not found");
     }
 
-    console.log(`Updated credits for user ${userId} to ${user.credits}`);
+    console.log(`Updated leads for user ${userId} to ${user.credits}`);
     return user;
   }
 

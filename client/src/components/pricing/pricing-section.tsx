@@ -20,15 +20,13 @@ export function PricingSection() {
     if (credits <= 500) return credits * 0.7; // 0.70€ pro Credit
     return credits * 0.6; // 0.60€ pro Credit ab 500
   };
-  console.log('Calculating price for:', credits);
   const price = Math.round(calculatePrice(credits));
-  console.log('Calculated price:', price);
 
   const handleSelect = async () => {
     if (!user) {
       toast({
         title: "Login erforderlich",
-        description: "Bitte melden Sie sich an, um Credits zu kaufen.",
+        description: "Bitte melden Sie sich an, um Leads zu kaufen.",
       });
       navigate("/auth");
       return;
@@ -81,9 +79,9 @@ export function PricingSection() {
     <div className="py-16 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Credits kaufen</h2>
+          <h2 className="text-3xl font-bold mb-4">Leads kaufen</h2>
           <p className="text-lg text-muted-foreground">
-            Wählen Sie die gewünschte Anzahl an Credits
+            Wählen Sie die gewünschte Anzahl a Leads
           </p>
         </div>
 
@@ -91,7 +89,7 @@ export function PricingSection() {
           <div className="space-y-8">
             <div>
               <label className="block text-sm font-medium mb-2">
-                Anzahl Credits: {credits}
+                Anzahl Leads: {credits}
               </label>
               <Slider
                 value={[credits]}
@@ -127,7 +125,7 @@ export function PricingSection() {
                     <span>Verarbeitung...</span>
                   </div>
                 ) : (
-                  `${credits} Credits für ${price}€ kaufen`
+                  `${credits} Leads für ${price}€ kaufen`
                 )}
               </button>
             </div>

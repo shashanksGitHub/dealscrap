@@ -50,7 +50,7 @@ export async function registerRoutes(router: Router) {
         return res.status(400).json({ message: "Gültiger Betrag ist erforderlich" });
       }
 
-      const description = req.body.description || `${creditAmount} Credits auf LeadScraper`;
+      const description = req.body.description || `${creditAmount} Leads auf LeadScraper`;
 
       const checkoutUrl = await createPayment(
         req.user.id,
@@ -97,16 +97,16 @@ export async function registerRoutes(router: Router) {
     const amount = parseInt(req.body.amount);
 
     if (isNaN(amount) || amount <= 0) {
-      console.error('Invalid credit amount:', amount);
-      return res.status(400).json({ message: "Invalid credit amount" });
+      console.error('Invalid lead amount:', amount);
+      return res.status(400).json({ message: "Invalid lead amount" });
     }
 
     try {
       const user = await storage.addCredits(req.user.id, amount);
       res.json(user);
     } catch (error) {
-      console.error('Error adding credits:', error);
-      res.status(500).json({ message: "Failed to add credits" });
+      console.error('Error adding leads:', error);
+      res.status(500).json({ message: "Failed to add leads" });
     }
   });
 
@@ -238,7 +238,7 @@ export async function registerRoutes(router: Router) {
     const user = await storage.getUser(req.user.id);
     
     if (!user || user.credits < count) {
-      return res.status(403).json({ message: "Insufficient credits" });
+      return res.status(403).json({ message: "Insufficient leads" });
     }
   
     try {

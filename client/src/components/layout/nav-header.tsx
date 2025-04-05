@@ -70,7 +70,7 @@ export function NavHeader() {
               {currentUser ? (
                 <div className="flex items-center gap-4">
                   <div className="flex items-center px-3 py-1.5 bg-muted rounded-full">
-                    <span className="text-sm font-medium mr-2">Credits:</span>
+                    <span className="text-sm font-medium mr-2">Leads:</span>
                     <span className={`text-lg font-bold ${currentUser.credits === 0 ? 'text-destructive' : 'text-primary'}`}>
                       {currentUser.credits}
                     </span>

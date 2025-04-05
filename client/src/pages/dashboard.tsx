@@ -155,7 +155,7 @@ export default function Dashboard() {
       }
 
       if (user && user.credits < data.count) {
-        throw new Error(`Sie benötigen ${data.count} Credits für diese Suche. Bitte kaufen Sie weitere Credits.`);
+        throw new Error(`Sie benötigen ${data.count} Leads für diese Suche. Bitte kaufen Sie weitere Leads.`);
       }
 
       let currentStatus = 0;
@@ -319,7 +319,7 @@ export default function Dashboard() {
             >
               <Sparkles className="w-5 h-5 text-primary" />
             </motion.div>
-            Credits erfolgreich aufgeladen! ⭐
+            Leads erfolgreich aufgeladen! ⭐
           </div>
         ),
         description: (
@@ -333,7 +333,7 @@ export default function Dashboard() {
               <span className="font-medium">Vielen Dank für Ihren Einkauf!</span>
             </p>
             <p className="text-sm text-muted-foreground">
-              Sie können jetzt mit Ihren neuen Credits Leads generieren.
+              Sie können jetzt mit Ihren neuen Leads generieren.
             </p>
           </motion.div>
         ),
@@ -398,7 +398,7 @@ export default function Dashboard() {
             <Card className="bg-muted/50">
               <CardHeader>
                 <CardTitle className="text-2xl font-bold tracking-tight text-center">
-                  Wählen Sie Ihr Credit-Paket
+                  Wählen Sie Ihr Lead-Paket
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -422,7 +422,7 @@ export default function Dashboard() {
                           Empfohlen
                         </Badge>
                       )}
-                      <span className="text-2xl font-bold">{pkg.credits} Credits</span>
+                      <span className="text-2xl font-bold">{pkg.credits} Leads</span>
                       <span className="text-3xl font-bold text-primary">€{pkg.price}</span>
                       {isProcessingPayment && (
                         <Loader2 className="h-4 w-4 animate-spin absolute bottom-2 right-2" />
@@ -506,13 +506,13 @@ export default function Dashboard() {
                     
                     // Check if user has enough credits
                     if (user && user.credits < leadCount) {
-                      console.error('❌ Insufficient credits', {
+                      console.error('❌ Insufficient leads', {
                         required: leadCount,
                         available: user.credits
                       });
                       toast({
-                        title: "Nicht genügend Credits",
-                        description: `Sie benötigen ${leadCount} Credits für diese Suche. Bitte kaufen Sie weitere Credits.`,
+                        title: "Nicht genügend Leads",
+                        description: `Sie benötigen ${leadCount} Leads für diese Suche. Bitte kaufen Sie weitere Leads.`,
                         variant: "destructive"
                       });
                       return;
@@ -542,7 +542,7 @@ export default function Dashboard() {
                 </Button>
                 {user?.credits > 0 && (
                   <p className="text-base text-muted-foreground text-center">
-                    Sie haben noch {user?.credits} Credits verfügbar
+                    Sie haben noch {user?.credits} Leads verfügbar
                   </p>
                 )}
               </div>
