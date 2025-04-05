@@ -44,6 +44,12 @@ app.use(express.static("dist/public", {
   }
 }));
 
+// Serve attached assets directly - making them available in both development and production
+app.use('/attached_assets', express.static(path.join(__dirname, '..', 'attached_assets'), {
+  maxAge: "24h",
+  etag: true
+}));
+
 // Body parser middleware with limits
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
@@ -51,7 +57,7 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 // Session middleware with optimized settings
 app.use(session({
   store: storage.sessionStore,
-  secret: CONFIG.SESSION_SECRET,
+  secret: CONFIG.SESSION_SECRET || 'session-secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -231,10 +237,12 @@ startServer().catch(async (error) => {
 });
 
 // Initialize database pool before starting server
-try {
-  await initializePool();
-  // Server is already started in the startServer function
-} catch (error) {
-  console.error("Failed to initialize database pool:", error);
-  process.exit(1);
-}
+(async () => {
+  try {
+    await initializePool();
+    // Server is already started in the startServer function
+  } catch (error) {
+    console.error("Failed to initialize database pool:", error);
+    process.exit(1);
+  }
+})();

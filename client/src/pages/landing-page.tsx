@@ -100,7 +100,7 @@ export default function LandingPage() {
               >
                 <div className="flex flex-col items-center">
                   <img 
-                    src="/dsgvo-logo.png" 
+                    src="/attached_assets/dsgvo-logo.png" 
                     alt="LeadScraper" 
                     className="h-8 mb-2"
                     loading="lazy"
@@ -115,7 +115,7 @@ export default function LandingPage() {
               >
                 <div className="flex flex-col items-center">
                   <img 
-                    src="/DEU_Hamburg_COA.svg.png" 
+                    src="/attached_assets/DEU_Hamburg_COA.png" 
                     alt="Hamburg" 
                     className="h-8 mb-2"
                     loading="lazy"
